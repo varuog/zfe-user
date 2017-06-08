@@ -28,3 +28,8 @@
 
 $app->get('/', App\Action\HomePageAction::class, 'home');
 $app->get('/api/ping', App\Action\PingAction::class, 'api.ping');
+$app->get('/user/register', App\Action\UserRegisterAction::class, 'user.register');
+$app->get('/user/login', App\Action\UserLoginAction::class, 'user.login');
+//$app->get('/user/forgot-password', App\Action\UserRegisterAction::class, 'user.register');
+//$app->get('/user/change-password', App\Action\UserLoginAction::class, 'user.login');
+//$app->get('/user/change-email', App\Action\UserLoginAction::class, 'user.login');
