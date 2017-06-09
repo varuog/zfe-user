@@ -33,12 +33,14 @@ class UserLoginAction implements ServerMiddlewareInterface {
         $this->userService->setAuthUser($user);
         $authResult = $this->userService->authenticate();
         $renderResponse = $this->userService->getOptions()->getResponseType();
-        if ($renderResponse == \Zend\Diactoros\Response\HtmlResponse::class) {
 
-            return new $renderResponse($this->template->render('app::home-page', ['user' => $authResult]));
+        $messages = $authResult->getMessages();
+
+        if ($renderResponse == \Zend\Diactoros\Response\HtmlResponse::class) {
+            return new $renderResponse($this->template->render('app::home-page', ['user' => implode(', ', $messages)]));
         }
 
-        return new $renderResponse(['user' => $authResult]);
+        return new $renderResponse(['user' => implode(', ', $messages)]);
     }
 
 }

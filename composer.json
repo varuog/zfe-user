@@ -12,6 +12,7 @@
         "alcaeus/mongo-php-adapter": "^1.1",
         "doctrine/mongodb-odm": "^1.1",
         "doctrine/orm": "*",
+        "facebook/graph-sdk": "^5.5",
         "roave/security-advisories": "dev-master",
         "zendframework/zend-authentication": "^2.5",
         "zendframework/zend-component-installer": "^1.0",
@@ -20,6 +21,7 @@
         "zendframework/zend-expressive-helpers": "^4.0",
         "zendframework/zend-expressive-zendrouter": "^2.0.1",
         "zendframework/zend-expressive-zendviewrenderer": "^1.4",
+        "zendframework/zend-i18n": "^2.7",
         "zendframework/zend-servicemanager": "^3.3",
         "zendframework/zend-stdlib": "^3.1"
     },

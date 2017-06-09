@@ -36,11 +36,17 @@ return [
             //Mongo factory
             Doctrine\ODM\MongoDB\DocumentManager::class => App\Factory\MongoDB\MongoDocumentManagerFactory::class,
             //Options
-            \App\Options\UserServiceOptions::class => \App\Factory\UserServiceOptionsFactory::class
+            \App\Options\UserServiceOptions::class => \App\Factory\UserServiceOptionsFactory::class,
+            Zend\I18n\Translator\TranslatorInterface::class => Zend\I18n\Translator\TranslatorServiceFactory::class
         ],
         'abstract_factories' => [
             App\Factory\AbstractServiceFactory::class,
             App\Factory\AbstractOptionsFactory::class,
+        ],
+        'delegators' => [
+            Zend\I18n\Translator\TranslatorServiceFactory::class => [
+                \App\Factory\Delegator\TranslatorDelegatorFactory::class
+            ],
         ],
     ],
 ];

@@ -7,7 +7,7 @@ use App\Model\User;
 use App\Options\UserServiceOptions;
 use Zend\Authentication\Adapter\AdapterInterface;
 use Zend\Authentication\Result;
-
+use Zend\I18n\Translator\TranslatorInterface;
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -24,10 +24,12 @@ class UserService implements AdapterInterface {
     private $persistantManager;
     private $options;
     private $authUser;
+    private $translator;
 
-    public function __construct(DocumentManager $mongoManager, UserServiceOptions $options) {
+    public function __construct(DocumentManager $mongoManager, TranslatorInterface $translator, UserServiceOptions $options) {
         $this->persistantManager = $mongoManager;
         $this->options = $options;
+        $this->translator=$translator;
     }
 
     public function register(User $user) {
@@ -40,7 +42,7 @@ class UserService implements AdapterInterface {
     {
         $this->authUser= $user;
     }
-    public function authenticate() {
+    public function authenticate() : Result {
 
         $loggedUser = $this->persistantManager->getRepository(get_class($this->authUser))->findOneBy(['email' => $this->authUser->getEmail()]);
         //$loggedUser = $this->persistantManager->createQueryBuilder(get_class($user))->field('email')->;
@@ -48,20 +50,26 @@ class UserService implements AdapterInterface {
         if ($loggedUser instanceof User) {
             if (password_verify($this->authUser->getPassword(), $loggedUser->getPassword())) {
                 $this->generateAuthToken($this->authUser);
-                return new Result(Result::SUCCESS, $loggedUser);
+                return new Result(Result::SUCCESS
+                        , $loggedUser
+                        , [$this->translator->translate('success-new-user-registration')]);
             }
             else
             {  
-                return new Result(Result::FAILURE_CREDENTIAL_INVALID, null, []);
+                return new Result(Result::FAILURE_CREDENTIAL_INVALID, null
+                        , [$this->translator->translate('error-credentail-invalid')]);
             }
         }
         else
         {
             
-        return new Result(Result::FAILURE_IDENTITY_NOT_FOUND, null, []);
+        return new Result(Result::FAILURE_IDENTITY_NOT_FOUND, null
+                , [$this->translator->translate('error-no-user-found')]);
         }
 
-        return new Result(Result::FAILURE_UNCATEGORIZED, null, []);
+        return new Result(Result::FAILURE_UNCATEGORIZED, null
+                , [$this->translator->translate('error-unknown-auth')]
+                );
     }
 
     public function changePassword(User $user) {
