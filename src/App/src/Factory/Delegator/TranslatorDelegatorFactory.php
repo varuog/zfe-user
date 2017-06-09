@@ -9,7 +9,6 @@
 namespace App\Factory\Delegator;
 
 use Psr\Container\ContainerInterface;
-use Psr\Log\LoggerInterface;
 
 class TranslatorDelegatorFactory
 {

@@ -44,7 +44,7 @@ return [
             App\Factory\AbstractOptionsFactory::class,
         ],
         'delegators' => [
-            Zend\I18n\Translator\TranslatorServiceFactory::class => [
+            Zend\I18n\Translator\TranslatorInterface::class => [
                 \App\Factory\Delegator\TranslatorDelegatorFactory::class
             ],
         ],
