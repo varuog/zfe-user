@@ -30,15 +30,15 @@ class UserLoginAction implements ServerMiddlewareInterface {
         $user->setEmail('gsarkar.dev@gmail.com');
         $user->setPassword('foobar');
 
-        $currentuser = $this->userService->auth($user);
+        $this->userService->setAuthUser($user);
+        $authResult = $this->userService->authenticate();
         $renderResponse = $this->userService->getOptions()->getResponseType();
+        if ($renderResponse == \Zend\Diactoros\Response\HtmlResponse::class) {
 
-        if ($renderResponse instanceof Zend\Diactoros\Response\HtmlResponse) {
-
-            return new $renderResponse($this->template->render('app::home-page', ['user' => $currentuser]));
+            return new $renderResponse($this->template->render('app::home-page', ['user' => $authResult]));
         }
 
-        return new $renderResponse(['user' => $currentuser]);
+        return new $renderResponse(['user' => $authResult]);
     }
 
 }

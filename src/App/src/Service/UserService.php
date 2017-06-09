@@ -5,6 +5,8 @@ namespace App\Service;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use App\Model\User;
 use App\Options\UserServiceOptions;
+use Zend\Authentication\Adapter\AdapterInterface;
+use Zend\Authentication\Result;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -17,11 +19,11 @@ use App\Options\UserServiceOptions;
  *
  * @author Win10Laptop-Kausik
  */
-class UserService {
-   
+class UserService implements AdapterInterface {
 
-        private $persistantManager;
+    private $persistantManager;
     private $options;
+    private $authUser;
 
     public function __construct(DocumentManager $mongoManager, UserServiceOptions $options) {
         $this->persistantManager = $mongoManager;
@@ -34,15 +36,32 @@ class UserService {
         $this->persistantManager->flush();
     }
 
-    public function auth(User $user) {
+    public function setAuthUser(User $user)
+    {
+        $this->authUser= $user;
+    }
+    public function authenticate() {
 
-        $loggedUser = $this->persistantManager->getRepository(get_class($user))->findOneBy(['email' => $user->getEmail()]);
+        $loggedUser = $this->persistantManager->getRepository(get_class($this->authUser))->findOneBy(['email' => $this->authUser->getEmail()]);
         //$loggedUser = $this->persistantManager->createQueryBuilder(get_class($user))->field('email')->;
 
-        if (password_verify($user->getPassword(), $loggedUser->getPassword())) {
-            $this->generateAuthToken($user);
-            return $loggedUser;
+        if ($loggedUser instanceof User) {
+            if (password_verify($this->authUser->getPassword(), $loggedUser->getPassword())) {
+                $this->generateAuthToken($this->authUser);
+                return new Result(Result::SUCCESS, $loggedUser);
+            }
+            else
+            {  
+                return new Result(Result::FAILURE_CREDENTIAL_INVALID, null, []);
+            }
         }
+        else
+        {
+            
+        return new Result(Result::FAILURE_IDENTITY_NOT_FOUND, null, []);
+        }
+
+        return new Result(Result::FAILURE_UNCATEGORIZED, null, []);
     }
 
     public function changePassword(User $user) {
@@ -128,7 +147,8 @@ class UserService {
         //$this->persistantManager->getRepository(get)
     }
 
-     public function getOptions() : UserServiceOptions{
+    public function getOptions(): UserServiceOptions {
         return $this->options;
     }
+
 }
