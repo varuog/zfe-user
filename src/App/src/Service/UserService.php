@@ -52,7 +52,7 @@ class UserService implements AdapterInterface {
                 $this->generateAuthToken($this->authUser);
                 return new Result(Result::SUCCESS
                         , $loggedUser
-                        , [$this->translator->translate('success-login')]);
+                        , [$this->translator->translate('success-login', 'zfe-user')]);
             }
             else
             {  
