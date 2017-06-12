@@ -9,7 +9,8 @@ return [
         'resetTokenValidity' => 300,
         'responseType' => Zend\Diactoros\Response\JsonResponse::class,
         'notifyNewRegistration' => true,
-        'notifyRecipientEmail' => 'sample@email.com',
-        'notifyRecipientName' => 'somename',
+        'responderEmail' => 'sample@email.com',
+        'responderName' => 'somename',
+        
     ],
 ];

@@ -25,7 +25,9 @@ class UserLoginAction implements ServerMiddlewareInterface {
      * @return \App\Action\renderResponse
      */
     public function process(ServerRequestInterface $request, DelegateInterface $delegate) {
-
+        
+        
+                
         $user = new \App\Model\User();
         $user->setEmail('gsarkar.dev@gmail.com');
         $user->setPassword('foobar');

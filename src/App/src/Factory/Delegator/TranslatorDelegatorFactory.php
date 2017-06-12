@@ -10,6 +10,7 @@ namespace App\Factory\Delegator;
 
 use Psr\Container\ContainerInterface;
 use Zend\I18n\Translator\TranslatorInterface;
+use  Zend\I18n\Translator\Translator;
 
 class TranslatorDelegatorFactory {
 
@@ -20,15 +21,18 @@ class TranslatorDelegatorFactory {
      * @return UserRepository
      */
     public function __invoke(ContainerInterface $container, $name, callable $callback) {
-        /* @var $translator TranslatorInterface  */
+        /* @var $translator Translator  */
         $translator = $callback();
 
         $type = 'phparray';
-        $filename = 'data/translator/User-EN.php';
+        $userTranslatorResource = 'data/language/User-en-US.php';
+        $mailTranslatorResource = 'data/language/Mailer-en-US.php';
         $textDomain = 'zfe-user';
-        $locale = 'en';
-
-        $translator->addTranslationFile($type, $filename, $textDomain, $locale);
+        $locale = 'en-US';
+        
+        $translator->setLocale($locale);
+        $translator->addTranslationFile($type, $userTranslatorResource, $textDomain, $locale);
+        $translator->addTranslationFile($type, $mailTranslatorResource, $textDomain, $locale);
         return $translator;
     }
 

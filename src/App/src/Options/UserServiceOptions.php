@@ -23,8 +23,8 @@ class UserServiceOptions extends AbstractOptions {
     private $credentialEmailEnabled;
     private $credentialUserNameEnabled;
     private $notifyNewRegistration;
-    private $notifyRecipientEmail;
-    private $notifyRecipientName;
+    private $responderEmail;
+    private $responderName;
 
     public function getCredentialEmailEnabled() {
         return $this->credentialEmailEnabled;
@@ -38,12 +38,12 @@ class UserServiceOptions extends AbstractOptions {
         return $this->notifyNewRegistration;
     }
 
-    public function getNotifyRecipientEmail() {
-        return $this->notifyRecipientEmail;
+    public function getResponderEmail() {
+        return $this->responderEmail;
     }
 
-    public function getNotifyRecipientName() {
-        return $this->notifyRecipientName;
+    public function getResponderName() {
+        return $this->responderName;
     }
 
     public function setCredentialEmailEnabled($credentialEmailEnabled) {
@@ -61,13 +61,13 @@ class UserServiceOptions extends AbstractOptions {
         return $this;
     }
 
-    public function setNotifyRecipientEmail($notifyRecipientEmail) {
-        $this->notifyRecipientEmail = $notifyRecipientEmail;
+    public function setResponderEmail($notifyRecipientEmail) {
+        $this->responderEmail = $notifyRecipientEmail;
         return $this;
     }
 
-    public function setNotifyRecipientName($notifyRecipientName) {
-        $this->notifyRecipientName = $notifyRecipientName;
+    public function setResponderName($notifyRecipientName) {
+        $this->responderName = $notifyRecipientName;
         return $this;
     }
 
