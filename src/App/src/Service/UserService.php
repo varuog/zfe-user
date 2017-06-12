@@ -34,18 +34,51 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
     private $mailerTemplate;
     private $events;
 
+    private $credential;
+    private $identity;
+    
+    
     public function __construct(DocumentManager $mongoManager, TranslatorInterface $translator, TransportInterface $mailer, TemplateRendererInterface $mailTemplate, UserServiceOptions $options) {
         $this->persistantManager = $mongoManager;
         $this->options = $options;
         $this->translator = $translator;
         $this->mailer = $mailer;
         $this->mailerTemplate = $mailTemplate;
+        
+        
+        $this->credential= $this->options->getCredentialField();
+        $this->identity= $this->options->getIdentityField();
     }
 
     public function register(User $user) {
+
+        //Calculate approval
+        ($this->options->getEnableUserApproval()) ? $user->setApproved(false) : $user->setApproved(true);
+        $user->setApproveTime(time());
+
+
         $user->hashPassword();
         $this->persistantManager->persist($user);
         $this->persistantManager->flush();
+
+        /*
+         * Send Mail
+         */
+        $mail = new Message();
+        $data = ['layout' => 'mail-template'];
+        $mail->addTo($user->getEmail(), $user->getFullName());
+        $mail->addFrom($this->options->getResponderEmail(), $this->options->getResponderName());
+        $mail->setSubject($this->translator->translate('subject-notify-user', 'zfe-user'));
+        $mail->setBody($this->mailerTemplate->render('mail::new-registration-notify-user', $data));
+        $this->mailer->send($mail);
+
+        $mail = new Message();
+        $mail->addTo($user->getEmail(), $user->getFullName());
+        $mail->addFrom($this->options->getResponderEmail(), $this->options->getResponderName());
+        $mail->setSubject($this->translator->translate('subject-notify-admin', 'zfe-user'));
+        $mail->setBody($this->mailerTemplate->render('mail::new-registration-notify-admin', $data));
+
+        $this->mailer->send($mail);
     }
 
     public function setAuthUser(User $user) {
@@ -54,29 +87,14 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
 
     public function authenticate(): Result {
 
-        $loggedUser = $this->persistantManager->getRepository(get_class($this->authUser))->findOneBy(['email' => $this->authUser->getEmail()]);
+        $loggedUser = $this->persistantManager
+                ->getRepository(get_class($this->authUser))
+                ->findOneBy([$this->identity => call_user_func([$this->authUser, "get{$this->identity}"])]);
         //$loggedUser = $this->persistantManager->createQueryBuilder(get_class($user))->field('email')->;
 
         if ($loggedUser instanceof User) {
             if (password_verify($this->authUser->getPassword(), $loggedUser->getPassword())) {
                 $this->generateAuthToken($this->authUser);
-
-                /*
-                 * Send Mail
-                 */
-                $mail = new Message();
-                //$data = ['layout' => 'mail-template'];
-                $data=[];
-                $mail->addTo($loggedUser->getEmail(), $loggedUser->getFullName());
-                $mail->addFrom($this->options->getResponderEmail(), $this->options->getResponderName());
-                $mail->setSubject($this->translator->translate('subject-notify-user', 'zfe-user'));
-                
-                //$this->mailerTemplate->addPath('tst', 'foo');
-                //$path=$this->mailerTemplate->getPaths();
-                
-                //$mail->setBody($this->mailerTemplate->render('mail::new-registration', $data));
-                $mail->setBody("TEST");
-                $this->mailer->send($mail);
 
                 return new Result(Result::SUCCESS
                         , $loggedUser
@@ -99,7 +117,7 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
     public function changePassword(User $user) {
 
         $loggedUser = $this->persistantManager->getRepository(get_class($user))
-                ->findOneBy(['email' => $user->getEmail()]);
+                ->findOneBy([$this->identity => call_user_func([$user, "get{$this->identity}"])]);
         //$loggedUser = $this->persistantManager->createQueryBuilder(get_class($user))->field('email')->;
         $isExpiredToken = time() < $loggedUser->getResetTokenTime() + $this->options->getResetTokenValidity();
         if ($loggedUser instanceof User && !$isExpiredToken) {
@@ -112,8 +130,8 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
                     ->set(null)
                     ->field('resetTokenTime')
                     ->set(null)
-                    ->field('password')
-                    ->set($user->getPassword())
+                    ->field($this->credential)
+                    ->set(call_user_func([$user, "get{$this->credential}"]))
                     ->getQuery()
                     ->execute();
         }
@@ -123,7 +141,7 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
 
     public function changeEmail(User $user) {
         $loggedUser = $this->persistantManager->getRepository(get_class($user))
-                ->findOneBy(['email' => $user->getEmail()]);
+                ->findOneBy([$this->identity => call_user_func([$user, "get{$this->identity}"])]);
         //$loggedUser = $this->persistantManager->createQueryBuilder(get_class($user))->field('email')->;
         $isExpiredToken = time() < $loggedUser->getResetTokenTime() + $this->options->getResetTokenValidity();
         if ($loggedUser instanceof User && !$isExpiredToken) {
@@ -136,8 +154,8 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
                     ->set(null)
                     ->field('resetTokenTime')
                     ->set(null)
-                    ->field('email')
-                    ->set($user->getPassword())
+                    ->field($this->identity)
+                    ->set(call_user_func([$user, "get{$this->identity}"]))
                     ->getQuery()
                     ->execute();
 
@@ -160,8 +178,8 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
         $user->generateToken();
 
         $this->persistantManager->createQueryBuilder(get_class($user))
-                ->field("email")
-                ->equals($user->getEmail())
+                ->field($this->identity)
+                ->equals(call_user_func([$user, "get{$this->identity}"]))
                 ->findAndUpdate()
                 ->field('authToken')
                 ->set($user->getAuthToken())
@@ -175,8 +193,8 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
         $user->generateToken();
 
         $this->persistantManager->createQueryBuilder(get_class($user))
-                ->field("email")
-                ->equals($user->getEmail())
+                ->field($this->identity)
+                ->equals(call_user_func([$user, "get{$this->identity}"]))
                 ->findAndUpdate()
                 ->field('resetToken')
                 ->set($user->getResetToken())
@@ -184,6 +202,13 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
                 ->set(time())
                 ->getQuery()
                 ->execute();
+
+        $mail = new Message();
+        $data = ['layout' => 'mail-template'];
+        $mail->addTo($user->getEmail(), $user->getFullName());
+        $mail->addFrom($this->options->getResponderEmail(), $this->options->getResponderName());
+        $mail->setSubject($this->translator->translate('subject-generate-reset-token', 'zfe-user'));
+        $mail->setBody($this->mailerTemplate->render('mail::generate-reset-token', $data));
     }
 
     public function isValidAuthToken(string $authToken): bool {

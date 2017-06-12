@@ -17,22 +17,16 @@ use Zend\View\Renderer\RendererInterface;
  * @author Win10Laptop-Kausik
  */
 class UserServiceOptions extends AbstractOptions {
-
-    private $resetTokenValidity;
+        private $resetTokenValidity;
     private $responseType;
-    private $credentialEmailEnabled;
-    private $credentialUserNameEnabled;
+    private $credentialField;
+    private $identityField;
+    private $passwordFieldField;
     private $notifyNewRegistration;
     private $responderEmail;
     private $responderName;
-
-    public function getCredentialEmailEnabled() {
-        return $this->credentialEmailEnabled;
-    }
-
-    public function getCredentialUserNameEnabled() {
-        return $this->credentialUserNameEnabled;
-    }
+    private $enableUserApproval;
+    private $enableEmailVerification;
 
     public function getNotifyNewRegistration() {
         return $this->notifyNewRegistration;
@@ -44,16 +38,6 @@ class UserServiceOptions extends AbstractOptions {
 
     public function getResponderName() {
         return $this->responderName;
-    }
-
-    public function setCredentialEmailEnabled($credentialEmailEnabled) {
-        $this->credentialEmailEnabled = $credentialEmailEnabled;
-        return $this;
-    }
-
-    public function setCredentialUserNameEnabled($credentialUserNameEnabled) {
-        $this->credentialUserNameEnabled = $credentialUserNameEnabled;
-        return $this;
     }
 
     public function setNotifyNewRegistration($notifyNewRegistration) {
@@ -92,5 +76,50 @@ class UserServiceOptions extends AbstractOptions {
         $this->responseType = $responseType;
         return $this;
     }
+
+    public function getEnableUserApproval() {
+        return $this->enableUserApproval;
+    }
+
+    public function setEnableUserApproval($enableUserApproval) {
+        $this->enableUserApproval = $enableUserApproval;
+        return $this;
+    }
+
+    public function getEnableEmailVerification() {
+        return $this->enableEmailVerification;
+    }
+
+    public function setEnableEmailVerification($enableEmailVerification) {
+        $this->enableEmailVerification = $enableEmailVerification;
+        return $this;
+    }
+
+    public function getCredentialField() {
+        return $this->credentialField;
+    }
+
+    public function getPasswordFieldField() {
+        return $this->passwordFieldField;
+    }
+
+    public function setCredentialField($credentialField) {
+        $this->credentialField = $credentialField;
+        return $this;
+    }
+
+    public function setPasswordFieldField($passwordFieldField) {
+        $this->passwordFieldField = $passwordFieldField;
+        return $this;
+    }
+    public function getIdentityField() {
+        return $this->identityField;
+    }
+
+    public function setIdentityField($identityField) {
+        $this->identityField = $identityField;
+        return $this;
+    }
+
 
 }

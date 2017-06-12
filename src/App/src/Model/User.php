@@ -45,6 +45,15 @@ class User {
     /** @ODM\Field(type="string") */
     private $resetTokenTime;
 
+    /** @ODM\Field(type="date") */
+    private $approveTime;
+
+    /** @ODM\Field(type="boolean") */
+    private $approved = false;
+
+    /** @ODM\Field(type="boolean") */
+    private $emailVerified=false;
+
     public function getId() {
         return $this->id;
     }
@@ -127,6 +136,33 @@ class User {
 
     public function hashPassword() {
         $this->password = password_hash($this->password, PASSWORD_DEFAULT);
+    }
+
+    public function getApproveTime() {
+        return $this->approveTime;
+    }
+
+    public function getApproved() {
+        return $this->approved;
+    }
+
+    public function getEmailVerified() {
+        return $this->emailVerified;
+    }
+
+    public function setApproveTime($approveTime) {
+        $this->approveTime = $approveTime;
+        return $this;
+    }
+
+    public function setApproved($approved) {
+        $this->approved = $approved;
+        return $this;
+    }
+
+    public function setEmailVerified($emailVerified) {
+        $this->emailVerified = $emailVerified;
+        return $this;
     }
 
 }
