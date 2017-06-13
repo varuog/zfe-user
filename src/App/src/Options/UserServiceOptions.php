@@ -17,7 +17,8 @@ use Zend\View\Renderer\RendererInterface;
  * @author Win10Laptop-Kausik
  */
 class UserServiceOptions extends AbstractOptions {
-        private $resetTokenValidity;
+   
+    private $resetTokenValidity;
     private $responseType;
     private $credentialField;
     private $identityField;
@@ -27,6 +28,13 @@ class UserServiceOptions extends AbstractOptions {
     private $responderName;
     private $enableUserApproval;
     private $enableEmailVerification;
+    private $enableEmailNotification;
+    private $enableNotifyDeactivation;
+    private $enableNotifyActivation;
+
+    public function __construct(array $options = null) {
+        parent::__construct($options);
+    }
 
     public function getNotifyNewRegistration() {
         return $this->notifyNewRegistration;
@@ -53,10 +61,6 @@ class UserServiceOptions extends AbstractOptions {
     public function setResponderName($notifyRecipientName) {
         $this->responderName = $notifyRecipientName;
         return $this;
-    }
-
-    public function __construct(array $options = null) {
-        parent::__construct($options);
     }
 
     public function getResetTokenValidity() {
@@ -112,6 +116,7 @@ class UserServiceOptions extends AbstractOptions {
         $this->passwordFieldField = $passwordFieldField;
         return $this;
     }
+
     public function getIdentityField() {
         return $this->identityField;
     }
@@ -121,5 +126,31 @@ class UserServiceOptions extends AbstractOptions {
         return $this;
     }
 
+    public function getEnableEmailNotification() {
+        return $this->enableEmailNotification;
+    }
+
+    public function getEnableNotifyDeactivation() {
+        return $this->enableNotifyDeactivation;
+    }
+
+    public function setEnableEmailNotification($enableEmailNotification) {
+        $this->enableEmailNotification = $enableEmailNotification;
+        return $this;
+    }
+
+    public function setEnableNotifyDeactivation($enableNotifyDeactivation) {
+        $this->enableNotifyDeactivation = $enableNotifyDeactivation;
+        return $this;
+    }
+
+    public function getEnableNotifyActivation() {
+        return $this->enableNotifyActivation;
+    }
+
+    public function setEnableNotifyActivation($enableNotifyActivation) {
+        $this->enableNotifyActivation = $enableNotifyActivation;
+        return $this;
+    }
 
 }

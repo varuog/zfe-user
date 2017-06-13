@@ -33,23 +33,33 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
     private $mailer;
     private $mailerTemplate;
     private $events;
-
     private $credential;
     private $identity;
-    
-    
+
+    /**
+     * 
+     * @param DocumentManager $mongoManager
+     * @param TranslatorInterface $translator
+     * @param TransportInterface $mailer
+     * @param TemplateRendererInterface $mailTemplate
+     * @param UserServiceOptions $options
+     */
     public function __construct(DocumentManager $mongoManager, TranslatorInterface $translator, TransportInterface $mailer, TemplateRendererInterface $mailTemplate, UserServiceOptions $options) {
         $this->persistantManager = $mongoManager;
         $this->options = $options;
         $this->translator = $translator;
         $this->mailer = $mailer;
         $this->mailerTemplate = $mailTemplate;
-        
-        
-        $this->credential= $this->options->getCredentialField();
-        $this->identity= $this->options->getIdentityField();
+
+
+        $this->credential = $this->options->getCredentialField();
+        $this->identity = $this->options->getIdentityField();
     }
 
+    /**
+     * 
+     * @param User $user
+     */
     public function register(User $user) {
 
         //Calculate approval
@@ -64,27 +74,37 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
         /*
          * Send Mail
          */
-        $mail = new Message();
-        $data = ['layout' => 'mail-template'];
-        $mail->addTo($user->getEmail(), $user->getFullName());
-        $mail->addFrom($this->options->getResponderEmail(), $this->options->getResponderName());
-        $mail->setSubject($this->translator->translate('subject-notify-user', 'zfe-user'));
-        $mail->setBody($this->mailerTemplate->render('mail::new-registration-notify-user', $data));
-        $this->mailer->send($mail);
+        if ($this->options->getEnableEmailNotification()) {
+            $mail = new Message();
+            $data = ['layout' => 'layout::mail-template'];
+            $mail->addTo($user->getEmail(), $user->getFullName());
+            $mail->addFrom($this->options->getResponderEmail(), $this->options->getResponderName());
+            $mail->setSubject($this->translator->translate('subject-notify-user', 'zfe-user'));
+            $mail->setBody($this->mailerTemplate->render('mail::new-registration-notify-user', $data));
+            $this->mailer->send($mail);
 
-        $mail = new Message();
-        $mail->addTo($user->getEmail(), $user->getFullName());
-        $mail->addFrom($this->options->getResponderEmail(), $this->options->getResponderName());
-        $mail->setSubject($this->translator->translate('subject-notify-admin', 'zfe-user'));
-        $mail->setBody($this->mailerTemplate->render('mail::new-registration-notify-admin', $data));
+            $mail = new Message();
+            $mail->addTo($user->getEmail(), $user->getFullName());
+            $mail->addFrom($this->options->getResponderEmail(), $this->options->getResponderName());
+            $mail->setSubject($this->translator->translate('subject-notify-admin', 'zfe-user'));
+            $mail->setBody($this->mailerTemplate->render('mail::new-registration-notify-admin', $data));
 
-        $this->mailer->send($mail);
+            $this->mailer->send($mail);
+        }
     }
 
+    /**
+     * 
+     * @param User $user
+     */
     public function setAuthUser(User $user) {
         $this->authUser = $user;
     }
 
+    /**
+     * 
+     * @return Result
+     */
     public function authenticate(): Result {
 
         $loggedUser = $this->persistantManager
@@ -114,6 +134,11 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
         );
     }
 
+    /**
+     * 
+     * @param User $user
+     * @return boolean
+     */
     public function changePassword(User $user) {
 
         $loggedUser = $this->persistantManager->getRepository(get_class($user))
@@ -130,6 +155,8 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
                     ->set(null)
                     ->field('resetTokenTime')
                     ->set(null)
+                    ->field('emailVerified')
+                    ->set(true)
                     ->field($this->credential)
                     ->set(call_user_func([$user, "get{$this->credential}"]))
                     ->getQuery()
@@ -139,6 +166,10 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
         return false;
     }
 
+    /**
+     * @param User $user
+     * @return boolean
+     */
     public function changeEmail(User $user) {
         $loggedUser = $this->persistantManager->getRepository(get_class($user))
                 ->findOneBy([$this->identity => call_user_func([$user, "get{$this->identity}"])]);
@@ -154,26 +185,21 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
                     ->set(null)
                     ->field('resetTokenTime')
                     ->set(null)
+                    ->field('emailVerified')
+                    ->set(true)
                     ->field($this->identity)
                     ->set(call_user_func([$user, "get{$this->identity}"]))
                     ->getQuery()
                     ->execute();
-
-            /*
-             * Send Mail
-             */
-            $mail = new Message();
-            $data = ['layout' => 'mail-template'];
-            $mail->addTo($loggedUser->getFullName(), $loggedUser->getEmail());
-            $mail->setSubject($this->translator->translate('subject-notify-user', 'zfe-user'));
-            $mail->setBody($this->mailerTemplate->render('mail::new-registration', $data));
-
-            $this->mailer->send($mail);
         }
 
         return false;
     }
 
+    /**
+     * 
+     * @param User $user
+     */
     public function generateAuthToken(User $user) {
         $user->generateToken();
 
@@ -189,7 +215,12 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
                 ->execute();
     }
 
-    public function generateResetToken(User $user) {
+    /**
+     * 
+     * @param User $user
+     * @param type $resetField
+     */
+    public function generateResetToken(User $user, $resetField = '') {
         $user->generateToken();
 
         $this->persistantManager->createQueryBuilder(get_class($user))
@@ -204,21 +235,38 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
                 ->execute();
 
         $mail = new Message();
-        $data = ['layout' => 'mail-template'];
+        $data = ['layout' => 'layout::mail-template'];
         $mail->addTo($user->getEmail(), $user->getFullName());
         $mail->addFrom($this->options->getResponderEmail(), $this->options->getResponderName());
-        $mail->setSubject($this->translator->translate('subject-generate-reset-token', 'zfe-user'));
-        $mail->setBody($this->mailerTemplate->render('mail::generate-reset-token', $data));
+
+        $subjectKey = (isset($resetField)) ? "subject-generate-reset-token-{$resetField}" : 'subject-generate-reset-token';
+        $bodyKey = (isset($resetField)) ? "mail::generate-reset-token-{$resetField}" : 'mail::generate-reset-token';
+        $mail->setSubject($this->translator->translate($subjectKey, 'zfe-user'));
+        $mail->setBody($this->mailerTemplate->render($bodyKey, $data));
+        
+        $this->mailer->send($mail);
     }
 
+    /**
+     * 
+     * @param string $authToken
+     */
     public function isValidAuthToken(string $authToken): bool {
         //$this->persistantManager->getRepository(get)
     }
 
+    /**
+     * 
+     * @return UserServiceOptions
+     */
     public function getOptions(): UserServiceOptions {
         return $this->options;
     }
 
+    /**
+     * 
+     * @return \Zend\EventManager\EventManagerInterface
+     */
     public function getEventManager(): \Zend\EventManager\EventManagerInterface {
         if (!$this->events) {
             $this->setEventManager(new EventManager());
@@ -226,8 +274,54 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
         return $this->events;
     }
 
+    /**
+     * 
+     * @param \Zend\EventManager\EventManagerInterface $eventManager
+     */
     public function setEventManager(\Zend\EventManager\EventManagerInterface $eventManager): void {
         $this->events = $eventManager;
+    }
+
+    
+    /**
+     * 
+     * @param User $user
+     */
+    public function activateUser(User $user) {
+        $updateApprove = $this->persistantManager->createQueryBuilder(get_class($user))
+                ->field($this->identity)
+                ->equals(call_user_func([$user, "get{$this->identity}"]))
+                ->findAndUpdate()
+                ->returnNew()
+                ->field('approved')
+                ->set($user->getApproved());
+
+        /*
+         * Only update time if activation is true
+         */
+        if ($user->getApproved()) {
+            $updateApprove = $updateApprove->field('approvedTime')
+                    ->set(time());
+        }
+        /* @var $updatedUser User */
+        $updatedUser = $updateApprove->getQuery()
+                ->execute();
+        
+
+        if (($this->options->getEnableNotifyDeactivation() && !$updatedUser->getApproved()) || $updatedUser->getApproved() && $this->options->getEnableNotifyActivation()) {
+            $mail = new Message();
+            $data = ['layout' => 'layout::mail-template'];
+            $mail->addTo($user->getEmail(), $user->getFullName());
+            $mail->addFrom($this->options->getResponderEmail(), $this->options->getResponderName());
+
+            $subjectKey = ($updatedUser->getApproved()) ? 'subject-notify-user-activation' : 'subject-notify-user-deactivation';
+            $bodyKey = ($updatedUser->getApproved()) ? 'mail::notify-user-activation' : 'mail::notify-user-deactivation';
+
+            $mail->setSubject($this->translator->translate($subjectKey, 'zfe-user'));
+            $mail->setBody($this->mailerTemplate->render($bodyKey, $data));
+            
+            $this->mailer->send($mail);
+        }
     }
 
 }

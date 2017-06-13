@@ -33,7 +33,7 @@ class UserLoginAction implements ServerMiddlewareInterface {
         $user->setPassword('foobar');
 
         $this->userService->setAuthUser($user);
-        $authResult = $this->userService->authenticate();
+        $authResult = $this->userService->authenticate(); 
         $renderResponse = $this->userService->getOptions()->getResponseType();
 
         $messages = $authResult->getMessages();

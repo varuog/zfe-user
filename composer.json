@@ -1,8 +1,8 @@
 {
-    "name": "zendframework/zend-expressive-skeleton",
-    "description": "Zend expressive skeleton. Begin developing PSR-7 middleware applications in seconds!",
-    "type": "project",
-    "homepage": "https://github.com/zendframework/zend-expressive-skeleton",
+    "name": "varuog/zfe-user",
+    "description": "Zend expressive 2. User handling",
+    "type": "libary",
+    "homepage": "https://github.com/Gourav-Sarkar/zfe-user",
     "license": "BSD-3-Clause",
     "config": {
         "sort-packages": true

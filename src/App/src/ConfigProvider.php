@@ -7,8 +7,8 @@ namespace App;
  *
  * @see https://docs.zendframework.com/zend-component-installer/
  */
-class ConfigProvider
-{
+class ConfigProvider {
+
     /**
      * Returns the configuration array
      *
@@ -17,11 +17,10 @@ class ConfigProvider
      *
      * @return array
      */
-    public function __invoke()
-    {
+    public function __invoke() {
         return [
             'dependencies' => $this->getDependencies(),
-            'templates'    => $this->getTemplates(),
+            'templates' => $this->getTemplates(),
         ];
     }
 
@@ -30,14 +29,36 @@ class ConfigProvider
      *
      * @return array
      */
-    public function getDependencies()
-    {
+    public function getDependencies() {
         return [
             'invokables' => [
                 Action\PingAction::class => Action\PingAction::class,
+                //Mail transport
+                \Zend\Mail\Transport\TransportInterface::class => \Zend\Mail\Transport\Sendmail::class
             ],
-            'factories'  => [
+            'factories' => [
+                 //Mongo factory
+                \Doctrine\ODM\MongoDB\DocumentManager::class => Factory\MongoDB\MongoDocumentManagerFactory::class,
+                
+               //Options
+                \App\Options\UserServiceOptions::class => Factory\UserServiceOptionsFactory::class,
+                //Translator
+                \Zend\I18n\Translator\TranslatorInterface::class => \Zend\I18n\Translator\TranslatorServiceFactory::class,
+                //Mail transporter
+                \App\Service\MailerTemplateInterface::class => \Zend\Expressive\ZendView\ZendViewRendererFactory::class,
+                
+                
                 Action\HomePageAction::class => Action\HomePageFactory::class,
+            ],
+            'abstract_factories' => [
+                Factory\AbstractServiceFactory::class,
+                Factory\AbstractOptionsFactory::class,
+                Factory\AbstractActionFactory::class,
+            ],
+            'delegators' => [
+                \Zend\I18n\Translator\TranslatorInterface::class => [
+                    Factory\Delegator\TranslatorDelegatorFactory::class
+                ],
             ],
         ];
     }
@@ -47,15 +68,15 @@ class ConfigProvider
      *
      * @return array
      */
-    public function getTemplates()
-    {
+    public function getTemplates() {
         return [
             'paths' => [
-                'app'    => [__DIR__ . '/../templates/app'],
-                'error'  => [__DIR__ . '/../templates/error'],
+                'app' => [__DIR__ . '/../templates/app'],
+                'error' => [__DIR__ . '/../templates/error'],
                 'layout' => [__DIR__ . '/../templates/layout'],
                 'mail' => [__DIR__ . '/../templates/mail'],
             ],
         ];
     }
+
 }

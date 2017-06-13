@@ -12,6 +12,9 @@ return [
         'responderEmail' => 'sample@email.com',
         'responderName' => 'somename',
         'enableUserApproval' => true,
-        'enableEmailVerification' => true
+        'enableEmailVerification' => true,
+        'enableEmailNotification' => true,
+        'enableNotifyDeactivation' => true,
+        'enableNotifyActivation' => true
     ],
 ];

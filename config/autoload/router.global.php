@@ -8,8 +8,6 @@ return [
         'invokables' => [
             RouterInterface::class => ZendRouter::class,
         ],
-        'abstract_factories' => [
-            App\Factory\AbstractActionFactory::class,
-        ],
+      
     ],
 ];

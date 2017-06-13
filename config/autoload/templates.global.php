@@ -9,14 +9,10 @@ return [
         'factories' => [
             TemplateRendererInterface::class => ZendViewRendererFactory::class,
             HelperPluginManager::class => HelperPluginManagerFactory::class,
-            App\Service\MailerTemplateInterface::class => ZendViewRendererFactory::class
         ],
     ],
     'templates' => [
         'layout' => 'layout::default',
-        'paths' => [
-            'mail' => ['/templates/mail'],
-        ]
     ],
     'view_helpers' => [
     // zend-servicemanager-style configuration for adding view helpers:
