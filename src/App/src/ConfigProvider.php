@@ -55,11 +55,14 @@ class ConfigProvider {
                 Factory\AbstractOptionsFactory::class,
                 Factory\AbstractActionFactory::class,
             ],
+            /*
             'delegators' => [
                 \Zend\I18n\Translator\TranslatorInterface::class => [
                     Factory\Delegator\TranslatorDelegatorFactory::class
                 ],
             ],
+             * 
+             */
         ];
     }
 
