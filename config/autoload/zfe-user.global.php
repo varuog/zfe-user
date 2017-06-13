@@ -1,7 +1,5 @@
 <?php
 
-use Zend\ConfigAggregator\ConfigAggregator;
-
 return [
     'zfe-user' => [
         'credentialField' => 'password',

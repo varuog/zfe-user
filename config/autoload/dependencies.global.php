@@ -39,7 +39,7 @@ return [
              * It should be called from other project
              */
             Application::class => [
-            App\Factory\Delegator\RoutesDelegator::class
+            ZfeUser\Factory\Delegator\RoutesDelegator::class
             ],
         ],
     ],
