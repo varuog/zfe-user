@@ -1,7 +1,7 @@
 {
     "name": "varuog/zfe-user",
     "description": "Zend expressive 2. User handling (Alpha)",
-    "type": "libary",
+    "type": "project",
     "homepage": "https://github.com/Gourav-Sarkar/zfe-user",
     "license": "BSD-3-Clause",
     "version" : "1.0.0alpha",
