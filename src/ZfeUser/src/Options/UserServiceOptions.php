@@ -14,7 +14,7 @@ use Zend\View\Renderer\RendererInterface;
 /**
  * Description of UserServiceOptions
  *
- * @author Win10Laptop-Kausik
+ * @author Gourav Sarkar
  */
 class UserServiceOptions extends AbstractOptions {
    

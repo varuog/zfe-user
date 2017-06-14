@@ -13,7 +13,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 /**
  * Description of User
  *
- * @author Win10Laptop-Kausik
+ * @author Gourav Sarkar
  * @ODM\Document
  */
 class User {

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "e1fcc34bb8d123427bac071a5dbcb620",
+    "content-hash": "88520bfa964e5ecbe3b759c3e9175bd2",
     "packages": [
         {
             "name": "alcaeus/mongo-php-adapter",
@@ -1545,6 +1545,114 @@
                 "shim"
             ],
             "time": "2017-06-09T14:24:12+00:00"
+        },
+        {
+            "name": "woohoolabs/yin",
+            "version": "2.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/woohoolabs/yin.git",
+                "reference": "535bac33bfb951f39e0c4aaa48a07de6a63bb5d3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/woohoolabs/yin/zipball/535bac33bfb951f39e0c4aaa48a07de6a63bb5d3",
+                "reference": "535bac33bfb951f39e0c4aaa48a07de6a63bb5d3",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.0.0",
+                "psr/http-message-implementation": "^1.0.0"
+            },
+            "require-dev": {
+                "justinrainbow/json-schema": "^2.0.0",
+                "phpunit/phpunit": "^6.0.0",
+                "seld/jsonlint": "^1.4.0",
+                "squizlabs/php_codesniffer": "^2.8.0",
+                "zendframework/zend-diactoros": "^1.3.0"
+            },
+            "suggest": {
+                "justinrainbow/json-schema": "Allows to validate the request and response body against the JSON API schema",
+                "seld/jsonlint": "Allows to lint the request and response body"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "WoohooLabs\\Yin\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Máté Kocsis",
+                    "email": "kocsismate@woohoolabs.com"
+                }
+            ],
+            "description": "Woohoo Labs. Yin",
+            "keywords": [
+                "Woohoo Labs.",
+                "Yin",
+                "json api",
+                "psr-7"
+            ],
+            "time": "2017-06-13T08:30:50+00:00"
+        },
+        {
+            "name": "woohoolabs/yin-middleware",
+            "version": "2.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/woohoolabs/yin-middleware.git",
+                "reference": "0a2f5300eab87ed756cdfd7f0fa6355637ae0dc5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/woohoolabs/yin-middleware/zipball/0a2f5300eab87ed756cdfd7f0fa6355637ae0dc5",
+                "reference": "0a2f5300eab87ed756cdfd7f0fa6355637ae0dc5",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.0.0",
+                "psr/container": "^1.0.0",
+                "psr/http-message-implementation": "^1.0.0",
+                "woohoolabs/yin": "^2.0.0"
+            },
+            "replace": {
+                "woohoolabs/yin-middlewares": "self.version"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^6.0.0",
+                "squizlabs/php_codesniffer": "^2.8.0",
+                "zendframework/zend-diactoros": "^1.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "WoohooLabs\\YinMiddleware\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Máté Kocsis",
+                    "email": "kocsismate@woohoolabs.com"
+                }
+            ],
+            "description": "Woohoo Labs. Yin Middleware",
+            "keywords": [
+                "Woohoo Labs.",
+                "Yin",
+                "json api",
+                "middleware",
+                "psr-7"
+            ],
+            "time": "2017-03-12T00:20:02+00:00"
         },
         {
             "name": "zendframework/zend-authentication",

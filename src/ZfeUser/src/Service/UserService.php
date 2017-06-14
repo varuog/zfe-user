@@ -57,6 +57,21 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
     }
 
     /**
+     * Destroy auth token
+     * @param User $user
+     */
+    public function logout(User $user) {
+        return $this->persistantManager->createQueryBuilder(get_class($user))
+                        ->field('authToken')
+                        ->exists(true)
+                        ->findAndUpdate()
+                        ->field('authToken')
+                        ->set(null)
+                        ->getQuery()
+                        ->execute();
+    }
+
+    /**
      * 
      * @param User $user
      */
@@ -243,7 +258,7 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
         $bodyKey = (isset($resetField)) ? "mail::generate-reset-token-{$resetField}" : 'mail::generate-reset-token';
         $mail->setSubject($this->translator->translate($subjectKey, 'zfe-user'));
         $mail->setBody($this->mailerTemplate->render($bodyKey, $data));
-        
+
         $this->mailer->send($mail);
     }
 
@@ -282,7 +297,6 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
         $this->events = $eventManager;
     }
 
-    
     /**
      * 
      * @param User $user
@@ -306,7 +320,7 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
         /* @var $updatedUser User */
         $updatedUser = $updateApprove->getQuery()
                 ->execute();
-        
+
 
         if (($this->options->getEnableNotifyDeactivation() && !$updatedUser->getApproved()) || $updatedUser->getApproved() && $this->options->getEnableNotifyActivation()) {
             $mail = new Message();
@@ -319,7 +333,7 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
 
             $mail->setSubject($this->translator->translate($subjectKey, 'zfe-user'));
             $mail->setBody($this->mailerTemplate->render($bodyKey, $data));
-            
+
             $this->mailer->send($mail);
         }
     }

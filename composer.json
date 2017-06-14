@@ -21,6 +21,7 @@
         "doctrine/orm": "*",
         "facebook/graph-sdk": "^5.5",
         "roave/security-advisories": "dev-master",
+        "woohoolabs/yin-middleware": "^2.0",
         "zendframework/zend-authentication": "^2.5",
         "zendframework/zend-component-installer": "^1.0",
         "zendframework/zend-config-aggregator": "^1.0",
