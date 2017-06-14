@@ -19,7 +19,7 @@ $aggregator = new ConfigAggregator([
     new ArrayProvider($cacheConfig),
 
     // Default App module config
-    ZfeUser\ConfigProvider::class,
+    \ZfeUser\ConfigProvider::class,
 
     // Load application config in a pre-defined order in such a way that local settings
     // overwrite global settings. (Loaded as first to last):

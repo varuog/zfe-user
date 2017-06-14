@@ -26,8 +26,8 @@
  * );
  */
 
-$app->get('/', App\Action\HomePageAction::class, 'home');
-//$app->get('/api/ping', App\Action\PingAction::class, 'api.ping');
+$app->get('/', \ZfeUser\Action\HomePageAction::class, 'home');
+$app->get('/api/ping', \ZfeUser\Action\PingAction::class, 'api.ping');
 //$app->get('/user/register', App\Action\UserRegisterAction::class, 'user.register');
 //$app->get('/user/login', App\Action\UserLoginAction::class, 'user.login');
 //$app->get('/user/forgot-password', App\Action\UserRegisterAction::class, 'user.register');
