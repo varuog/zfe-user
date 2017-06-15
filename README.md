@@ -5,7 +5,9 @@ Commong User handling task for zend expressive 2 application. currently supports
 HTML, JSON or JSON-API payload.
 
 ## Composer Install
-`$composer require varuog/zfe-user`
+```bash
+$composer require varuog/zfe-user
+```
 
 ## Notice
 It is under active development.
