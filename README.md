@@ -10,4 +10,4 @@ $composer require varuog/zfe-user
 ```
 
 ## Notice
-**It is under active development.**
+**It is under active development. (Not suitable for production)**
