@@ -11,4 +11,4 @@ $composer require varuog/zfe-user
 
 
 ## Notice
-**It is under active development. (Not suitable for production)**
+**It is under active development. (WIP) Not suitable for production.**
