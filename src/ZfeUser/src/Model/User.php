@@ -18,7 +18,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  */
 class User {
 
-    /** @ODM\Id */
+    /** @ODM\Id(strategy="NONE") */
     private $id;
 
     /** @ODM\Field(type="string") */
@@ -46,7 +46,7 @@ class User {
     private $resetTokenTime;
 
     /** @ODM\Field(type="date") */
-    private $approveTime;
+    private $approveTime=0;
 
     /** @ODM\Field(type="boolean") */
     private $approved = false;

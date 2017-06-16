@@ -10,6 +10,8 @@ use ZfeUser\Service\UserService;
 use ZfeUser\Hateoas\Jsonapi\Hydrator\UserHydrator;
 use WoohooLabs\Yin\JsonApi\Request\Request as JsonApiRequest;
 use WoohooLabs\Yin\JsonApi\Exception\DefaultExceptionFactory;
+use ZfeUser\Hateoas\Jsonapi\Document;
+use ZfeUser\Hateoas\Jsonapi\Transformer;
 use ZfeUser\Model\User;
 
 class UserRegisterAction implements ServerMiddlewareInterface {
@@ -24,19 +26,13 @@ class UserRegisterAction implements ServerMiddlewareInterface {
 
     public function process(ServerRequestInterface $request, DelegateInterface $delegate) {
 
-        $user = new User();
-        /**
-        $user->setUsername('gsark');
-        $user->setEmail('gsarkar.dev@gmail.com');
-        $user->setPassword('foobar');
-        $user->setFullName('gsarkar');
-         * 
-         */
-        
+        $user = new User(); 
         $defaultExpFactory = new DefaultExceptionFactory();
         $jsonapiRequest=new JsonApiRequest($request, $defaultExpFactory);
+        $jsonApi= new \WoohooLabs\Yin\JsonApi\JsonApi($jsonapiRequest, new \Zend\Diactoros\Response(), $defaultExpFactory, null);
+        $jsonApi->hydrate($this->userHydrator, $user);
         
-        $this->userHydrator->hydrate($jsonapiRequest, $defaultExpFactory, $user);
+        
         $this->userService->register($user);
 
         $renderResponse = $this->userService->getOptions()->getResponseType();
@@ -44,6 +40,10 @@ class UserRegisterAction implements ServerMiddlewareInterface {
         if ($renderResponse instanceof \Zend\Diactoros\Response\HtmlResponse) {
 
             return new $renderResponse($this->template->render('app::home-page', ['user' => $user]));
+        }
+        else if ($renderResponse == \WoohooLabs\Yin\JsonApi\JsonApi::class) {
+            return $jsonApi->respond()->ok(new Document\User(new Transformer\User())
+                            , $user);
         }
 
         return new $renderResponse(['user' => $user]);

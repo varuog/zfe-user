@@ -36,8 +36,10 @@ class RoutesDelegator {
         $app = $callback();
 
         // Setup routes:
-        $app->get('/user/register', Action\UserRegisterAction::class, 'user.register');
-        $app->get('/user/login', Action\UserLoginAction::class, 'user.login');
+        $app->post('/user/register', [\Zend\Expressive\Helper\BodyParams\BodyParamsMiddleware::class
+            , Action\UserRegisterAction::class], 'user.register');
+        $app->post('/user/login', [\Zend\Expressive\Helper\BodyParams\BodyParamsMiddleware::class,
+            Action\UserLoginAction::class], 'user.login');
 
         return $app;
     }

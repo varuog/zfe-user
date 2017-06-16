@@ -13,15 +13,18 @@ use WoohooLabs\Yin\JsonApi\JsonApi;
 use WoohooLabs\Yin\JsonApi\Request\Request;
 use Zend\Diactoros\Response;
 use WoohooLabs\Yin\JsonApi\Exception\DefaultExceptionFactory;
+use ZfeUser\Hateoas\Jsonapi\Hydrator\UserHydrator;
 
 class UserLoginAction implements ServerMiddlewareInterface {
 
     private $userService;
     private $template;
+    private $userHydrator;
 
-    public function __construct(UserService $userService, TemplateRendererInterface $template = null) {
+    public function __construct(UserService $userService, UserHydrator $userHydrator, TemplateRendererInterface $template = null) {
         $this->userService = $userService;
         $this->template = $template;
+        $this->userHydrator= $userHydrator;
     }
 
     /**
@@ -32,23 +35,22 @@ class UserLoginAction implements ServerMiddlewareInterface {
      */
     public function process(ServerRequestInterface $request, DelegateInterface $delegate) {
 
-
-
         $user = new \ZfeUser\Model\User();
-        $user->setEmail('gsarkar.dev@gmail.com');
-        $user->setPassword('foobar');
+        $defaultExpFactory = new DefaultExceptionFactory();
+        $jsonapi = new JsonApi(new Request($request, $defaultExpFactory), new Response(), $defaultExpFactory);
+
+        $jsonapi->hydrate($this->userHydrator, $user);
 
         $this->userService->setAuthUser($user);
         $authResult = $this->userService->authenticate();
         $renderResponse = $this->userService->getOptions()->getResponseType();
 
         $messages = $authResult->getMessages();
-        
+
         if ($renderResponse == \Zend\Diactoros\Response\HtmlResponse::class) {
             return new $renderResponse($this->template->render('app::home-page', ['user' => implode(', ', $messages)]));
         } else if ($renderResponse == \WoohooLabs\Yin\JsonApi\JsonApi::class) {
-            $defaultExpFactory = new DefaultExceptionFactory();
-            $jsonapi = new JsonApi(new Request($request, $defaultExpFactory), new Response(), $defaultExpFactory);
+
 
             return $jsonapi->respond()->ok(new Document\User(new Transformer\User())
                             , $authResult->getIdentity());

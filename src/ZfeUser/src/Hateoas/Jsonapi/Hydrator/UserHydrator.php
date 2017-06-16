@@ -21,11 +21,13 @@ use ZfeUser\Model\User;
 class UserHydrator extends AbstractHydrator {
 
     protected function generateId(): string {
-        return Uuid::generate();
+        $f=\Doctrine\ODM\MongoDB\Id\UuidGenerator::generateV4();
+        return \Doctrine\ODM\MongoDB\Id\UuidGenerator::generateV4();
     }
 
     protected function getAcceptedTypes(): array {
-        return [User::class];
+        $parts=explode('\\',User::class);
+        return [end($parts)];
     }
 
     /**
