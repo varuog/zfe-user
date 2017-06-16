@@ -21,6 +21,8 @@ class User extends AbstractResourceTransformer {
     /**
      * 
      * @param Model\User $domainObject
+     * @todo approveTime need to to be fixed for null values. check default 
+     *  value for same attribute in user model
      * @return array
      */
     public function getAttributes($domainObject): array {
