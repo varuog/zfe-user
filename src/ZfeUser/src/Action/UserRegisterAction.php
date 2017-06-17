@@ -26,28 +26,30 @@ class UserRegisterAction implements ServerMiddlewareInterface {
 
     public function process(ServerRequestInterface $request, DelegateInterface $delegate) {
 
-        $user = new User(); 
+        $user = new User();
         $defaultExpFactory = new DefaultExceptionFactory();
-        $jsonapiRequest=new JsonApiRequest($request, $defaultExpFactory);
-        $jsonApi= new \WoohooLabs\Yin\JsonApi\JsonApi($jsonapiRequest, new \Zend\Diactoros\Response(), $defaultExpFactory, null);
+        $jsonapiRequest = new JsonApiRequest($request, $defaultExpFactory);
+        $jsonApi = new \WoohooLabs\Yin\JsonApi\JsonApi($jsonapiRequest, new \Zend\Diactoros\Response(), $defaultExpFactory, null);
         $jsonApi->hydrate($this->userHydrator, $user);
-        
-        
-        $this->userService->register($user);
+
+        try {
+
+            $this->userService->register($user);
+        } catch (\Zend\Mail\Transport\Exception\RuntimeException $ex) {
+            //Ignore mail transport exception. can be logged or notify
+        }
 
         $renderResponse = $this->userService->getOptions()->getResponseType();
-        
+
         if ($renderResponse instanceof \Zend\Diactoros\Response\HtmlResponse) {
 
             return new $renderResponse($this->template->render('app::home-page', ['user' => $user]));
-        }
-        else if ($renderResponse == \WoohooLabs\Yin\JsonApi\JsonApi::class) {
+        } else if ($renderResponse == \WoohooLabs\Yin\JsonApi\JsonApi::class) {
             return $jsonApi->respond()->ok(new Document\User(new Transformer\User())
                             , $user);
         }
 
         return new $renderResponse(['user' => $user]);
     }
-
 
 }

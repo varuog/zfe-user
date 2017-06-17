@@ -14,6 +14,10 @@ use WoohooLabs\Yin\JsonApi\Request\Request;
 use Zend\Diactoros\Response;
 use WoohooLabs\Yin\JsonApi\Exception\DefaultExceptionFactory;
 use ZfeUser\Hateoas\Jsonapi\Hydrator\UserHydrator;
+use WoohooLabs\Yin\JsonApi\Document\ErrorDocument;
+use Zend\Authentication\Result;
+use WoohooLabs\Yin\JsonApi\Schema\JsonApiObject;
+use WoohooLabs\Yin\JsonApi\Schema\Error;
 
 class UserLoginAction implements ServerMiddlewareInterface {
 
@@ -24,7 +28,7 @@ class UserLoginAction implements ServerMiddlewareInterface {
     public function __construct(UserService $userService, UserHydrator $userHydrator, TemplateRendererInterface $template = null) {
         $this->userService = $userService;
         $this->template = $template;
-        $this->userHydrator= $userHydrator;
+        $this->userHydrator = $userHydrator;
     }
 
     /**
@@ -51,9 +55,30 @@ class UserLoginAction implements ServerMiddlewareInterface {
             return new $renderResponse($this->template->render('app::home-page', ['user' => implode(', ', $messages)]));
         } else if ($renderResponse == \WoohooLabs\Yin\JsonApi\JsonApi::class) {
 
+            if ($authResult->getIdentity() != null) {
 
-            return $jsonapi->respond()->ok(new Document\User(new Transformer\User())
-                            , $authResult->getIdentity());
+                return $jsonapi->respond()->ok(new Document\User(new Transformer\User())
+                                , $authResult->getIdentity());
+            } else {
+
+                $errorDoc = new ErrorDocument();
+                if ($authResult->getCode() == Result::FAILURE_IDENTITY_NOT_FOUND) {
+                    return $jsonapi->respond()->notFound($errorDoc);
+                } else {
+
+                    $erroDoc = new ErrorDocument();
+                    $erroDoc->setJsonApi(new JsonApiObject("1.0"));
+                    $errors = [];
+                    foreach ($authResult->getMessages() as $errorMessage) {
+                        $error = new Error();
+                        $error->setTitle($errorMessage);
+                        $errors[] = $error;
+                    }
+                    //$erroDoc->setLinks(Links::createWithoutBaseUri()->setSelf("http://example.com/api/errors/404")));
+
+                    return $jsonapi->respond()->genericError($erroDoc, [$error], 500);
+                }
+            }
         }
 
         return new $renderResponse(['user' => implode(', ', $messages)]);
