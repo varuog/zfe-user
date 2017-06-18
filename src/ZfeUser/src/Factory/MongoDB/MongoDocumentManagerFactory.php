@@ -30,11 +30,12 @@ class MongoDocumentManagerFactory {
         $config->setDefaultDB('user');
 
 
-        $config->setMetadataDriverImpl(AnnotationDriver::create(__DIR__ . '/data/documents'));
+        $config->setMetadataDriverImpl(AnnotationDriver::create(['data/document']));
         AnnotationDriver::registerAnnotationClasses();
 
 
         $dm = DocumentManager::create($connection, $config);
+        $dm->getSchemaManager()->ensureIndexes();
 
         return $dm;
     }

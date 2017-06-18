@@ -84,12 +84,13 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
 
         //Calculate approval
         ($this->options->getEnableUserApproval()) ? $user->setApproved(false) : $user->setApproved(true);
-        $user->setApproveTime(time());
+        $user->setApproveTime(new \DateTime());
 
 
         $user->hashPassword();
         $this->persistantManager->persist($user);
-        $this->persistantManager->flush();
+        $this->persistantManager->flush($user, ['safe' => true]);
+        //$this->persistantManager->getSchemaManager()->ensureIndexes();
 
         /*
          * Send Mail

@@ -21,37 +21,37 @@ class User {
     /** @ODM\Id(strategy="NONE") */
     private $id;
 
-    /** @ODM\Field(type="string") */
+    /** @ODM\Field(type="string") @ODM\UniqueIndex */
     private $email;
 
-    /** @ODM\Field(type="string") */
+    /** @ODM\Field(type="string") @ODM\Index(unique=true, dropDups=true) */
     private $username;
 
     /** @ODM\Field(type="string") */
     private $fullName;
 
-    /** @ODM\Field(type="string") */
+    /** @ODM\Field(type="string") @ODM\UniqueIndex */
     private $password;
 
-    /** @ODM\Field(type="string") */
+    /** @ODM\Field(type="string") @ODM\UniqueIndex */
     private $authToken;
 
-    /** @ODM\Field(type="string") */
+    /** @ODM\Field(type="string") @ODM\UniqueIndex */
     private $authTokenTime;
 
-    /** @ODM\Field(type="string") */
+    /** @ODM\Field(type="string") @ODM\UniqueIndex */
     private $resetToken;
 
-    /** @ODM\Field(type="string") */
+    /** @ODM\Field(type="string") @ODM\UniqueIndex */
     private $resetTokenTime;
 
     /** @ODM\Field(type="date") */
     private $approveTime;
 
-    /** @ODM\Field(type="boolean") */
+    /** @ODM\Field(type="boolean") @ODM\Index*/
     private $approved = false;
 
-    /** @ODM\Field(type="boolean") */
+    /** @ODM\Field(type="boolean") @ODM\Index */
     private $emailVerified=false;
     
     private $roles;
@@ -152,7 +152,7 @@ class User {
         return $this->emailVerified;
     }
 
-    public function setApproveTime($approveTime) {
+    public function setApproveTime(\DateTime $approveTime) {
         $this->approveTime = $approveTime;
         return $this;
     }
