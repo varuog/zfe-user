@@ -27,7 +27,7 @@ class UserHydrator extends AbstractHydrator {
 
     protected function getAcceptedTypes(): array {
         $parts=explode('\\',User::class);
-        return [end($parts)];
+        return [end($parts), User::class];
     }
 
     /**

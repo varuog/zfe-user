@@ -16,9 +16,9 @@ use WoohooLabs\Yin\JsonApi\Document\AbstractSingleResourceDocument;
  *
  * @author Gourav Sarkar
  */
-class User extends AbstractSingleResourceDocument {
+class UserDocument extends AbstractSingleResourceDocument {
 
-    public function __construct(Transformer\User $userTransformer) {
+    public function __construct(Transformer\UserTransformer $userTransformer) {
         parent::__construct($userTransformer);
     }
 

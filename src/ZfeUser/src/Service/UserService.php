@@ -56,6 +56,11 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
         $this->identity = $this->options->getIdentityField();
     }
 
+    
+    public function fetch(User $user)
+    {
+        return $this->persistantManager->find(get_class($user), $user->getId());
+    }
     /**
      * Destroy auth token
      * @param User $user

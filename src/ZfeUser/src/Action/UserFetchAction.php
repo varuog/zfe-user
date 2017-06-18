@@ -14,8 +14,11 @@ use ZfeUser\Hateoas\Jsonapi\Document;
 use ZfeUser\Hateoas\Jsonapi\Transformer;
 use ZfeUser\Model\User;
 use ZfeUser\Hateoas\Jsonapi\Document\UserDocument;
+use WoohooLabs\Yin\JsonApi\JsonApi;
+use WoohooLabs\Yin\JsonApi\Request\Request;
+use Zend\Diactoros\Response;
 
-class UserRegisterAction implements ServerMiddlewareInterface {
+class UserFetchAction implements ServerMiddlewareInterface {
 
     private $userService;
     private $userHydrator;
@@ -30,19 +33,18 @@ class UserRegisterAction implements ServerMiddlewareInterface {
     public function process(ServerRequestInterface $request, DelegateInterface $delegate) {
 
         $user = new User();
+        $user->setId($request->getAttribute('id'));
+        $user=$this->userService->fetch($user);
+        
         $defaultExpFactory = new DefaultExceptionFactory();
-        $jsonapiRequest = new JsonApiRequest($request, $defaultExpFactory);
-        $jsonApi = new \WoohooLabs\Yin\JsonApi\JsonApi($jsonapiRequest, new \Zend\Diactoros\Response(), $defaultExpFactory, null);
-        $jsonApi->hydrate($this->userHydrator, $user);
-
-        try {
-
-            $this->userService->register($user);
-        } catch (\Zend\Mail\Transport\Exception\RuntimeException $ex) {
-            //Ignore mail transport exception. can be logged or notify
+        $jsonapi = new JsonApi(new Request($request, $defaultExpFactory), new Response(), $defaultExpFactory);
+        
+        if($user instanceof User)
+        {
+            return $jsonapi->respond()->ok($this->userDocuemnt, $user);
         }
-
-        return $jsonApi->respond()->ok($this->userDocuemnt, $user);
+        
+        return $jsonapi->respond()->notFound($this->userDocuemnt);
     }
 
 }

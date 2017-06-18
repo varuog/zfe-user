@@ -55,6 +55,8 @@ class ConfigProvider {
                 Factory\AbstractServiceFactory::class,
                 Factory\AbstractOptionsFactory::class,
                 Factory\AbstractActionFactory::class,
+                Factory\AbstractDocumentfactory::class,
+                Factory\AbstractTransformerFactory::class,
             ],
             /*
             'delegators' => [

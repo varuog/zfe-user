@@ -6,7 +6,7 @@
  * and open the template in the editor.
  */
 
-namespace ZfeUser\Factory\Delegator;
+namespace ZfeUser;
 
 use ZfeUser\Action;
 use Psr\Container\ContainerInterface;
@@ -23,7 +23,7 @@ use Zend\Stratigility\Middleware\ErrorHandler;
  * specify roots here
  * @author Win10Laptop-Kausik
  */
-class RoutesDelegator {
+class RouteProvider {
 
     /**
      * @param ContainerInterface $container
@@ -36,10 +36,15 @@ class RoutesDelegator {
         $app = $callback();
 
         // Setup routes:
-        $app->post('/user/register', [\Zend\Expressive\Helper\BodyParams\BodyParamsMiddleware::class
-            , Action\UserRegisterAction::class], 'user.register');
-        $app->post('/user/login', [\Zend\Expressive\Helper\BodyParams\BodyParamsMiddleware::class,
-            Action\UserLoginAction::class], 'user.login');
+        $app->post('/user/register'
+                , [\Zend\Expressive\Helper\BodyParams\BodyParamsMiddleware::class, Action\UserRegisterAction::class]
+                , 'user.register');
+        $app->post('/user/login'
+                , [\Zend\Expressive\Helper\BodyParams\BodyParamsMiddleware::class, Action\UserLoginAction::class]
+                , 'user.login');
+        $app->get('/user/fetch/:id'
+                , [Action\UserFetchAction::class]
+                , 'user.fetch');
 
         return $app;
     }

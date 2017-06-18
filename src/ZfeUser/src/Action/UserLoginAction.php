@@ -18,17 +18,20 @@ use WoohooLabs\Yin\JsonApi\Document\ErrorDocument;
 use Zend\Authentication\Result;
 use WoohooLabs\Yin\JsonApi\Schema\JsonApiObject;
 use WoohooLabs\Yin\JsonApi\Schema\Error;
+use ZfeUser\Middleware\JsonApiResponseMiddleware;
 
 class UserLoginAction implements ServerMiddlewareInterface {
 
     private $userService;
     private $template;
     private $userHydrator;
+    private $userDocument;
 
-    public function __construct(UserService $userService, UserHydrator $userHydrator, TemplateRendererInterface $template = null) {
+    public function __construct(UserService $userService, UserHydrator $userHydrator, Document\UserDocument $userDoc, TemplateRendererInterface $template = null) {
         $this->userService = $userService;
         $this->template = $template;
         $this->userHydrator = $userHydrator;
+        $this->userDocument = $userDoc;
     }
 
     /**
@@ -47,16 +50,12 @@ class UserLoginAction implements ServerMiddlewareInterface {
 
         $this->userService->setAuthUser($user);
         $authResult = $this->userService->authenticate();
-        $renderResponse = $this->userService->getOptions()->getResponseType();
 
-        $messages = $authResult->getMessages();
 
         if ($authResult->getIdentity() != null) {
 
-            return $jsonapi->respond()->ok(new Document\User(new Transformer\User())
-                            , $authResult->getIdentity());
+            return $jsonapi->respond()->ok($this->userDocument, $authResult->getIdentity());
         } else {
-
             $errorDoc = new ErrorDocument();
             $errorDoc->setJsonApi(new JsonApiObject("1.0"));
             $errors = [];
@@ -69,7 +68,6 @@ class UserLoginAction implements ServerMiddlewareInterface {
             if ($authResult->getCode() == Result::FAILURE_IDENTITY_NOT_FOUND) {
                 return $jsonapi->respond()->notFound($errorDoc, $errors);
             } else {
-                //$erroDoc->setLinks(Links::createWithoutBaseUri()->setSelf("http://example.com/api/errors/404")));
                 return $jsonapi->respond()->genericError($errorDoc, $errors, 500);
             }
         }

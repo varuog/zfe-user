@@ -46,13 +46,15 @@ class User {
     private $resetTokenTime;
 
     /** @ODM\Field(type="date") */
-    private $approveTime=0;
+    private $approveTime;
 
     /** @ODM\Field(type="boolean") */
     private $approved = false;
 
     /** @ODM\Field(type="boolean") */
     private $emailVerified=false;
+    
+    private $roles;
 
     public function getId() {
         return $this->id;

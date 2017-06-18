@@ -16,7 +16,7 @@ use ZfeUser\Model;
  *
  * @author Gourav Sarkar
  */
-class User extends AbstractResourceTransformer {
+class UserTransformer extends AbstractResourceTransformer {
 
     /**
      * 
@@ -37,7 +37,9 @@ class User extends AbstractResourceTransformer {
                 return $domainObject->getEmail();
             },
             "approveTime" => function (Model\User $domainObject) {
-                return $this->toIso8601DateTime(new \DateTime('@' . $domainObject->getApproveTime()));
+                if ($domainObject->getApproveTime() != null) {
+                    return $this->toIso8601DateTime($domainObject->getApproveTime());
+                }
             },
             "approved" => function (Model\User $domainObject) {
                 return $this->toBool($domainObject->getApproved());
