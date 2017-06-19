@@ -56,11 +56,10 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
         $this->identity = $this->options->getIdentityField();
     }
 
-    
-    public function fetch(User $user)
-    {
+    public function fetch(User $user) {
         return $this->persistantManager->find(get_class($user), $user->getId());
     }
+
     /**
      * Destroy auth token
      * @param User $user
@@ -120,6 +119,27 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
      */
     public function setAuthUser(User $user) {
         $this->authUser = $user;
+    }
+
+    /**
+     * 
+     * @param User $user
+     */
+    public function isValidAuthToken(User $user) {
+        /** @var User $newuser */
+        $newuser = $this->persistantManager->getRepository(get_class($user))
+                ->findOneBy(['resetToken' => $user->getResetToken()]);
+
+        //expired token
+        if ($user->getAuthTokenTime() + $this->options->getAccessTokenTtl() > time()) {
+            //Update auth token if it matches
+            if ($newuser->getRefreashToken() == $user->getRefreashToken()) {
+                $this->generateAuthToken($newuser);
+                return $newuser;
+            }
+        }
+
+        return $newuser;
     }
 
     /**
@@ -232,6 +252,8 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
                 ->set($user->getAuthToken())
                 ->field('authTokenTime')
                 ->set(time())
+                ->field('refreshToken')
+                ->set(hash('sha256', random_int(PHP_INT_MIN, PHP_INT_MAX)))
                 ->getQuery()
                 ->execute();
     }
@@ -266,14 +288,6 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
         $mail->setBody($this->mailerTemplate->render($bodyKey, $data));
 
         $this->mailer->send($mail);
-    }
-
-    /**
-     * 
-     * @param string $authToken
-     */
-    public function isValidAuthToken(string $authToken): bool {
-        //$this->persistantManager->getRepository(get)
     }
 
     /**

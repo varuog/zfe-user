@@ -40,6 +40,9 @@ class User {
     private $authTokenTime;
 
     /** @ODM\Field(type="string") @ODM\UniqueIndex */
+    private $refreashToken;
+
+    /** @ODM\Field(type="string") @ODM\UniqueIndex */
     private $resetToken;
 
     /** @ODM\Field(type="string") @ODM\UniqueIndex */
@@ -48,12 +51,11 @@ class User {
     /** @ODM\Field(type="date") */
     private $approveTime;
 
-    /** @ODM\Field(type="boolean") @ODM\Index*/
+    /** @ODM\Field(type="boolean") @ODM\Index */
     private $approved = false;
 
     /** @ODM\Field(type="boolean") @ODM\Index */
-    private $emailVerified=false;
-    
+    private $emailVerified = false;
     private $roles;
 
     public function getId() {
@@ -164,6 +166,24 @@ class User {
 
     public function setEmailVerified($emailVerified) {
         $this->emailVerified = $emailVerified;
+        return $this;
+    }
+
+    public function getRefreashToken() {
+        return $this->refreashToken;
+    }
+
+    public function getRoles() {
+        return $this->roles;
+    }
+
+    public function setRefreashToken($refreashToken) {
+        $this->refreashToken = $refreashToken;
+        return $this;
+    }
+
+    public function setRoles($roles) {
+        $this->roles = $roles;
         return $this;
     }
 

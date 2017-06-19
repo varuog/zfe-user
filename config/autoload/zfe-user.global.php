@@ -14,6 +14,7 @@ return [
         'enableEmailVerification' => true,
         'enableEmailNotification' => true,
         'enableNotifyDeactivation' => true,
-        'enableNotifyActivation' => true
+        'enableNotifyActivation' => true,
+        'accessTokenTtl' => 30*60,
     ],
 ];

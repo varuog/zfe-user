@@ -17,6 +17,8 @@ use ZfeUser\Hateoas\Jsonapi\Document\UserDocument;
 use WoohooLabs\Yin\JsonApi\JsonApi;
 use WoohooLabs\Yin\JsonApi\Request\Request;
 use Zend\Diactoros\Response;
+use WoohooLabs\Yin\JsonApi\Document\ErrorDocument;
+use WoohooLabs\Yin\JsonApi\Schema\JsonApiObject;
 
 class UserFetchAction implements ServerMiddlewareInterface {
 
@@ -34,17 +36,19 @@ class UserFetchAction implements ServerMiddlewareInterface {
 
         $user = new User();
         $user->setId($request->getAttribute('id'));
-        $user=$this->userService->fetch($user);
-        
+        $user = $this->userService->fetch($user);
+
         $defaultExpFactory = new DefaultExceptionFactory();
         $jsonapi = new JsonApi(new Request($request, $defaultExpFactory), new Response(), $defaultExpFactory);
-        
-        if($user instanceof User)
-        {
+
+        if ($user instanceof User) {
             return $jsonapi->respond()->ok($this->userDocuemnt, $user);
         }
-        
-        return $jsonapi->respond()->notFound($this->userDocuemnt);
+
+
+        $errorDoc = new ErrorDocument();
+        $errorDoc->setJsonApi(new JsonApiObject("1.0"));
+        return $jsonapi->respond()->notFound($errorDoc);
     }
 
 }

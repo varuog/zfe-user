@@ -48,6 +48,8 @@ class ConfigProvider {
                 //Mail transporter
                 \ZfeUser\Service\MailerTemplateInterface::class => \Zend\Expressive\ZendView\ZendViewRendererFactory::class,
                 
+                //Middleware intercepter
+                Middleware\AuthValidatorMiddleware::class => Factory\Middleware\AuthValidatorMiddlewareFactory::class,
                 
                 Action\HomePageAction::class => Action\HomePageFactory::class,
             ],
@@ -57,6 +59,7 @@ class ConfigProvider {
                 Factory\AbstractActionFactory::class,
                 Factory\AbstractDocumentfactory::class,
                 Factory\AbstractTransformerFactory::class,
+               // Factory\AbstractMiddlewareFactory::class,
             ],
             /*
             'delegators' => [

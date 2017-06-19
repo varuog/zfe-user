@@ -43,7 +43,7 @@ class RouteProvider {
                 , [\Zend\Expressive\Helper\BodyParams\BodyParamsMiddleware::class, Action\UserLoginAction::class]
                 , 'user.login');
         $app->get('/user/fetch/:id'
-                , [Action\UserFetchAction::class]
+                , [ Action\UserFetchAction::class]
                 , 'user.fetch');
 
         return $app;

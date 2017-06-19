@@ -17,7 +17,7 @@ use Zend\View\Renderer\RendererInterface;
  * @author Gourav Sarkar
  */
 class UserServiceOptions extends AbstractOptions {
-   
+
     private $resetTokenValidity;
     private $responseType;
     private $credentialField;
@@ -31,9 +31,19 @@ class UserServiceOptions extends AbstractOptions {
     private $enableEmailNotification;
     private $enableNotifyDeactivation;
     private $enableNotifyActivation;
+    private $accessTokenTtl;
 
     public function __construct(array $options = null) {
         parent::__construct($options);
+    }
+
+    public function getAccessTokenTtl() {
+        return $this->accessTokenTtl;
+    }
+
+    public function setAccessTokenTtl($accessTokenTtl) {
+        $this->accessTokenTtl = $accessTokenTtl;
+        return $this;
     }
 
     public function getNotifyNewRegistration() {

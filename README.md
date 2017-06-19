@@ -32,6 +32,10 @@ $composer require varuog/zfe-user
 Copy file `zfe-user.global.php` from instllation directory  to config\autoload\zfe-user.global.php.dist and
 rename it to zfe-user.global.php
 
+Copy `data\language` folder from zfe-user and paste it to application data directory
+Create other directory `data\proxies`, `data\hydrators`, `data\document`
+
+Copy `template` folder from zfe-user and paste to application template folder
 Add this code block to `config\atuoload\dependencies.global.php` under dependency keys
 ```php
  'dependencies' => [

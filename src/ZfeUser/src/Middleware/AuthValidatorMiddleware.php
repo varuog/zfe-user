@@ -15,6 +15,11 @@ use \Psr\Http\Message\ResponseInterface;
 use WoohooLabs\Yin\JsonApi\Document\ErrorDocument;
 use WoohooLabs\Yin\JsonApi\JsonApi;
 use ZfeUser\Service\UserService;
+use WoohooLabs\Yin\JsonApi\Exception\DefaultExceptionFactory;
+use WoohooLabs\Yin\JsonApi\Request\Request as JsonApiRequest;
+use Zend\Diactoros\Response;
+use WoohooLabs\Yin\JsonApi\Schema\JsonApiObject;
+use WoohooLabs\Yin\JsonApi\Schema\Error;
 
 /**
  * Description of JsonApiResponseMiddleware
@@ -22,26 +27,45 @@ use ZfeUser\Service\UserService;
  * @author gourav sarkar
  */
 class AuthValidatorMiddleware implements MiddlewareInterface {
- 
+
     private $userService;
+
     public function __construct(UserService $userService) {
-        $this->userService= $userService;
+        $this->userService = $userService;
     }
 
     public function process(ServerRequestInterface $request, DelegateInterface $delegate): ResponseInterface {
 
-        $document=$request->getAttribute(static::ATTR_RESPONSE_DOCUMENT);
-        $statusCode=$request->getAttribute(static::ATTR_RESPONSE_STATUS_CODE);
-        $data=$request->getAttribute(static::ATTR_RESPONSE_DATA);
+        $defaultExpFactory = new DefaultExceptionFactory();
+
+        $jsonapiRequest = new JsonApiRequest($request, $defaultExpFactory);
+        $jsonApi = new JsonApi($jsonapiRequest, new Response(), $defaultExpFactory, null);
+
+
+        $authString = $request->getHeader('Authorization');
+        $authStringParts = explode(':', $authString[0]);
         
-        if ($document instanceof ErrorDocument) {
-            /** @var ErrorDocument $document; */
-            $document->setJsonApi(new JsonApiObject("1.0"));
-            return $this->jsonApi->respond()->genericError($document, $data, $statusCode);
-            
-        } else {
-           
+        if (count($authStringParts) > 0) {
+            $user = new \ZfeUser\Model\User();
+            $user->setEmail($authStringParts[0]);
+            $user->setResetToken($authStringParts[1]);
+
+            $currentUser = $this->userService->isValidAuthToken($user);
+
+            if ($currentUser != null) {
+                return $delegate($request);
+            }
         }
+
+
+
+        $errorDoc = new ErrorDocument();
+        $errorDoc->setJsonApi(new JsonApiObject("1.0"));
+
+        $error = new Error();
+        $error->setTitle('Unathorised access');
+
+        return $jsonApi->respond()->genericError($errorDoc,[],503);
     }
 
 }

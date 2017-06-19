@@ -6,7 +6,7 @@ use Interop\Container\ContainerInterface;
 use ReflectionClass;
 use Zend\ServiceManager\Factory\AbstractFactoryInterface;
 
-class AbstractDocumentfactory implements AbstractFactoryInterface
+class AbstractMiddlewareFactory implements AbstractFactoryInterface
 {
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
@@ -36,7 +36,7 @@ class AbstractDocumentfactory implements AbstractFactoryInterface
     public function canCreate(ContainerInterface $container, $requestedName)
     {
         // Only accept Action classes
-        if (substr($requestedName, -8) == 'Document') {
+        if (substr($requestedName, -10) == 'Middleware') {
             return true;
         }
 
