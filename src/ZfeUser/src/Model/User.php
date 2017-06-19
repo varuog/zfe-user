@@ -33,10 +33,10 @@ class User {
     /** @ODM\Field(type="string") @ODM\UniqueIndex */
     private $password;
 
-    /** @ODM\Field(type="string") @ODM\UniqueIndex */
+    /** @ODM\Field(type="integer") @ODM\UniqueIndex */
     private $authToken;
 
-    /** @ODM\Field(type="string") @ODM\UniqueIndex */
+    /** @ODM\Field(type="int") @ODM\UniqueIndex */
     private $authTokenTime;
 
     /** @ODM\Field(type="string") @ODM\UniqueIndex */
@@ -45,7 +45,7 @@ class User {
     /** @ODM\Field(type="string") @ODM\UniqueIndex */
     private $resetToken;
 
-    /** @ODM\Field(type="string") @ODM\UniqueIndex */
+    /** @ODM\Field(type="int") @ODM\UniqueIndex */
     private $resetTokenTime;
 
     /** @ODM\Field(type="date") */
@@ -92,6 +92,11 @@ class User {
 
     public function getResetTokenTime() {
         return $this->resetTokenTime;
+    }
+
+    public function setAuthToken($authToken) {
+        $this->authToken = $authToken;
+        return $this;
     }
 
     public function setAuthTokenTime($authTokenTime) {

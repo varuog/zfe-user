@@ -48,12 +48,12 @@ class AuthValidatorMiddleware implements MiddlewareInterface {
         if (count($authStringParts) > 0) {
             $user = new \ZfeUser\Model\User();
             $user->setEmail($authStringParts[0]);
-            $user->setResetToken($authStringParts[1]);
+            $user->setAuthToken($authStringParts[1]);
 
             $currentUser = $this->userService->isValidAuthToken($user);
 
             if ($currentUser != null) {
-                return $delegate($request);
+                return $delegate->process($request);
             }
         }
 
@@ -65,7 +65,7 @@ class AuthValidatorMiddleware implements MiddlewareInterface {
         $error = new Error();
         $error->setTitle('Unathorised access');
 
-        return $jsonApi->respond()->genericError($errorDoc,[],503);
+        return $jsonApi->respond()->forbidden($errorDoc);
     }
 
 }
