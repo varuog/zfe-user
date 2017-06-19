@@ -1,18 +1,38 @@
 # zfe-user
 
-## Description
-Commong User handling task for zend expressive 2 application. currently supports MongoDB based datatbase. has option for
-HTML, JSON or JSON-API payload.
+## Notice
+**It is under active development. (WIP) Not suitable for production.**
 
-## Composer Install
+
+## Description
+Commong User handling task for zend expressive 2 application. currently supports 
+MongoDB based database, JSON-API payload. Does not includes any view templates 
+or view helpers. Its end points meant to be consumed by API clients. Though it 
+is easily possible to compose a view from `UserService` and use customized view.
+
+
+## Features
+1. User is able to register and login
+2. User can reset their password and email with mail verification. auto discarded
+reset tokens.
+3. Customizable mail template for notifying user and admin
+4. User can be fetched via url
+5. Access token based authentication
+
+## Future plan
+1. Currently it only supports mongodb. would add doctrine ORM (mysql) and zend-db
+2. Currently it only supports json-api payload. Would add other payload.
+3. Add event hook for all process
+
+## Installation
 ```bash
 $composer require varuog/zfe-user
 ```
 
-Copy file zfe-user.global.php from instllation directory  to config\autoload\zfe-user.global.php.dist and
+Copy file `zfe-user.global.php` from instllation directory  to config\autoload\zfe-user.global.php.dist and
 rename it to zfe-user.global.php
 
-Add this code block to `config\atuoload\dependencies` under dependency keys
+Add this code block to `config\atuoload\dependencies.global.php` under dependency keys
 ```php
  'dependencies' => [
             /**
@@ -27,5 +47,3 @@ Add this code block to `config\atuoload\dependencies` under dependency keys
 ]
 ```
 
-## Notice
-**It is under active development. (WIP) Not suitable for production.**
