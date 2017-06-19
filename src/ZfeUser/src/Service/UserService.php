@@ -190,10 +190,11 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
         $isExpiredToken = time() < $loggedUser->getResetTokenTime() + $this->options->getResetTokenValidity();
         if ($loggedUser instanceof User && !$isExpiredToken) {
             $loggedUser->getResetToken();
-            $this->persistantManager->createQueryBuilder(get_class($user))
+            return $this->persistantManager->createQueryBuilder(get_class($user))
                     ->field("resetToken")
                     ->equals($loggedUser->getResetToken())
                     ->findAndUpdate()
+                    ->returnNew()
                     ->field('resetToken')
                     ->set(null)
                     ->field('resetTokenTime')
@@ -222,10 +223,11 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
 
             $loggedUser->getResetToken();
 
-            $this->persistantManager->createQueryBuilder(get_class($user))
+            return $this->persistantManager->createQueryBuilder(get_class($user))
                     ->field("resetToken")
                     ->equals($loggedUser->getResetToken())
                     ->findAndUpdate()
+                    ->returnNew()
                     ->field('resetToken')
                     ->set(null)
                     ->field('resetTokenTime')
@@ -271,10 +273,11 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
     public function generateResetToken(User $user, $resetField = '') {
         $user->generateResetToken();
 
-        $this->persistantManager->createQueryBuilder(get_class($user))
+        $user=$this->persistantManager->createQueryBuilder(get_class($user))
                 ->field($this->identity)
                 ->equals(call_user_func([$user, "get{$this->identity}"]))
                 ->findAndUpdate()
+                        ->returnNew()
                 ->field('resetToken')
                 ->set($user->getResetToken())
                 ->field('resetTokenTime')
