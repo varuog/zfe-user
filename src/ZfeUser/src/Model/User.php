@@ -139,8 +139,16 @@ class User {
         return $this;
     }
 
-    public function generateToken() {
-        $this->authToken = md5(time());
+     public function generateResetToken() {
+        $this->resetToken = hash('sha256', random_int(PHP_INT_MIN, PHP_INT_MAX));
+    }
+    
+    public function generateRefreashToken() {
+        $this->refreashToken = hash('sha256', random_int(PHP_INT_MIN, PHP_INT_MAX));
+    }
+    
+     public function generateAuthToken() {
+        $this->authToken = hash('sha256', random_int(PHP_INT_MIN, PHP_INT_MAX));
     }
 
     public function hashPassword() {

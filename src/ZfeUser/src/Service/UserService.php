@@ -128,7 +128,10 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
     public function isValidAuthToken(User $user) {
         /** @var User $newuser */
         $newuser = $this->persistantManager->getRepository(get_class($user))
-                ->findOneBy(['email' => $user->getEmail(), 'authToken' => $user->getAuthToken()]);
+                ->findOneBy([$this->identity => call_user_func([$this->authUser, "get{$this->identity}"])
+            , 'authToken' => $user->getAuthToken()
+                ]
+        );
 
         //expired token
         if ($user->getAuthTokenTime() + $this->options->getAccessTokenTtl() < time()) {
@@ -186,10 +189,10 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
         //$loggedUser = $this->persistantManager->createQueryBuilder(get_class($user))->field('email')->;
         $isExpiredToken = time() < $loggedUser->getResetTokenTime() + $this->options->getResetTokenValidity();
         if ($loggedUser instanceof User && !$isExpiredToken) {
-
+            $loggedUser->getResetToken();
             $this->persistantManager->createQueryBuilder(get_class($user))
                     ->field("resetToken")
-                    ->equals($user->getResetToken())
+                    ->equals($loggedUser->getResetToken())
                     ->findAndUpdate()
                     ->field('resetToken')
                     ->set(null)
@@ -198,7 +201,7 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
                     ->field('emailVerified')
                     ->set(true)
                     ->field($this->credential)
-                    ->set(call_user_func([$user, "get{$this->credential}"]))
+                    ->set(call_user_func([$loggedUser, "get{$this->credential}"]))
                     ->getQuery()
                     ->execute();
         }
@@ -217,9 +220,11 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
         $isExpiredToken = time() < $loggedUser->getResetTokenTime() + $this->options->getResetTokenValidity();
         if ($loggedUser instanceof User && !$isExpiredToken) {
 
+            $loggedUser->getResetToken();
+
             $this->persistantManager->createQueryBuilder(get_class($user))
                     ->field("resetToken")
-                    ->equals($user->getResetToken())
+                    ->equals($loggedUser->getResetToken())
                     ->findAndUpdate()
                     ->field('resetToken')
                     ->set(null)
@@ -228,7 +233,7 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
                     ->field('emailVerified')
                     ->set(true)
                     ->field($this->identity)
-                    ->set(call_user_func([$user, "get{$this->identity}"]))
+                    ->set(call_user_func([$loggedUser, "get{$this->identity}"]))
                     ->getQuery()
                     ->execute();
         }
@@ -241,21 +246,21 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
      * @param User $user
      */
     public function generateAuthToken(User $user) {
-        $user->generateToken();
+        $user->generateAuthToken();
 
         return $this->persistantManager->createQueryBuilder(get_class($user))
-                ->field($this->identity)
-                ->equals(call_user_func([$user, "get{$this->identity}"]))
-                ->findAndUpdate()
-                ->returnNew()
-                ->field('authToken')
-                ->set($user->getAuthToken())
-                ->field('authTokenTime')
-                ->set(time())
-                ->field('refreshToken')
-                ->set(hash('sha256', random_int(PHP_INT_MIN, PHP_INT_MAX)))
-                ->getQuery()
-                ->execute();
+                        ->field($this->identity)
+                        ->equals(call_user_func([$user, "get{$this->identity}"]))
+                        ->findAndUpdate()
+                        ->returnNew()
+                        ->field('authToken')
+                        ->set($user->getAuthToken())
+                        ->field('authTokenTime')
+                        ->set(time())
+                        ->field('refreshToken')
+                        ->set($user->getRefreashToken())
+                        ->getQuery()
+                        ->execute();
     }
 
     /**
@@ -264,7 +269,7 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
      * @param type $resetField
      */
     public function generateResetToken(User $user, $resetField = '') {
-        $user->generateToken();
+        $user->generateResetToken();
 
         $this->persistantManager->createQueryBuilder(get_class($user))
                 ->field($this->identity)
