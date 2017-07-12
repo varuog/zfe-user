@@ -18,186 +18,159 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  */
 class User {
 
-    /** @ODM\Id(strategy="NONE") */
-    private $id;
+	/** @ODM\Id(strategy="NONE") */
+	private $id;
 
-    /** @ODM\Field(type="string") @ODM\UniqueIndex */
-    private $email;
+	/** @ODM\Field(type="string") @ODM\UniqueIndex */
+	private $email;
 
-    /** @ODM\Field(type="string") @ODM\Index(unique=true, dropDups=true) */
-    private $username;
+	/** @ODM\Field(type="string") @ODM\Index(unique=true, dropDups=true) */
+	private $username;
 
-    /** @ODM\Field(type="string") */
-    private $fullName;
+	/** @ODM\Field(type="string") */
+	private $fullName;
 
-    /** @ODM\Field(type="string") @ODM\UniqueIndex */
-    private $password;
+	/** @ODM\Field(type="string") @ODM\UniqueIndex */
+	private $password;
 
-    /** @ODM\Field(type="integer") @ODM\UniqueIndex */
-    private $authToken;
+	/** @ODM\Field(type="string") @ODM\UniqueIndex */
+	private $resetToken;
 
-    /** @ODM\Field(type="int") @ODM\UniqueIndex */
-    private $authTokenTime;
+	/** @ODM\Field(type="int") @ODM\UniqueIndex */
+	private $resetTokenTime;
 
-    /** @ODM\Field(type="string") @ODM\UniqueIndex */
-    private $refreashToken;
+	/** @ODM\Field(type="date") */
+	private $approveTime;
 
-    /** @ODM\Field(type="string") @ODM\UniqueIndex */
-    private $resetToken;
+	/** @ODM\Field(type="boolean") @ODM\Index */
+	private $approved = false;
 
-    /** @ODM\Field(type="int") @ODM\UniqueIndex */
-    private $resetTokenTime;
+	/** @ODM\Field(type="boolean") @ODM\Index */
+	private $emailVerified = false;
 
-    /** @ODM\Field(type="date") */
-    private $approveTime;
+	/** @ODM\EmbedMany(targetDocument="Authentication") */
+	private $authenticationInfo = [];
+	private $roles;
 
-    /** @ODM\Field(type="boolean") @ODM\Index */
-    private $approved = false;
+	public function getId() {
+		return $this->id;
+	}
 
-    /** @ODM\Field(type="boolean") @ODM\Index */
-    private $emailVerified = false;
-    private $roles;
+	public function getEmail() {
+		return $this->email;
+	}
 
-    public function getId() {
-        return $this->id;
-    }
+	public function getUsername() {
+		return $this->username;
+	}
 
-    public function getEmail() {
-        return $this->email;
-    }
+	public function getFullName() {
+		return $this->fullName;
+	}
 
-    public function getUsername() {
-        return $this->username;
-    }
+	public function getPassword() {
+		return $this->password;
+	}
 
-    public function getFullName() {
-        return $this->fullName;
-    }
+	public function getResetToken() {
+		return $this->resetToken;
+	}
 
-    public function getPassword() {
-        return $this->password;
-    }
+	public function getResetTokenTime() {
+		return $this->resetTokenTime;
+	}
 
-    public function getAuthToken() {
-        return $this->authToken;
-    }
+	public function setResetToken( $resetToken ) {
+		$this->resetToken = $resetToken;
+		return $this;
+	}
 
-    public function getAuthTokenTime() {
-        return $this->authTokenTime;
-    }
+	public function setResetTokenTime( $resetTokenTime ) {
+		$this->resetTokenTime = $resetTokenTime;
+		return $this;
+	}
 
-    public function getResetToken() {
-        return $this->resetToken;
-    }
+	public function setId( $id ) {
+		$this->id = $id;
+		return $this;
+	}
 
-    public function getResetTokenTime() {
-        return $this->resetTokenTime;
-    }
+	public function setEmail( $email ) {
+		$this->email = $email;
+		return $this;
+	}
 
-    public function setAuthToken($authToken) {
-        $this->authToken = $authToken;
-        return $this;
-    }
+	public function setUsername( $username ) {
+		$this->username = $username;
+		return $this;
+	}
 
-    public function setAuthTokenTime($authTokenTime) {
-        $this->authTokenTime = $authTokenTime;
-        return $this;
-    }
+	public function setFullName( $fullName ) {
+		$this->fullName = $fullName;
+		return $this;
+	}
 
-    public function setResetToken($resetToken) {
-        $this->resetToken = $resetToken;
-        return $this;
-    }
+	public function setPassword( $password ) {
+		$this->password = $password;
+		return $this;
+	}
 
-    public function setResetTokenTime($resetTokenTime) {
-        $this->resetTokenTime = $resetTokenTime;
-        return $this;
-    }
+	public function generateResetToken() {
+		$this->resetToken = hash( 'sha256', random_int( PHP_INT_MIN, PHP_INT_MAX ) );
+	}
 
-    public function setId($id) {
-        $this->id = $id;
-        return $this;
-    }
+	public function hashPassword() {
+		$this->password = password_hash( $this->password, PASSWORD_DEFAULT );
+	}
 
-    public function setEmail($email) {
-        $this->email = $email;
-        return $this;
-    }
+	public function getApproveTime() {
+		return $this->approveTime;
+	}
 
-    public function setUsername($username) {
-        $this->username = $username;
-        return $this;
-    }
+	public function getApproved() {
+		return $this->approved;
+	}
 
-    public function setFullName($fullName) {
-        $this->fullName = $fullName;
-        return $this;
-    }
+	public function getEmailVerified() {
+		return $this->emailVerified;
+	}
 
-    public function setPassword($password) {
-        $this->password = $password;
-        return $this;
-    }
+	public function setApproveTime( \DateTime $approveTime ) {
+		$this->approveTime = $approveTime;
+		return $this;
+	}
 
-     public function generateResetToken() {
-        $this->resetToken = hash('sha256', random_int(PHP_INT_MIN, PHP_INT_MAX));
-    }
-    
-    public function generateRefreashToken() {
-        $this->refreashToken = hash('sha256', random_int(PHP_INT_MIN, PHP_INT_MAX));
-    }
-    
-     public function generateAuthToken() {
-        $this->authToken = hash('sha256', random_int(PHP_INT_MIN, PHP_INT_MAX));
-    }
+	public function setApproved( $approved ) {
+		$this->approved = $approved;
+		return $this;
+	}
 
-    public function hashPassword() {
-        $this->password = password_hash($this->password, PASSWORD_DEFAULT);
-    }
+	public function setEmailVerified( $emailVerified ) {
+		$this->emailVerified = $emailVerified;
+		return $this;
+	}
 
-    public function getApproveTime() {
-        return $this->approveTime;
-    }
+	public function getRoles() {
+		return $this->roles;
+	}
 
-    public function getApproved() {
-        return $this->approved;
-    }
+	public function setRoles( $roles ) {
+		$this->roles = $roles;
+		return $this;
+	}
 
-    public function getEmailVerified() {
-        return $this->emailVerified;
-    }
+	public function generateRefreashToken( Authentication $auth ) {
+		//$refreshToken= new Authentication(hash('sha256', random_int(PHP_INT_MIN, PHP_INT_MAX)), time());
+		throw new \BadMethodCallException( 'Method Not Implemented' );
+	}
 
-    public function setApproveTime(\DateTime $approveTime) {
-        $this->approveTime = $approveTime;
-        return $this;
-    }
+	public function generateAuthToken() {
+		$authToken					 = new Authentication( hash( 'sha256', random_int( PHP_INT_MIN, PHP_INT_MAX ) ), time() );
+		$this->authenticationInfo[]	 = $authToken;
+	}
 
-    public function setApproved($approved) {
-        $this->approved = $approved;
-        return $this;
-    }
-
-    public function setEmailVerified($emailVerified) {
-        $this->emailVerified = $emailVerified;
-        return $this;
-    }
-
-    public function getRefreashToken() {
-        return $this->refreashToken;
-    }
-
-    public function getRoles() {
-        return $this->roles;
-    }
-
-    public function setRefreashToken($refreashToken) {
-        $this->refreashToken = $refreashToken;
-        return $this;
-    }
-
-    public function setRoles($roles) {
-        $this->roles = $roles;
-        return $this;
-    }
+	public function getAuthenticationInfo() {
+		return $this->authenticationInfo;
+	}
 
 }

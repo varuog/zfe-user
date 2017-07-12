@@ -128,8 +128,8 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
     public function isValidAuthToken(User $user) {
         /** @var User $newuser */
         $newuser = $this->persistantManager->getRepository(get_class($user))
-                ->findOneBy([$this->identity => call_user_func([$this->authUser, "get{$this->identity}"])
-            , 'authToken' => $user->getAuthToken()
+                ->findOneBy([$this->identity => call_user_func([$user, "get{$this->identity}"])
+            , 'authToken' => $user->getAuthToken()[0]
                 ]
         );
 
@@ -249,18 +249,16 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
      */
     public function generateAuthToken(User $user) {
         $user->generateAuthToken();
-
+		var_dump($user);
         return $this->persistantManager->createQueryBuilder(get_class($user))
                         ->field($this->identity)
                         ->equals(call_user_func([$user, "get{$this->identity}"]))
                         ->findAndUpdate()
                         ->returnNew()
-                        ->field('authToken')
-                        ->set($user->getAuthToken())
-                        ->field('authTokenTime')
-                        ->set(time())
-                        ->field('refreshToken')
-                        ->set($user->getRefreashToken())
+                        ->field('authenticationInfo')
+                        ->a($user->getAuthenticationInfo())
+                        //->field('authenticationInfo.refreshToken')
+                        //->set($user->getRefreashToken())
                         ->getQuery()
                         ->execute();
     }
