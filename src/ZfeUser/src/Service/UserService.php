@@ -256,7 +256,7 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
                         ->findAndUpdate()
                         ->returnNew()
                         ->field('authenticationInfo')
-                        ->a($user->getAuthenticationInfo())
+                        ->pushAll($user->getAuthenticationInfo())
                         //->field('authenticationInfo.refreshToken')
                         //->set($user->getRefreashToken())
                         ->getQuery()
