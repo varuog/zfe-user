@@ -48,7 +48,7 @@ class User {
 	/** @ODM\Field(type="boolean") @ODM\Index */
 	private $emailVerified = false;
 
-	/** @ODM\EmbedMany(targetDocument="Authentication") */
+	/** @ODM\EmbedMany(targetDocument="\ZfeUser\Model\Authentication") */
 	private $authenticationInfo = [];
 	private $roles;
 
@@ -164,8 +164,11 @@ class User {
 		throw new \BadMethodCallException( 'Method Not Implemented' );
 	}
 
-	public function generateAuthToken() {
-		$authToken					 = new Authentication( hash( 'sha256', random_int( PHP_INT_MIN, PHP_INT_MAX ) ), time() );
+	public function generateAuthToken( array $serverInfo ) {
+		$authToken					 = new Authentication( hash( 'sha256', random_int( PHP_INT_MIN, PHP_INT_MAX ) )
+		, time()
+		, $serverInfo[ 'REMOTE_ADDR' ]
+		, $serverInfo[ 'HTTP_USER_AGENT' ] );
 		$this->authenticationInfo[]	 = $authToken;
 	}
 

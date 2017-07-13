@@ -15,11 +15,11 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  * Description of Authentication
  *
  * @author Gourav Sarkar
- * @ODM\Document
+ * @ODM\EmbeddedDocument
  */
 class Authentication {
 
-	/** @ODM\ID */
+	/** @ODM\Field(type="string") @ODM\UniqueIndex */
 	private $authToken;
 
 	/** @ODM\Field(type="int") @ODM\Index */
@@ -28,9 +28,25 @@ class Authentication {
 	/** @ODM\Field(type="string") @ODM\UniqueIndex */
 	private $refreashToken;
 
-	public function __construct( $authToken, $authTokenTime ) {
+	/** @ODM\Field(type="string") @ODM\UniqueIndex */
+	private $logIp;
+
+	/** @ODM\Field(type="string") @ODM\UniqueIndex */
+	private $deviceID;
+
+	/**
+	 * 
+	 * @todo IP Address should be converted to ineteger
+	 * @param type $authToken
+	 * @param type $authTokenTime
+	 * @param type $ip
+	 * @param type $device
+	 */
+	public function __construct( $authToken, $authTokenTime, $ip, $device ) {
 		$this->authToken	 = $authToken;
 		$this->authTokenTime = $authTokenTime;
+		$this->logIp		 = $ip;
+		$this->deviceID		 = $device;
 	}
 
 	public function getAuthToken() {
@@ -58,6 +74,14 @@ class Authentication {
 	public function setRefreashToken( $refreashToken ) {
 		$this->refreashToken = $refreashToken;
 		return $this;
+	}
+
+	public function getLogIp() {
+		return $this->logIp;
+	}
+
+	public function getDeviceID() {
+		return $this->deviceID;
 	}
 
 }

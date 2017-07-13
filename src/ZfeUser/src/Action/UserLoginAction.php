@@ -49,6 +49,7 @@ class UserLoginAction implements ServerMiddlewareInterface {
         $jsonapi->hydrate($this->userHydrator, $user);
 
         $this->userService->setAuthUser($user);
+		$this->userService->setServerOptions($request->getServerParams());
         $authResult = $this->userService->authenticate();
 
 
