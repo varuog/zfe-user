@@ -88,10 +88,10 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
 		$user->setApproveTime( new \DateTime() );
 
 
+		$this->persistantManager->getSchemaManager()->ensureIndexes();
 		$user->hashPassword();
 		$this->persistantManager->persist( $user );
 		$this->persistantManager->flush( $user, [ 'safe' => true ] );
-		//$this->persistantManager->getSchemaManager()->ensureIndexes();
 
 		/*
 		 * Send Mail
