@@ -1,24 +1,27 @@
 <?php
 
 return [
-    'zfe-user' => [
-        'credentialField' => 'password',
-        'identityField' => 'email',
-        'resetTokenValidity' => 300,
-        'responseType' => \WoohooLabs\Yin\JsonApi\JsonApi::class,
-        //'responseType' => Zend\Diactoros\Response\JsonResponse::class,
-        'notifyNewRegistration' => true,
-        'responderEmail' => 'sample@email.com',
-        'responderName' => 'somename',
-        'enableUserApproval' => true,
-        'enableEmailVerification' => true,
-        'enableEmailNotification' => true,
-        'enableNotifyDeactivation' => true,
-        'enableNotifyActivation' => true,
-        'accessTokenTtl' => 30*60*60*24,
-    ],
-	'db' =>[
+	'zfe-user'	 => [
+		'credentialField'			 => 'password',
+		'identityField'				 => 'email',
+		'resetTokenValidity'		 => 300,
+		'responseType'				 => \WoohooLabs\Yin\JsonApi\JsonApi::class,
+		//'responseType' => Zend\Diactoros\Response\JsonResponse::class,
+		'notifyNewRegistration'		 => true,
+		'responderEmail'			 => 'sample@email.com',
+		'responderName'				 => 'somename',
+		'enableUserApproval'		 => true,
+		'enableEmailVerification'	 => true,
+		'enableEmailNotification'	 => true,
+		'enableNotifyDeactivation'	 => true,
+		'enableNotifyActivation'	 => true,
+		'accessTokenTtl'			 => 30 * 60 * 60 * 24,
+		'publicProfile'				 => true,
+	],
+	/**
+	 * Not documented
+	 */
+	'db'		 => [
 		'database' => 'User'
 	]
-	
 ];

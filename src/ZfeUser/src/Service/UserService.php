@@ -12,6 +12,7 @@ use Zend\EventManager\EventManagerAwareInterface;
 use Zend\Mail\Transport\TransportInterface;
 use Zend\Mail\Message;
 use Zend\Expressive\Template\TemplateRendererInterface;
+use ZfeUser\Model\Authentication;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -59,7 +60,11 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
 	}
 
 	public function fetch( User $user ) {
-		return $this->persistantManager->find( get_class( $user ), $user->getId() );
+		//return $this->persistantManager->( get_class( $user ), $user->getId() );
+		$user = $this->persistantManager->getRepository( get_class( $user ) )
+		->findOneBy( [ 'slug' => $user->getSlug() ] );
+
+		return $user;
 	}
 
 	/**
@@ -124,23 +129,24 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
 	}
 
 	/**
+	 * @todo identity check can be removed [IMPORTANT]
+	 * @todo Should throw exception on invalid token
 	 * @todo reset token issue
 	 * @param User $user
 	 */
-	public function isValidAuthToken( User $user ) {
-		/** @var User $newuser */
+	public function isValidAuthToken( User $user, Authentication $auth ) {
+		/* @var User $newuser */
 		$newuser = $this->persistantManager->getRepository( get_class( $user ) )
-		->findOneBy( [ $this->identity	 => call_user_func( [ $user, "get{$this->identity}" ] )
-			, 'authToken'		 => $user->getAuthToken()[ 0 ]
+		->findOneBy( [ $this->identity					 => call_user_func( [ $user, "get{$this->identity}" ] )
+			, 'authenticationInfo.authToken'	 => $auth->getAuthToken()
 		]
 		);
 
 		//expired token
-		if ( $user->getAuthTokenTime() + $this->options->getAccessTokenTtl() < time() ) {
+		$authToken = $newuser->getAuthToken( $auth );
+		if ( $authToken instanceof Authentication && $authToken->getAuthTokenTime() + $this->options->getAccessTokenTtl() < time() ) {
 			//Update auth token if it matches
-			if ( is_null( $newuser ) || $newuser->getRefreashToken() == $user->getRefreashToken() ) {
-				return $this->generateAuthToken( $user );
-			}
+			return false;
 		}
 
 		return $newuser;
@@ -259,8 +265,10 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
 
 		$user->generateAuthToken( $this->serverOptions );
 
+		$this->persistantManager->getSchemaManager()->ensureIndexes();
+
 		$this->persistantManager->persist( $user );
-		$this->persistantManager->flush();
+		$this->persistantManager->flush( $user, [ 'safe' => true ] );
 		/*
 		 * 
 		 *
