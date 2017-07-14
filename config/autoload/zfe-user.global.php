@@ -17,4 +17,8 @@ return [
         'enableNotifyActivation' => true,
         'accessTokenTtl' => 30*60*60*24,
     ],
+	'db' =>[
+		'database' => 'User'
+	]
+	
 ];

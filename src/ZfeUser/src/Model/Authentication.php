@@ -31,7 +31,7 @@ class Authentication {
 	/** @ODM\Field(type="string") @ODM\UniqueIndex */
 	private $logIp;
 
-	/** @ODM\Field(type="string") @ODM\UniqueIndex */
+	/** @ODM\Field(type="string") @ODM\Index */
 	private $deviceID;
 
 	/**

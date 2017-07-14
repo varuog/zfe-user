@@ -15,6 +15,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  *
  * @author Gourav Sarkar
  * @ODM\Document
+ * 
  */
 class User {
 
@@ -48,7 +49,7 @@ class User {
 	/** @ODM\Field(type="boolean") @ODM\Index */
 	private $emailVerified = false;
 
-	/** @ODM\EmbedMany(targetDocument="\ZfeUser\Model\Authentication") */
+	/** @ODM\EmbedMany(targetDocument="Authentication") */
 	private $authenticationInfo = [];
 	private $roles;
 

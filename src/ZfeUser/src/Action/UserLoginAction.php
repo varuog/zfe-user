@@ -8,13 +8,13 @@ use Psr\Http\Message\ServerRequestInterface;
 use ZfeUser\Service\UserService;
 use Zend\Expressive\Template\TemplateRendererInterface;
 use ZfeUser\Hateoas\Jsonapi\Document;
+use WoohooLabs\Yin\JsonApi\Document\ErrorDocument;
 use ZfeUser\Hateoas\Jsonapi\Transformer;
 use WoohooLabs\Yin\JsonApi\JsonApi;
 use WoohooLabs\Yin\JsonApi\Request\Request;
 use Zend\Diactoros\Response;
 use WoohooLabs\Yin\JsonApi\Exception\DefaultExceptionFactory;
 use ZfeUser\Hateoas\Jsonapi\Hydrator\UserHydrator;
-use WoohooLabs\Yin\JsonApi\Document\ErrorDocument;
 use Zend\Authentication\Result;
 use WoohooLabs\Yin\JsonApi\Schema\JsonApiObject;
 use WoohooLabs\Yin\JsonApi\Schema\Error;
@@ -60,6 +60,9 @@ class UserLoginAction implements ServerMiddlewareInterface {
             $errorDoc = new ErrorDocument();
             $errorDoc->setJsonApi(new JsonApiObject("1.0"));
             $errors = [];
+			/*
+			 * Get all messages from auth results
+			 */
             foreach ($authResult->getMessages() as $errorMessage) {
                 $error = new Error();
                 $error->setTitle($errorMessage);

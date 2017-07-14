@@ -10,39 +10,61 @@ use ZfeUser\Service\UserService;
 use ZfeUser\Hateoas\Jsonapi\Hydrator\UserHydrator;
 use WoohooLabs\Yin\JsonApi\Request\Request as JsonApiRequest;
 use WoohooLabs\Yin\JsonApi\Exception\DefaultExceptionFactory;
-use ZfeUser\Hateoas\Jsonapi\Document;
 use ZfeUser\Hateoas\Jsonapi\Transformer;
 use ZfeUser\Model\User;
 use ZfeUser\Hateoas\Jsonapi\Document\UserDocument;
+use Zend\I18n\Translator\TranslatorInterface;
+use ZfeUser\Hateoas\Jsonapi\Document;
+use WoohooLabs\Yin\JsonApi\Document\ErrorDocument;
+use WoohooLabs\Yin\JsonApi\JsonApi;
+use WoohooLabs\Yin\JsonApi\Schema\JsonApiObject;
+use WoohooLabs\Yin\JsonApi\Schema\Error;
 
 class UserRegisterAction implements ServerMiddlewareInterface {
 
-    private $userService;
-    private $userHydrator;
-    private $userDocuemnt;
+	private $userService;
+	private $userHydrator;
+	private $userDocuemnt;
 
-    public function __construct(UserService $userService, UserHydrator $userHydrator, UserDocument $userDoc) {
-        $this->userService = $userService;
-        $this->userHydrator = $userHydrator;
-        $this->userDocuemnt = $userDoc;
-    }
+	/**
+	 *
+	 * @var TranslatorInterface 
+	 */
+	private $translator;
 
-    public function process(ServerRequestInterface $request, DelegateInterface $delegate) {
+	public function __construct( UserService $userService, UserHydrator $userHydrator, UserDocument $userDoc,
+							  TranslatorInterface $translator ) {
+		$this->userService	 = $userService;
+		$this->userHydrator	 = $userHydrator;
+		$this->userDocuemnt	 = $userDoc;
+		$this->translator	 = $translator;
+	}
 
-        $user = new User();
-        $defaultExpFactory = new DefaultExceptionFactory();
-        $jsonapiRequest = new JsonApiRequest($request, $defaultExpFactory);
-        $jsonApi = new \WoohooLabs\Yin\JsonApi\JsonApi($jsonapiRequest, new \Zend\Diactoros\Response(), $defaultExpFactory, null);
-        $jsonApi->hydrate($this->userHydrator, $user);
+	public function process( ServerRequestInterface $request, DelegateInterface $delegate ) {
 
-        try {
+		$user				 = new User();
+		$defaultExpFactory	 = new DefaultExceptionFactory();
+		$jsonapiRequest		 = new JsonApiRequest( $request, $defaultExpFactory );
+		$jsonApi			 = new \WoohooLabs\Yin\JsonApi\JsonApi( $jsonapiRequest, new \Zend\Diactoros\Response(), $defaultExpFactory, null );
+		$jsonApi->hydrate( $this->userHydrator, $user );
 
-            $this->userService->register($user);
-        } catch (\Zend\Mail\Transport\Exception\RuntimeException $ex) {
-            //Ignore mail transport exception. can be logged or notify
-        }
+		try {
 
-        return $jsonApi->respond()->ok($this->userDocuemnt, $user);
-    }
+			$this->userService->register( $user );
+		} catch ( \Zend\Mail\Transport\Exception\RuntimeException $ex ) {
+			//Ignore mail transport exception. can be logged or notify
+		} catch ( \MongoDuplicateKeyException $mongoEx ) {
+			$errorDoc	 = new ErrorDocument();
+			$errorDoc->setJsonApi( new JsonApiObject( "1.0" ) );
+			$errors		 = [];
+
+			$error = new Error();
+			$error->setTitle( $this->translator->translate( 'error-user-conflict', 'zfe-user' ) );
+
+			return $jsonApi->respond()->conflict( $errorDoc );
+		}
+
+		return $jsonApi->respond()->ok( $this->userDocuemnt, $user );
+	}
 
 }

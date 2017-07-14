@@ -14,30 +14,31 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 
 /**
  * Description of MongoDocumentManagerFactory
- *
+ * @todo Database name should be overridable 
  * @author Win10Laptop-Kausik
  */
 class MongoDocumentManagerFactory {
 
-    public function __invoke(ContainerInterface $container) {
-        $connection = new \Doctrine\MongoDB\Connection();
-        $config = new \Doctrine\ODM\MongoDB\Configuration();
+	public function __invoke( ContainerInterface $container ) {
+		$connection	 = new \Doctrine\MongoDB\Connection();
+		$config		 = new \Doctrine\ODM\MongoDB\Configuration();
 
-        $config->setProxyDir('data/proxies');
-        $config->setProxyNamespace('data/Proxies');
-        $config->setHydratorDir('data/hydrators');
-        $config->setHydratorNamespace('Hydrators');
-        $config->setDefaultDB('user');
+		$config->setProxyDir( 'data/proxies' );
+		$config->setProxyNamespace( 'data/Proxies' );
+		$config->setHydratorDir( 'data/hydrators' );
+		$config->setHydratorNamespace( 'Hydrators' );
+		$config->setDefaultDB( 'user' );
+		$modelPath = dirname( dirname( __DIR__ ) ) . DIRECTORY_SEPARATOR . 'Model';
+
+		$config->setMetadataDriverImpl( AnnotationDriver::create( [ $modelPath ] ) );
+		AnnotationDriver::registerAnnotationClasses();
 
 
-        $config->setMetadataDriverImpl(AnnotationDriver::create(['data/document']));
-        AnnotationDriver::registerAnnotationClasses();
+		$dm = DocumentManager::create( $connection, $config );
+		//$dm->getSchemaManager()->ensureDocumentIndexes(\ZfeUser\Model\User::class);
+		
 
-
-        $dm = DocumentManager::create($connection, $config);
-        $dm->getSchemaManager()->ensureIndexes();
-
-        return $dm;
-    }
+		return $dm;
+	}
 
 }

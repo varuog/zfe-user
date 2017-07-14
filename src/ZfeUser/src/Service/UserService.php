@@ -166,16 +166,16 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
 				, [ $this->translator->translate( 'success-login', 'zfe-user' ) ] );
 			} else {
 				return new Result( Result::FAILURE_CREDENTIAL_INVALID, null
-				, [ $this->translator->translate( 'error-credentail-invalid' ) ] );
+				, [ $this->translator->translate( 'error-credentail-invalid', 'zfe-user' ) ] );
 			}
 		} else {
 
 			return new Result( Result::FAILURE_IDENTITY_NOT_FOUND, null
-			, [ $this->translator->translate( 'error-no-user-found' ) ] );
+			, [ $this->translator->translate( 'error-no-user-found', 'zfe-user' ) ] );
 		}
 
 		return new Result( Result::FAILURE_UNCATEGORIZED, null
-		, [ $this->translator->translate( 'error-unknown-auth' ) ]
+		, [ $this->translator->translate( 'error-unknown-auth', 'zfe-user' ) ]
 		);
 	}
 
@@ -251,7 +251,10 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
 	 */
 	public function generateAuthToken( User $user ) {
 
-		$user = $this->persistantManager->getRepository( get_class( $user ) )
+		$this->persistantManager->getSchemaManager()->ensureIndexes();
+
+		$user = $this->persistantManager
+		->getRepository( get_class( $user ) )
 		->findOneBy( [ $this->identity => call_user_func( [ $user, "get{$this->identity}" ] ) ] );
 
 		$user->generateAuthToken( $this->serverOptions );
