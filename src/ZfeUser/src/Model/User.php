@@ -25,8 +25,11 @@ class User {
 	/** @ODM\Field(type="string") @ODM\UniqueIndex */
 	private $email;
 
-	/** @ODM\Field(type="string") @ODM\Index(unique=true, dropDups=true) */
+	/** @ODM\Field(type="string") @ODM\Index(unique=true) */
 	private $username;
+
+	/** @ODM\Field(type="string") @ODM\Index(unique=true) */
+	private $slug;
 
 	/** @ODM\Field(type="string") */
 	private $fullName;
@@ -151,6 +154,15 @@ class User {
 		return $this;
 	}
 
+	public function getSlug() {
+		return $this->slug;
+	}
+
+	public function setSlug( $slug ) {
+		$this->slug = $slug;
+		return $this;
+	}
+
 	public function getRoles() {
 		return $this->roles;
 	}
@@ -175,6 +187,21 @@ class User {
 
 	public function getAuthenticationInfo() {
 		return $this->authenticationInfo;
+	}
+
+	
+	/**
+	 * 
+	 * @return boolean
+	 */
+	public function getAuthToken( Authentication $authToken) {
+		/*@var Authentication $authInfo */
+		foreach ( $this->getAuthenticationInfo() as $authInfo ) {
+			if ( $authInfo->getAuthToken() == $authToken->getAuthToken() )
+				return $authInfo;
+		}
+
+		return false;
 	}
 
 }

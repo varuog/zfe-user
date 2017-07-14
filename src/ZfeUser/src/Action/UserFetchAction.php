@@ -30,6 +30,7 @@ class UserFetchAction implements ServerMiddlewareInterface {
         $this->userService = $userService;
         $this->userHydrator = $userHydrator;
         $this->userDocuemnt = $userDoc;
+		
     }
 
     public function process(ServerRequestInterface $request, DelegateInterface $delegate) {
