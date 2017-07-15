@@ -42,7 +42,7 @@ class RouteProvider {
         $app->post('/user/login'
                 , [\Zend\Expressive\Helper\BodyParams\BodyParamsMiddleware::class, Action\UserLoginAction::class]
                 , 'user.login');
-        $app->get('/user/fetch/:id'
+        $app->get('/user/fetch/:slug'
                 , [Middleware\AuthValidatorMiddleware::class, Action\UserFetchAction::class]
                 , 'user.fetch');
 

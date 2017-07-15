@@ -142,10 +142,13 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
 		]
 		);
 
-		//expired token
-		$authToken = $newuser->getAuthToken( $auth );
-		if ( $authToken instanceof Authentication && $authToken->getAuthTokenTime() + $this->options->getAccessTokenTtl() < time() ) {
-			//Update auth token if it matches
+		if ( $newuser instanceof ZfeUser\Model\User ) {
+			//expired token
+			$authToken = $newuser->getAuthToken( $auth );
+			if ( $authToken instanceof Authentication && $authToken->getAuthTokenTime() + $this->options->getAccessTokenTtl() < time() ) {
+				//Update auth token if it matches
+				return false;
+			}
 			return false;
 		}
 

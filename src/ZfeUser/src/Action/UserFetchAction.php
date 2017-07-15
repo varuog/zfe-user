@@ -36,7 +36,7 @@ class UserFetchAction implements ServerMiddlewareInterface {
     public function process(ServerRequestInterface $request, DelegateInterface $delegate) {
 
         $user = new User();
-        $user->setId($request->getAttribute('id'));
+        $user->setSlug($request->getAttribute('slug'));
         $user = $this->userService->fetch($user);
 
         $defaultExpFactory = new DefaultExceptionFactory();
