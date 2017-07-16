@@ -11,6 +11,7 @@ namespace ZfeUser\Factory\MongoDB;
 use Interop\Container\ContainerInterface;
 use Doctrine\ODM\MongoDB\Mapping\Driver\AnnotationDriver;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\ODM\MongoDB\Mapping\Driver\YamlDriver;
 
 /**
  * Description of MongoDocumentManagerFactory
@@ -19,26 +20,28 @@ use Doctrine\ODM\MongoDB\DocumentManager;
  */
 class MongoDocumentManagerFactory {
 
-	public function __invoke( ContainerInterface $container ) {
-		$connection	 = new \Doctrine\MongoDB\Connection();
-		$config		 = new \Doctrine\ODM\MongoDB\Configuration();
+    public function __invoke(ContainerInterface $container) {
+        $connection = new \Doctrine\MongoDB\Connection();
+        $config = new \Doctrine\ODM\MongoDB\Configuration();
 
-		$config->setProxyDir( 'data/proxies' );
-		$config->setProxyNamespace( 'data/Proxies' );
-		$config->setHydratorDir( 'data/hydrators' );
-		$config->setHydratorNamespace( 'Hydrators' );
-		$config->setDefaultDB( 'user' );
-		$modelPath = dirname( dirname( __DIR__ ) ) . DIRECTORY_SEPARATOR . 'Model';
+        $config->setProxyDir('data/proxies');
+        $config->setProxyNamespace('data/Proxies');
+        $config->setHydratorDir('data/hydrators');
+        $config->setHydratorNamespace('Hydrators');
+        $config->setDefaultDB('user');
+        $modelPath = realpath('data/document');
 
-		$config->setMetadataDriverImpl( AnnotationDriver::create( [ $modelPath ] ) );
-		AnnotationDriver::registerAnnotationClasses();
+        $driver = new YamlDriver([$modelPath]);
+        //$driver =AnnotationDriver::create([$modelPath]);
+        $config->setMetadataDriverImpl($driver);
+        //AnnotationDriver::registerAnnotationClasses();
 
 
-		$dm = DocumentManager::create( $connection, $config );
-		//$dm->getSchemaManager()->ensureDocumentIndexes(\ZfeUser\Model\User::class);
-		
+        $dm = DocumentManager::create($connection, $config);
+        //$dm->getSchemaManager()->ensureDocumentIndexes(\ZfeUser\Model\User::class);
 
-		return $dm;
-	}
+
+        return $dm;
+    }
 
 }

@@ -1,0 +1,50 @@
+## YAML Template.
+ZfeUser\Model\User:
+  type: document    
+  collection: user
+  fields:
+    id:
+        id: true
+        strategy: none
+        type: string   
+    username:
+        unique:
+            order: desc
+        type: string
+    slug:
+        unique:
+            order: desc
+        type: string
+    email:
+        unique:
+            order: desc  
+        type: string  
+    fullName:
+        type: string     
+    password:
+        unique:
+            order: desc
+        type: string   
+    resetToken:
+        unique:
+            order: desc
+        type: string   
+    resetTokenTime:
+        type: int
+    approveTime:
+        type: date
+    approved:
+        type: boolean
+    emailVerified:
+        type: boolean
+    authenticationInfo:
+        embedded: true
+        type: many
+        targetDocument: ZfeUser\Model\Authentication
+        cascade: all
+    roles:
+        reference: true
+        type: many
+        targetDocument: Zend\Permissions\Rbac\Role
+        cascade: all
+  
