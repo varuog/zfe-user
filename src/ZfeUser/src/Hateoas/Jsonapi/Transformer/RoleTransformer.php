@@ -16,13 +16,7 @@ use ZfeUser\Model;
  *
  * @author Gourav Sarkar
  */
-class UserTransformer extends AbstractResourceTransformer {
-
-	private $roleTransformer;
-
-	public function __construct( RoleTransformer $roleTransformer ) {
-		$this->roleTransformer = $roleTransformer;
-	}
+class RoleTransformer extends AbstractResourceTransformer {
 
 	/**
 	 * 
@@ -65,8 +59,7 @@ class UserTransformer extends AbstractResourceTransformer {
 	 * @return array
 	 */
 	public function getDefaultIncludedRelationships( $domainObject ): array {
-		return [
-		];
+		return [];
 	}
 
 	/**
