@@ -11,7 +11,7 @@ namespace ZfeUser\Hateoas\Jsonapi\Hydrator;
 use WoohooLabs\Yin\JsonApi\Hydrator\AbstractHydrator;
 use WoohooLabs\Yin\JsonApi\Request\RequestInterface;
 use WoohooLabs\Yin\JsonApi\Exception\ExceptionFactoryInterface;
-use ZfeUser\Model\User;
+use Zend\Permissions\Rbac\Role;
 
 /**
  * Description of UserHydrator
@@ -22,41 +22,27 @@ class RoleHydrator extends AbstractHydrator {
 
 	protected function generateId(): string {
 		$f = \Doctrine\ODM\MongoDB\Id\UuidGenerator::generateV4();
-		return \Doctrine\ODM\MongoDB\Id\UuidGenerator::generateV4();
+		//return \Doctrine\ODM\MongoDB\Id\UuidGenerator::generateV4();
+		return null;
 	}
 
 	protected function getAcceptedTypes(): array {
-		$parts = explode( '\\', User::class );
-		return [ end( $parts ), User::class ];
+		$parts = explode( '\\', Role::class );
+		return [ end( $parts ), Role::class ];
 	}
 
 	/**
 	 * 
-	 * @param User $domainObject
+	 * @param Role $domainObject
 	 */
 	protected function getAttributeHydrator( $domainObject ): array {
 		return [
-			"userName" => function (User $domainObject, $attribute, $data, $attributeName) {
-				$domainObject->setUsername( $attribute );
-			},
-			"email" => function (User $domainObject, $attribute, $data, $attributeName) {
-				$domainObject->setEmail( $attribute );
-			},
-			"fullName" => function (User $domainObject, $attribute, $data, $attributeName) {
-				$domainObject->setFullName( $attribute );
-			},
-			"password" => function (User $domainObject, $attribute, $data, $attributeName) {
-				$domainObject->setPassword( $attribute );
-			},
-			"slug" => function (User $domainObject, $attribute, $data, $attributeName) {
-				$domainObject->setSlug( $attribute );
-			}
 		];
 	}
 
 	/**
 	 * 
-	 * @param User $domainObject
+	 * @param Role $domainObject
 	 */
 	protected function getRelationshipHydrator( $domainObject ): array {
 		return [];
@@ -64,11 +50,11 @@ class RoleHydrator extends AbstractHydrator {
 
 	/**
 	 * 
-	 * @param User $domainObject
+	 * @param Role $domainObject
 	 * @param string $id
 	 */
 	protected function setId( $domainObject, String $id ) {
-		$domainObject->setId( $id );
+		$domainObject->setName( $id );
 	}
 
 	/**

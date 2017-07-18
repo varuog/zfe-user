@@ -35,7 +35,8 @@ class ConfigProvider {
                 Action\PingAction::class => Action\PingAction::class,
                 //Mail transport
                 \Zend\Mail\Transport\TransportInterface::class => \Zend\Mail\Transport\Sendmail::class,
-                Hateoas\Jsonapi\Hydrator\UserHydrator::class=> Hateoas\Jsonapi\Hydrator\UserHydrator::class
+                Hateoas\Jsonapi\Hydrator\UserHydrator::class=> Hateoas\Jsonapi\Hydrator\UserHydrator::class,
+				Hateoas\Jsonapi\Hydrator\RoleHydrator::class=> Hateoas\Jsonapi\Hydrator\RoleHydrator::class
             ],
             'factories' => [
                  //Mongo factory

@@ -9,7 +9,7 @@
 namespace ZfeUser\Hateoas\Jsonapi\Transformer;
 
 use WoohooLabs\Yin\JsonApi\Transformer\AbstractResourceTransformer;
-use ZfeUser\Model;
+use Zend\Permissions\Rbac\Role;
 
 /**
  * Description of User
@@ -20,42 +20,25 @@ class RoleTransformer extends AbstractResourceTransformer {
 
 	/**
 	 * 
-	 * @param Model\User $domainObject
+	 * @param Model\Role $domainObject
 	 * @todo approveTime need to to be fixed for null values. check default 
 	 *  value for same attribute in user model
 	 * @return array
 	 */
 	public function getAttributes( $domainObject ): array {
 		return [
-			"userName" => function (Model\User $domainObject) {
+			"name" => function (Role $domainObject) {
 				return $domainObject->getUsername();
 			},
-			"fullName" => function (Model\User $domainObject) {
-				return $domainObject->getFullName();
-			},
-			"email" => function (Model\User $domainObject) {
-				return $domainObject->getEmail();
-			},
-			"slug" => function (Model\User $domainObject) {
-				return $domainObject->getSlug();
-			},
-			"approveTime" => function (Model\User $domainObject) {
-				if ( $domainObject->getApproveTime() != null ) {
-					return $this->toIso8601DateTime( $domainObject->getApproveTime() );
-				}
-			},
-			"approved" => function (Model\User $domainObject) {
-				return $this->toBool( $domainObject->getApproved() );
-			},
-			"emailVerified" => function (Model\User $domainObject) {
-				return $this->toBool( $domainObject->getEmailVerified() );
-			},
+			"permission" => function (Role $domainObject) {
+				return iterator_to_array();
+			}
 		];
 	}
 
 	/**
 	 * 
-	 * @param Model\User $domainObject
+	 * @param Model\Role $domainObject
 	 * @return array
 	 */
 	public function getDefaultIncludedRelationships( $domainObject ): array {
@@ -64,15 +47,15 @@ class RoleTransformer extends AbstractResourceTransformer {
 
 	/**
 	 * 
-	 * @param Model\User $domainObject
+	 * @param Model\Role $domainObject
 	 */
 	public function getId( $domainObject ): string {
-		return $domainObject->getId();
+		return $domainObject->getName();
 	}
 
 	/**
 	 * 
-	 * @param Model\User $domainObject
+	 * @param Model\Role $domainObject
 	 */
 	public function getLinks( $domainObject ) {
 		
@@ -80,7 +63,7 @@ class RoleTransformer extends AbstractResourceTransformer {
 
 	/**
 	 * 
-	 * @param Model\User $domainObject
+	 * @param Model\Role $domainObject
 	 */
 	public function getMeta( $domainObject ): array {
 		return [];
@@ -88,7 +71,7 @@ class RoleTransformer extends AbstractResourceTransformer {
 
 	/**
 	 * 
-	 * @param Model\User $domainObject
+	 * @param Model\Role $domainObject
 	 */
 	public function getRelationships( $domainObject ): array {
 		return [];
@@ -96,7 +79,7 @@ class RoleTransformer extends AbstractResourceTransformer {
 
 	/**
 	 * 
-	 * @param Model\User $domainObject
+	 * @param Model\Role $domainObject
 	 */
 	public function getType( $domainObject ): string {
 		$parts = explode( '\\', get_class( $domainObject ) );

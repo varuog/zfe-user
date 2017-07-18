@@ -18,8 +18,8 @@ use WoohooLabs\Yin\JsonApi\Document\AbstractSingleResourceDocument;
  */
 class RoleDocument extends AbstractSingleResourceDocument {
 
-    public function __construct(Transformer\UserTransformer $userTransformer) {
-        parent::__construct($userTransformer);
+    public function __construct( Transformer\RoleTransformer $roleTransformer) {
+        parent::__construct($roleTransformer);
     }
 
     public function getJsonApi() {
