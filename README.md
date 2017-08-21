@@ -52,5 +52,5 @@ Add this code block to `config\atuoload\dependencies.global.php` under dependenc
 ```
 
 ## Credits
-Abstract Factories for all action are based on @xtreamwayz
-https://xtreamwayz.com/blog/2015-12-30-psr7-abstract-action-factory-one-for-all
+Abstract Factories for all action are based on [@xtreamwayz](http://github.com/xtreamwayz)
+[one ActionFactory for all ](https://xtreamwayz.com/blog/2015-12-30-psr7-abstract-action-factory-one-for-all)
