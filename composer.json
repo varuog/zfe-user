@@ -20,6 +20,7 @@
         "doctrine/mongodb-odm": "^1.1",
         "doctrine/orm": "*",
         "facebook/graph-sdk": "^5.5",
+        "firebase/php-jwt": "v5.0.0",
         "roave/security-advisories": "dev-master",
         "symfony/yaml": "^3.3",
         "woohoolabs/yin-middleware": "^2.0",

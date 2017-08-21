@@ -37,11 +37,8 @@ ZfeUser\Model\User:
         type: boolean
     emailVerified:
         type: boolean
-    authenticationInfo:
-        embedded: true
-        type: many
-        targetDocument: ZfeUser\Model\Authentication
-        cascade: all
+    authenticationTokens:
+        type: collection
     roles:
         reference: true
         type: many

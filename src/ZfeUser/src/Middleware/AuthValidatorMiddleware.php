@@ -20,7 +20,6 @@ use WoohooLabs\Yin\JsonApi\Request\Request as JsonApiRequest;
 use Zend\Diactoros\Response;
 use WoohooLabs\Yin\JsonApi\Schema\JsonApiObject;
 use WoohooLabs\Yin\JsonApi\Schema\Error;
-use ZfeUser\Model\Authentication;
 
 /**
  * Description of JsonApiResponseMiddleware
@@ -29,52 +28,43 @@ use ZfeUser\Model\Authentication;
  */
 class AuthValidatorMiddleware implements MiddlewareInterface {
 
-	private $userService;
+    private $userService;
 
-	public function __construct( UserService $userService ) {
-		$this->userService = $userService;
-	}
+    public function __construct(UserService $userService) {
+        $this->userService = $userService;
+    }
 
-	public function process( ServerRequestInterface $request, DelegateInterface $delegate ): ResponseInterface {
-		$authStringParts	 = [];
-		$defaultExpFactory	 = new DefaultExceptionFactory();
+    public function process(ServerRequestInterface $request, DelegateInterface $delegate): ResponseInterface {
+        $authStringParts = [];
+        $defaultExpFactory = new DefaultExceptionFactory();
 
-		$jsonapiRequest	 = new JsonApiRequest( $request, $defaultExpFactory );
-		$jsonApi		 = new JsonApi( $jsonapiRequest, new Response(), $defaultExpFactory, null );
-
-
-		$authString = $request->getHeader( 'Authorization' );
-		if ( !empty( $authString ) ) {
-
-			$authStringParts = explode( ':', $authString[ 0 ] );
-		}
+        $jsonapiRequest = new JsonApiRequest($request, $defaultExpFactory);
+        $jsonApi = new JsonApi($jsonapiRequest, new Response(), $defaultExpFactory, null);
 
 
-		if ( count( $authStringParts ) > 0 ) {
-			$user		 = new \ZfeUser\Model\User();
-			$user->setEmail( $authStringParts[ 0 ] );
-			$authToken	 = new Authentication( $authStringParts[ 1 ]
-			, null
-			, $request->getServerParams()[ 'REMOTE_ADDR' ]
-			, $request->getServerParams()[ 'HTTP_USER_AGENT' ]
-			);
+        $authString = $request->getHeader('Authorization');
+        if (!empty($authString)) {
 
-			$currentUser = $this->userService->isValidAuthToken( $user, $authToken );
+            $bearerPosition=strpos($authString[0],'Bearer ') + strlen('Bearer');
+            $authToken = trim(substr($authString[0], $bearerPosition, strlen($authString[0])));
+        }
 
-			if ( $currentUser != null ) {
-				return $delegate->process( $request );
-			}
-		}
+
+        $currentUser = $this->userService->isValidAuthToken($authToken);
+
+        if ($currentUser != null) {
+            return $delegate->process($request);
+        }
 
 
 
-		$errorDoc = new ErrorDocument();
-		$errorDoc->setJsonApi( new JsonApiObject( "1.0" ) );
+        $errorDoc = new ErrorDocument();
+        $errorDoc->setJsonApi(new JsonApiObject("1.0"));
 
-		$error = new Error();
-		$error->setTitle( 'Unathorised access' );
+        $error = new Error();
+        $error->setTitle('Unathorised access');
 
-		return $jsonApi->respond()->forbidden( $errorDoc );
-	}
+        return $jsonApi->respond()->forbidden($errorDoc);
+    }
 
 }

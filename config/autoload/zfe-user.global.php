@@ -15,8 +15,10 @@ return [
 		'enableEmailNotification'	 => true,
 		'enableNotifyDeactivation'	 => true,
 		'enableNotifyActivation'	 => true,
-		'accessTokenTtl'			 => 30 * 60 * 60 * 24,
+		'accessTokenTtl'			 => 86400*365,
 		'publicProfile'				 => true,
+                'authSecret' => 'fbH)\Jh9J`gQkn!y',
+            
 	],
 	/**
 	 * Not documented
