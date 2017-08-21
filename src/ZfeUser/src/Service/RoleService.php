@@ -18,7 +18,6 @@ use Zend\EventManager\EventManagerAwareInterface;
 use Zend\Mail\Transport\TransportInterface;
 use Zend\Mail\Message;
 use Zend\Expressive\Template\TemplateRendererInterface;
-use ZfeUser\Model\Authentication;
 use Zend\Permissions\Rbac\Role;
 
 /**
