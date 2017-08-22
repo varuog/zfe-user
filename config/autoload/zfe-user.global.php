@@ -19,7 +19,16 @@ return [
         'publicProfile' => true,
         'authSecret' => 'fbH)\Jh9J`gQkn!y',
         'tokenRevokable' => false,
+        'social' => [
+            'facebook' => [
+                'authUri' => 'https://www.facebook.com/v2.10/dialog/oauth',
+                'redirectUrl' =>'',
+                'appSecret' => '',
+                'scopes' => ''
+            ]
+        ]
     ],
+    
     /**
      * Not documented
      */
