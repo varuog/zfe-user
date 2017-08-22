@@ -17,8 +17,9 @@ use Zend\View\Renderer\RendererInterface;
  * @author Gourav Sarkar
  */
 class UserServiceOptions extends AbstractOptions {
+   
 
-    private $resetTokenValidity;
+         private $resetTokenValidity;
     private $responseType;
     private $credentialField;
     private $identityField;
@@ -34,6 +35,7 @@ class UserServiceOptions extends AbstractOptions {
     private $accessTokenTtl;
     private $publicProfile;
     private $authSecret;
+    private $tokenRevokable=false;
 
     public function __construct(array $options = null) {
         parent::__construct($options);
@@ -182,5 +184,16 @@ class UserServiceOptions extends AbstractOptions {
         $this->authSecret = $authSecret;
         return $this;
     }
+    
+      public function isTokenRevokable()
+     {
+         return $this->tokenRevokable;
+     }
+
+     public function setTokenRevokable($tokenRevokable)
+     {
+         $this->tokenRevokable = $tokenRevokable;
+         return $this;
+     }
 
 }

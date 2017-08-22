@@ -143,6 +143,24 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
             //echo $exc->getTraceAsString();
             return false;
         }
+        
+        /**
+         * If setting is set to be revokable auth token, check database for 
+         * validation association
+         */
+        if($this->options->isTokenRevokable())
+        {
+            $foundUsers=$this->persistantManager->createQueryBuilder(User::class)
+                    ->field('authenticationTokens')
+                    ->equals($token)
+                    ->getQuery()
+                    ->execute();
+            
+            if($foundUsers->count() != 1)
+            {
+                return false;
+            }
+        }
 
 
         /*
