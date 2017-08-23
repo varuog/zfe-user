@@ -39,6 +39,11 @@ ZfeUser\Model\User:
         type: boolean
     authenticationTokens:
         type: collection
+    social:
+        embedded: true
+        type: many
+        targetDocument: ZfeUser\Model\Social
+        cascade: all
     roles:
         reference: true
         type: many

@@ -1,0 +1,16 @@
+## YAML Template.
+ZfeUser\Model\Social:
+  type: embeddedDocument
+  fields:
+    id:
+        id: true
+        strategy: none
+        type: int   
+    accessToken:
+        unique:
+            order: desc
+        type: string
+    providerName:
+        unique:
+            order: desc
+        type: string

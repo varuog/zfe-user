@@ -198,6 +198,7 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
 
         if ($loggedUser instanceof User) {
             if (password_verify($this->authUser->getPassword(), $loggedUser->getPassword())) {
+                
                 $this->generateAuthToken($this->authUser);
 
                 return new Result(Result::SUCCESS

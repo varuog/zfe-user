@@ -54,7 +54,7 @@ class UserLoginAction implements ServerMiddlewareInterface {
 
 
         if ($authResult->getIdentity() != null) {
-
+            $this->userDocument->setAccessToken($authResult->getIdentity()->getLastAccessToken());
             return $jsonapi->respond()->ok($this->userDocument, $authResult->getIdentity());
         } else {
             $errorDoc = new ErrorDocument();

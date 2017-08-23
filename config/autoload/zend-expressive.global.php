@@ -10,7 +10,7 @@ return [
     ConfigAggregator::ENABLE_CACHE => false,
 
     // Enable debugging; typically used to provide debugging information within templates.
-    'debug' => false,
+    'debug' => true,
 
     'zend-expressive' => [
         // Enable programmatic pipeline: Any `middleware_pipeline` or `routes`
