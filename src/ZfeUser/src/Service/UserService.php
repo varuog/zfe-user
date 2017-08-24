@@ -192,6 +192,27 @@ class UserService implements AdapterInterface, EventManagerAwareInterface
 
         return $parsedToken;
     }
+    
+    
+    /**
+     * 
+     * @param type $id
+     * @param type $providerName
+     */
+    public function fetchUserBySocialID($id, $providerName)
+    {
+         $loggedUser = $this->persistantManager
+                ->getRepository(get_class($this->authUser))
+                ->findOneBy(['social.*.id' =>$id, 'social.*.providerName' => $pr
+                        ]);
+         
+        if ($loggedUser instanceof User) {
+              $this->generateAuthToken($this->authUser);
+              return $loggedUser;
+        }
+        
+        return false;
+    }
 
     /**
      *
@@ -462,6 +483,8 @@ class UserService implements AdapterInterface, EventManagerAwareInterface
         return $this;
     }
 
+    
+    
     public function getSocialLoginUrl($paltform)
     {
         $socialOption= $this->options[$platform];
