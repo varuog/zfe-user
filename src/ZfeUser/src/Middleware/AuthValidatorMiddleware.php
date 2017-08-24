@@ -26,15 +26,18 @@ use WoohooLabs\Yin\JsonApi\Schema\Error;
  * @todo incomplete implementation
  * @author gourav sarkar
  */
-class AuthValidatorMiddleware implements MiddlewareInterface {
+class AuthValidatorMiddleware implements MiddlewareInterface
+{
 
     private $userService;
 
-    public function __construct(UserService $userService) {
+    public function __construct(UserService $userService)
+    {
         $this->userService = $userService;
     }
 
-    public function process(ServerRequestInterface $request, DelegateInterface $delegate): ResponseInterface {
+    public function process(ServerRequestInterface $request, DelegateInterface $delegate): ResponseInterface
+    {
         $authStringParts = [];
         $defaultExpFactory = new DefaultExceptionFactory();
 
@@ -44,8 +47,7 @@ class AuthValidatorMiddleware implements MiddlewareInterface {
 
         $authString = $request->getHeader('Authorization');
         if (!empty($authString)) {
-
-            $bearerPosition=strpos($authString[0],'Bearer ') + strlen('Bearer');
+            $bearerPosition=strpos($authString[0], 'Bearer ') + strlen('Bearer');
             $authToken = trim(substr($authString[0], $bearerPosition, strlen($authString[0])));
         }
 
@@ -66,5 +68,4 @@ class AuthValidatorMiddleware implements MiddlewareInterface {
 
         return $jsonApi->respond()->forbidden($errorDoc);
     }
-
 }

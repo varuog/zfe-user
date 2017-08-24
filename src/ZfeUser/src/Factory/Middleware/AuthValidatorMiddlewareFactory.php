@@ -17,12 +17,13 @@ use Doctrine\ODM\MongoDB\DocumentManager;
  *
  * @author Win10Laptop-Kausik
  */
-class AuthValidatorMiddlewareFactory {
+class AuthValidatorMiddlewareFactory
+{
 
-    public function __invoke(ContainerInterface $container) {
-      $userService=$container->get(\ZfeUser\Service\UserService::class);
+    public function __invoke(ContainerInterface $container)
+    {
+        $userService=$container->get(\ZfeUser\Service\UserService::class);
 
         return new \ZfeUser\Middleware\AuthValidatorMiddleware($userService);
     }
-
 }

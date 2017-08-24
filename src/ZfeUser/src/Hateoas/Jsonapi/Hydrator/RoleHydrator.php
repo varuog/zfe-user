@@ -18,62 +18,69 @@ use Zend\Permissions\Rbac\Role;
  *
  * @author Gourav Sarkar
  */
-class RoleHydrator extends AbstractHydrator {
+class RoleHydrator extends AbstractHydrator
+{
 
-	protected function generateId(): string {
-		$f = \Doctrine\ODM\MongoDB\Id\UuidGenerator::generateV4();
-		//return \Doctrine\ODM\MongoDB\Id\UuidGenerator::generateV4();
-		return null;
-	}
+    protected function generateId(): string
+    {
+        $f = \Doctrine\ODM\MongoDB\Id\UuidGenerator::generateV4();
+        //return \Doctrine\ODM\MongoDB\Id\UuidGenerator::generateV4();
+        return null;
+    }
 
-	protected function getAcceptedTypes(): array {
-		$parts = explode( '\\', Role::class );
-		return [ end( $parts ), Role::class ];
-	}
+    protected function getAcceptedTypes(): array
+    {
+        $parts = explode('\\', Role::class);
+        return [ end($parts), Role::class ];
+    }
 
-	/**
-	 * 
-	 * @param Role $domainObject
-	 */
-	protected function getAttributeHydrator( $domainObject ): array {
-		return [
-		];
-	}
+    /**
+     *
+     * @param Role $domainObject
+     */
+    protected function getAttributeHydrator($domainObject): array
+    {
+        return [
+        ];
+    }
 
-	/**
-	 * 
-	 * @param Role $domainObject
-	 */
-	protected function getRelationshipHydrator( $domainObject ): array {
-		return [];
-	}
+    /**
+     *
+     * @param Role $domainObject
+     */
+    protected function getRelationshipHydrator($domainObject): array
+    {
+        return [];
+    }
 
-	/**
-	 * 
-	 * @param Role $domainObject
-	 * @param string $id
-	 */
-	protected function setId( $domainObject, String $id ) {
-		$domainObject->setName( $id );
-	}
+    /**
+     *
+     * @param Role $domainObject
+     * @param string $id
+     */
+    protected function setId($domainObject, String $id)
+    {
+        $domainObject->setName($id);
+    }
 
-	/**
-	 * 
-	 * @param string $clientGeneratedId
-	 * @param \WoohooLabs\Yin\JsonApi\Request\RequestInterface $request
-	 * @param \WoohooLabs\Yin\JsonApi\Exception\ExceptionFactoryInterface $exceptionFactory
-	 */
-	protected function validateClientGeneratedId( string $clientGeneratedId, RequestInterface $request,
-											   ExceptionFactoryInterface $exceptionFactory ): void {
-		
-	}
+    /**
+     *
+     * @param string $clientGeneratedId
+     * @param \WoohooLabs\Yin\JsonApi\Request\RequestInterface $request
+     * @param \WoohooLabs\Yin\JsonApi\Exception\ExceptionFactoryInterface $exceptionFactory
+     */
+    protected function validateClientGeneratedId(
+        string $clientGeneratedId,
+        RequestInterface $request,
+        ExceptionFactoryInterface $exceptionFactory
+    ): void {
+    }
 
-	/**
-	 * @todo validate request to filter out sensitive but conditional data
-	 * @param \WoohooLabs\Yin\JsonApi\Request\RequestInterface $request
-	 */
-	protected function validateRequest( RequestInterface $request ): void {
-		
-	}
-
+    /**
+     * @todo validate request to filter out sensitive but conditional data
+     * @param \WoohooLabs\Yin\JsonApi\Request\RequestInterface $request
+     */
+    protected function validateRequest(RequestInterface $request): void
+    {
+    }
 }

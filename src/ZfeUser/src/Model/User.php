@@ -15,7 +15,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  *
  * @author Gourav Sarkar
  * @ODM\Document
- * 
+ *
  */
 class User
 {
@@ -202,7 +202,6 @@ class User
 
     public function genereateJwtToken(User $user)
     {
-        
     }
 
     public function getAuthenticationTokens()
@@ -226,11 +225,9 @@ class User
         $this->socials = $socials;
         return $this;
     }
-    
+
     public function getLastAccessToken()
     {
         return end($this->authenticationTokens);
     }
-
-
 }

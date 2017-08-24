@@ -20,14 +20,16 @@ use WoohooLabs\Yin\JsonApi\Schema\JsonApiObject;
 use WoohooLabs\Yin\JsonApi\Schema\Error;
 use ZfeUser\Middleware\JsonApiResponseMiddleware;
 
-class UserLoginAction implements ServerMiddlewareInterface {
+class UserLoginAction implements ServerMiddlewareInterface
+{
 
     private $userService;
     private $template;
     private $userHydrator;
     private $userDocument;
 
-    public function __construct(UserService $userService, UserHydrator $userHydrator, Document\UserDocument $userDoc, TemplateRendererInterface $template = null) {
+    public function __construct(UserService $userService, UserHydrator $userHydrator, Document\UserDocument $userDoc, TemplateRendererInterface $template = null)
+    {
         $this->userService = $userService;
         $this->template = $template;
         $this->userHydrator = $userHydrator;
@@ -40,7 +42,8 @@ class UserLoginAction implements ServerMiddlewareInterface {
      * @param DelegateInterface $delegate
      * @return \App\Action\renderResponse
      */
-    public function process(ServerRequestInterface $request, DelegateInterface $delegate) {
+    public function process(ServerRequestInterface $request, DelegateInterface $delegate)
+    {
 
         $user = new \ZfeUser\Model\User();
         $defaultExpFactory = new DefaultExceptionFactory();
@@ -49,7 +52,7 @@ class UserLoginAction implements ServerMiddlewareInterface {
         $jsonapi->hydrate($this->userHydrator, $user);
 
         $this->userService->setAuthUser($user);
-		$this->userService->setServerOptions($request->getServerParams());
+        $this->userService->setServerOptions($request->getServerParams());
         $authResult = $this->userService->authenticate();
 
 
@@ -60,7 +63,7 @@ class UserLoginAction implements ServerMiddlewareInterface {
             $errorDoc = new ErrorDocument();
             $errorDoc->setJsonApi(new JsonApiObject("1.0"));
             $errors = [];
-			/*
+            /*
 			 * Get all messages from auth results
 			 */
             foreach ($authResult->getMessages() as $errorMessage) {
@@ -76,5 +79,4 @@ class UserLoginAction implements ServerMiddlewareInterface {
             }
         }
     }
-
 }

@@ -25,40 +25,46 @@ use Zend\Permissions\Rbac\Role;
  *
  * @author Win10Laptop-Kausik
  */
-class RoleService {
+class RoleService
+{
 
-	private $persistantManager;
-	private $options;
-	private $authUser;
-	private $translator;
-	private $mailer;
-	private $mailerTemplate;
-	private $events;
+    private $persistantManager;
+    private $options;
+    private $authUser;
+    private $translator;
+    private $mailer;
+    private $mailerTemplate;
+    private $events;
 
-	//private $serverOptions;
+    //private $serverOptions;
 
 
-	public function __construct( DocumentManager $mongoManager, TranslatorInterface $translator,
-							  TransportInterface $mailer, TemplateRendererInterface $mailTemplate, UserServiceOptions $options ) {
-		$this->persistantManager = $mongoManager;
-		$this->options			 = $options;
-		$this->translator		 = $translator;
-		$this->mailer			 = $mailer;
-		$this->mailerTemplate	 = $mailTemplate;
-	}
+    public function __construct(
+        DocumentManager $mongoManager,
+        TranslatorInterface $translator,
+        TransportInterface $mailer,
+        TemplateRendererInterface $mailTemplate,
+        UserServiceOptions $options
+    ) {
+        $this->persistantManager = $mongoManager;
+        $this->options           = $options;
+        $this->translator        = $translator;
+        $this->mailer            = $mailer;
+        $this->mailerTemplate    = $mailTemplate;
+    }
 
-	public function fetchRoles( array $roles ) {
-		
-	}
+    public function fetchRoles(array $roles)
+    {
+    }
 
-	/**
-	 * 
-	 * @param Role $role
-	 */
-	public function add( Role $role ) {
-		$this->persistantManager->getSchemaManager()->ensureIndexes();
-		$this->persistantManager->persist( $role );
-		$this->persistantManager->flush( $role, [ 'safe' => true ] );
-	}
-
+    /**
+     *
+     * @param Role $role
+     */
+    public function add(Role $role)
+    {
+        $this->persistantManager->getSchemaManager()->ensureIndexes();
+        $this->persistantManager->persist($role);
+        $this->persistantManager->flush($role, [ 'safe' => true ]);
+    }
 }

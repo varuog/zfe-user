@@ -34,13 +34,12 @@ class UserDocument extends AbstractSingleResourceDocument
 
     public function getLinks()
     {
-        
     }
 
     public function getMeta(): array
     {
         $meta=[];
-        $accessToken= $this->getAccessToken;
+        $accessToken= $this->getAccessToken();
         $metaAccessToken=isset($accessToken) ?  ['accessToken' => $accessToken] : [];
         return array_merge($meta, $metaAccessToken);
     }
@@ -55,5 +54,4 @@ class UserDocument extends AbstractSingleResourceDocument
         $this->accessToken = $accessToken;
         return $this;
     }
-
 }

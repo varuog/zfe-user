@@ -7,11 +7,14 @@
  */
 
 namespace ZfeUser\Service;
+
 use Zend\Expressive\Template\TemplateRendererInterface;
+
 /**
  *
  * @author Win10Laptop-Kausik
  */
-interface MailerTemplateInterface extends TemplateRendererInterface{
+interface MailerTemplateInterface extends TemplateRendererInterface
+{
     //put your code here
 }

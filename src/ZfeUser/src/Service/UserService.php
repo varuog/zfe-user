@@ -13,6 +13,7 @@ use Zend\Mail\Transport\TransportInterface;
 use Zend\Mail\Message;
 use Zend\Expressive\Template\TemplateRendererInterface;
 use Firebase\JWT\JWT;
+use Zend\Expressive\Helper\UrlHelper;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -25,7 +26,8 @@ use Firebase\JWT\JWT;
  *
  * @author Win10Laptop-Kausik
  */
-class UserService implements AdapterInterface, EventManagerAwareInterface {
+class UserService implements AdapterInterface, EventManagerAwareInterface
+{
 
     private $persistantManager;
     private $options;
@@ -37,16 +39,18 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
     private $credential;
     private $identity;
     private $serverOptions;
+    private $urlHelper;
 
     /**
-     * 
+     *
      * @param DocumentManager $mongoManager
      * @param TranslatorInterface $translator
      * @param TransportInterface $mailer
      * @param TemplateRendererInterface $mailTemplate
      * @param UserServiceOptions $options
      */
-    public function __construct(DocumentManager $mongoManager, TranslatorInterface $translator, TransportInterface $mailer, TemplateRendererInterface $mailTemplate, UserServiceOptions $options) {
+    public function __construct(DocumentManager $mongoManager, TranslatorInterface $translator, TransportInterface $mailer, TemplateRendererInterface $mailTemplate, UserServiceOptions $options, UrlHelper $urlheper)
+    {
         $this->persistantManager = $mongoManager;
         $this->options = $options;
         $this->translator = $translator;
@@ -54,11 +58,13 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
         $this->mailerTemplate = $mailTemplate;
 
 
+
         $this->credential = $this->options->getCredentialField();
         $this->identity = $this->options->getIdentityField();
     }
 
-    public function fetch(User $user) {
+    public function fetch(User $user)
+    {
         //return $this->persistantManager->( get_class( $user ), $user->getId() );
         $user = $this->persistantManager->getRepository(get_class($user))
                 ->findOneBy(['slug' => $user->getSlug()]);
@@ -70,7 +76,8 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
      * Destroy auth token
      * @param User $user
      */
-    public function logout(User $user) {
+    public function logout(User $user)
+    {
         return $this->persistantManager->createQueryBuilder(get_class($user))
                         ->field('authToken')
                         ->exists(true)
@@ -82,10 +89,11 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
     }
 
     /**
-     * 
+     *
      * @param User $user
      */
-    public function register(User $user) {
+    public function register(User $user)
+    {
 
         //Calculate approval
         ($this->options->getEnableUserApproval()) ? $user->setApproved(false) : $user->setApproved(true);
@@ -120,10 +128,11 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
     }
 
     /**
-     * 
+     *
      * @param User $user
      */
-    public function setAuthUser(User $user) {
+    public function setAuthUser(User $user)
+    {
         $this->authUser = $user;
     }
 
@@ -133,7 +142,8 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
      * @todo reset token issue
      * @param User $user
      */
-    public function isValidAuthToken($token) {
+    public function isValidAuthToken($token)
+    {
         /* @var User $newuser */
         try {
             $authscret = $this->options->getAuthSecret();
@@ -143,21 +153,19 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
             //echo $exc->getTraceAsString();
             return false;
         }
-        
+
         /**
-         * If setting is set to be revokable auth token, check database for 
+         * If setting is set to be revokable auth token, check database for
          * validation association
          */
-        if($this->options->isTokenRevokable())
-        {
+        if ($this->options->isTokenRevokable()) {
             $foundUsers=$this->persistantManager->createQueryBuilder(User::class)
                     ->field('authenticationTokens')
                     ->equals($token)
                     ->getQuery()
                     ->execute();
-            
-            if($foundUsers->count() != 1)
-            {
+
+            if ($foundUsers->count() != 1) {
                 return false;
             }
         }
@@ -179,17 +187,18 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
           }
           return false;
           }
-         * 
+         *
          */
 
         return $parsedToken;
     }
 
     /**
-     * 
+     *
      * @return Result
      */
-    public function authenticate(): Result {
+    public function authenticate(): Result
+    {
 
         $loggedUser = $this->persistantManager
                 ->getRepository(get_class($this->authUser))
@@ -198,33 +207,26 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
 
         if ($loggedUser instanceof User) {
             if (password_verify($this->authUser->getPassword(), $loggedUser->getPassword())) {
-                
                 $this->generateAuthToken($this->authUser);
 
-                return new Result(Result::SUCCESS
-                        , $loggedUser
-                        , [$this->translator->translate('success-login', 'zfe-user')]);
+                return new Result(Result::SUCCESS, $loggedUser, [$this->translator->translate('success-login', 'zfe-user')]);
             } else {
-                return new Result(Result::FAILURE_CREDENTIAL_INVALID, null
-                        , [$this->translator->translate('error-credentail-invalid', 'zfe-user')]);
+                return new Result(Result::FAILURE_CREDENTIAL_INVALID, null, [$this->translator->translate('error-credentail-invalid', 'zfe-user')]);
             }
         } else {
-
-            return new Result(Result::FAILURE_IDENTITY_NOT_FOUND, null
-                    , [$this->translator->translate('error-no-user-found', 'zfe-user')]);
+            return new Result(Result::FAILURE_IDENTITY_NOT_FOUND, null, [$this->translator->translate('error-no-user-found', 'zfe-user')]);
         }
 
-        return new Result(Result::FAILURE_UNCATEGORIZED, null
-                , [$this->translator->translate('error-unknown-auth', 'zfe-user')]
-        );
+        return new Result(Result::FAILURE_UNCATEGORIZED, null, [$this->translator->translate('error-unknown-auth', 'zfe-user')]);
     }
 
     /**
-     * 
+     *
      * @param User $user
      * @return boolean
      */
-    public function changePassword(User $user) {
+    public function changePassword(User $user)
+    {
 
         $loggedUser = $this->persistantManager->getRepository(get_class($user))
                 ->findOneBy([$this->identity => call_user_func([$user, "get{$this->identity}"])]);
@@ -256,13 +258,13 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
      * @param User $user
      * @return boolean
      */
-    public function changeEmail(User $user) {
+    public function changeEmail(User $user)
+    {
         $loggedUser = $this->persistantManager->getRepository(get_class($user))
                 ->findOneBy([$this->identity => call_user_func([$user, "get{$this->identity}"])]);
         //$loggedUser = $this->persistantManager->createQueryBuilder(get_class($user))->field('email')->;
         $isExpiredToken = time() < $loggedUser->getResetTokenTime() + $this->options->getResetTokenValidity();
         if ($loggedUser instanceof User && !$isExpiredToken) {
-
             $loggedUser->getResetToken();
 
             return $this->persistantManager->createQueryBuilder(get_class($user))
@@ -285,7 +287,8 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
         return false;
     }
 
-    public function generateJwtToken(User $user) {
+    public function generateJwtToken(User $user)
+    {
         $identityField = $this->options->getIdentityField();
         $token = [
             "aud" => "http://example.com",
@@ -296,7 +299,7 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
             'id' => $user->getId(),
             'identifier' => call_user_func([$user, "get{$identityField}"]),
         ];
-            
+
 
         $user->addAuthenticationToken(JWT::encode($token, $this->options->getAuthSecret()));
 
@@ -307,7 +310,8 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
      * @todo refreashToken generate should be moved to User model
      * @param User $user
      */
-    public function generateAuthToken(User $user) {
+    public function generateAuthToken(User $user)
+    {
 
         $this->persistantManager->getSchemaManager()->ensureIndexes();
 
@@ -322,7 +326,7 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
         $this->persistantManager->persist($user);
         $this->persistantManager->flush($user, ['safe' => true]);
         /*
-         * 
+         *
          *
           $user = $this->persistantManager->createQueryBuilder( get_class( $user ) )
           ->update()
@@ -335,18 +339,19 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
           //->set($user->getRefreashToken())
           ->getQuery()
           ->execute();
-         * 
+         *
          */
 
         return $user;
     }
 
     /**
-     * 
+     *
      * @param User $user
      * @param type $resetField
      */
-    public function generateResetToken(User $user, $resetField = '') {
+    public function generateResetToken(User $user, $resetField = '')
+    {
         $user->generateResetToken();
 
         $user = $this->persistantManager->createQueryBuilder(get_class($user))
@@ -375,18 +380,20 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
     }
 
     /**
-     * 
+     *
      * @return UserServiceOptions
      */
-    public function getOptions(): UserServiceOptions {
+    public function getOptions(): UserServiceOptions
+    {
         return $this->options;
     }
 
     /**
-     * 
+     *
      * @return \Zend\EventManager\EventManagerInterface
      */
-    public function getEventManager(): \Zend\EventManager\EventManagerInterface {
+    public function getEventManager(): \Zend\EventManager\EventManagerInterface
+    {
         if (!$this->events) {
             $this->setEventManager(new EventManager());
         }
@@ -394,18 +401,20 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
     }
 
     /**
-     * 
+     *
      * @param \Zend\EventManager\EventManagerInterface $eventManager
      */
-    public function setEventManager(\Zend\EventManager\EventManagerInterface $eventManager): void {
+    public function setEventManager(\Zend\EventManager\EventManagerInterface $eventManager): void
+    {
         $this->events = $eventManager;
     }
 
     /**
-     * 
+     *
      * @param User $user
      */
-    public function activateUser(User $user) {
+    public function activateUser(User $user)
+    {
         $updateApprove = $this->persistantManager->createQueryBuilder(get_class($user))
                 ->field($this->identity)
                 ->equals(call_user_func([$user, "get{$this->identity}"]))
@@ -442,13 +451,21 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
         }
     }
 
-    public function getServerOptions() {
+    public function getServerOptions()
+    {
         return $this->serverOptions;
     }
 
-    public function setServerOptions($serverOptions) {
+    public function setServerOptions($serverOptions)
+    {
         $this->serverOptions = $serverOptions;
         return $this;
     }
 
+    public function getSocialLoginUrl($paltform)
+    {
+        $socialOption= $this->options[$platform];
+
+        return sprintf('%s?client_id=%s&redirect_uri=%s', $socialOption['authuri'], $socialOption['appID'], $socialOption['authuri']);
+    }
 }

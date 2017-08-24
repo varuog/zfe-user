@@ -52,5 +52,4 @@ class Social
         $this->accessToken = $accessToken;
         return $this;
     }
-
 }

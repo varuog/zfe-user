@@ -1,6 +1,7 @@
 <?php
 
 namespace ZfeUser\Hateoas\Jsonapi\Document;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -16,22 +17,25 @@ use WoohooLabs\Yin\JsonApi\Document\AbstractSingleResourceDocument;
  *
  * @author Gourav Sarkar
  */
-class RoleDocument extends AbstractSingleResourceDocument {
+class RoleDocument extends AbstractSingleResourceDocument
+{
 
-    public function __construct( Transformer\RoleTransformer $roleTransformer) {
+    public function __construct(Transformer\RoleTransformer $roleTransformer)
+    {
         parent::__construct($roleTransformer);
     }
 
-    public function getJsonApi() {
+    public function getJsonApi()
+    {
          return new JsonApiObject("1.0");
     }
 
-    public function getLinks() {
-        
+    public function getLinks()
+    {
     }
 
-    public function getMeta(): array {
+    public function getMeta(): array
+    {
         return [];
     }
-
 }

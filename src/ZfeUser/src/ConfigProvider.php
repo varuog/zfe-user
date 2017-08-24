@@ -7,7 +7,8 @@ namespace ZfeUser;
  *
  * @see https://docs.zendframework.com/zend-component-installer/
  */
-class ConfigProvider {
+class ConfigProvider
+{
 
     /**
      * Returns the configuration array
@@ -17,7 +18,8 @@ class ConfigProvider {
      *
      * @return array
      */
-    public function __invoke() {
+    public function __invoke()
+    {
         return [
             'dependencies' => $this->getDependencies(),
             'templates' => $this->getTemplates(),
@@ -29,29 +31,30 @@ class ConfigProvider {
      *
      * @return array
      */
-    public function getDependencies() {
+    public function getDependencies()
+    {
         return [
             'invokables' => [
                 Action\PingAction::class => Action\PingAction::class,
                 //Mail transport
                 \Zend\Mail\Transport\TransportInterface::class => \Zend\Mail\Transport\Sendmail::class,
                 Hateoas\Jsonapi\Hydrator\UserHydrator::class=> Hateoas\Jsonapi\Hydrator\UserHydrator::class,
-				Hateoas\Jsonapi\Hydrator\RoleHydrator::class=> Hateoas\Jsonapi\Hydrator\RoleHydrator::class
+                Hateoas\Jsonapi\Hydrator\RoleHydrator::class=> Hateoas\Jsonapi\Hydrator\RoleHydrator::class
             ],
             'factories' => [
                  //Mongo factory
                 \Doctrine\ODM\MongoDB\DocumentManager::class => Factory\MongoDB\MongoDocumentManagerFactory::class,
-                
+
                //Options
                 \ZfeUser\Options\UserServiceOptions::class => Factory\UserServiceOptionsFactory::class,
                 //Translator
                 \Zend\I18n\Translator\TranslatorInterface::class => \Zend\I18n\Translator\TranslatorServiceFactory::class,
                 //Mail transporter
                 \ZfeUser\Service\MailerTemplateInterface::class => \Zend\Expressive\ZendView\ZendViewRendererFactory::class,
-                
+
                 //Middleware intercepter
                 Middleware\AuthValidatorMiddleware::class => Factory\Middleware\AuthValidatorMiddlewareFactory::class,
-                
+
                 Action\HomePageAction::class => Action\HomePageFactory::class,
             ],
             'abstract_factories' => [
@@ -68,7 +71,7 @@ class ConfigProvider {
                     Factory\Delegator\TranslatorDelegatorFactory::class
                 ],
             ],
-             * 
+             *
              */
         ];
     }
@@ -78,7 +81,8 @@ class ConfigProvider {
      *
      * @return array
      */
-    public function getTemplates() {
+    public function getTemplates()
+    {
         return [
             'paths' => [
                 'app' => [__DIR__ . '/../templates/app'],
@@ -88,5 +92,4 @@ class ConfigProvider {
             ],
         ];
     }
-
 }

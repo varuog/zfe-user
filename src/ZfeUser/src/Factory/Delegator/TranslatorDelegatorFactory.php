@@ -10,9 +10,10 @@ namespace ZfeUser\Factory\Delegator;
 
 use Psr\Container\ContainerInterface;
 use Zend\I18n\Translator\TranslatorInterface;
-use  Zend\I18n\Translator\Translator;
+use Zend\I18n\Translator\Translator;
 
-class TranslatorDelegatorFactory {
+class TranslatorDelegatorFactory
+{
 
     /**
      * @param ContainerInterface $container
@@ -20,7 +21,8 @@ class TranslatorDelegatorFactory {
      * @param callable $callback
      * @return UserRepository
      */
-    public function __invoke(ContainerInterface $container, $name, callable $callback) {
+    public function __invoke(ContainerInterface $container, $name, callable $callback)
+    {
         /* @var $translator Translator  */
         $translator = $callback();
 
@@ -29,11 +31,10 @@ class TranslatorDelegatorFactory {
         $mailTranslatorResource = 'data/language/Mailer-en-US.php';
         $textDomain = 'zfe-user';
         $locale = 'en-US';
-        
+
         $translator->setLocale($locale);
         $translator->addTranslationFile($type, $userTranslatorResource, $textDomain, $locale);
         $translator->addTranslationFile($type, $mailTranslatorResource, $textDomain, $locale);
         return $translator;
     }
-
 }

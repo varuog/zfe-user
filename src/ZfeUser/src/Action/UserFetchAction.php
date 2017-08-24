@@ -20,20 +20,22 @@ use Zend\Diactoros\Response;
 use WoohooLabs\Yin\JsonApi\Document\ErrorDocument;
 use WoohooLabs\Yin\JsonApi\Schema\JsonApiObject;
 
-class UserFetchAction implements ServerMiddlewareInterface {
+class UserFetchAction implements ServerMiddlewareInterface
+{
 
     private $userService;
     private $userHydrator;
     private $userDocuemnt;
 
-    public function __construct(UserService $userService, UserHydrator $userHydrator, UserDocument $userDoc) {
+    public function __construct(UserService $userService, UserHydrator $userHydrator, UserDocument $userDoc)
+    {
         $this->userService = $userService;
         $this->userHydrator = $userHydrator;
         $this->userDocuemnt = $userDoc;
-		
     }
 
-    public function process(ServerRequestInterface $request, DelegateInterface $delegate) {
+    public function process(ServerRequestInterface $request, DelegateInterface $delegate)
+    {
 
         $user = new User();
         $user->setSlug($request->getAttribute('slug'));
@@ -51,5 +53,4 @@ class UserFetchAction implements ServerMiddlewareInterface {
         $errorDoc->setJsonApi(new JsonApiObject("1.0"));
         return $jsonapi->respond()->notFound($errorDoc);
     }
-
 }

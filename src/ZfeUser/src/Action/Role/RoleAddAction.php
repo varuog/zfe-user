@@ -21,52 +21,56 @@ use WoohooLabs\Yin\JsonApi\Schema\Error;
 use ZfeUser\Middleware\JsonApiResponseMiddleware;
 use Zend\Permissions\Rbac\Role;
 
-class RoleAddAction implements ServerMiddlewareInterface {
+class RoleAddAction implements ServerMiddlewareInterface
+{
 
-	private $rolService;
-	private $template;
-	private $roleHydrator;
-	private $roleDocument;
+    private $rolService;
+    private $template;
+    private $roleHydrator;
+    private $roleDocument;
 
-	public function __construct( RoleService $rolService, RoleHydrator $roleHydrator, Document\RoleDocument $roleDoc,
-							  TemplateRendererInterface $template = null ) {
-		$this->rolService	 = $rolService;
-		$this->template		 = $template;
-		$this->roleHydrator	 = $roleHydrator;
-		$this->roleDocument	 = $roleDoc;
-	}
+    public function __construct(
+        RoleService $rolService,
+        RoleHydrator $roleHydrator,
+        Document\RoleDocument $roleDoc,
+        TemplateRendererInterface $template = null
+    ) {
+        $this->rolService    = $rolService;
+        $this->template      = $template;
+        $this->roleHydrator  = $roleHydrator;
+        $this->roleDocument  = $roleDoc;
+    }
 
-	/**
-	 * @todo Verify response type and throw error
-	 * @param ServerRequestInterface $request
-	 * @param DelegateInterface $delegate
-	 * @return \App\Action\renderResponse
-	 */
-	public function process( ServerRequestInterface $request, DelegateInterface $delegate ) {
+    /**
+     * @todo Verify response type and throw error
+     * @param ServerRequestInterface $request
+     * @param DelegateInterface $delegate
+     * @return \App\Action\renderResponse
+     */
+    public function process(ServerRequestInterface $request, DelegateInterface $delegate)
+    {
 
-		$role				 = new Role( null );
-		$defaultExpFactory	 = new DefaultExceptionFactory();
-		$jsonapi			 = new JsonApi( new Request( $request, $defaultExpFactory ), new Response(), $defaultExpFactory );
+        $role                = new Role(null);
+        $defaultExpFactory   = new DefaultExceptionFactory();
+        $jsonapi             = new JsonApi(new Request($request, $defaultExpFactory), new Response(), $defaultExpFactory);
 
-		$jsonapi->hydrate( $this->roleHydrator, $role );
-		//$this->rolService->addRole( $role );
+        $jsonapi->hydrate($this->roleHydrator, $role);
+        //$this->rolService->addRole( $role );
 
 
-		try {
+        try {
+            $this->rolService->add($role);
+        } catch (\MongoDuplicateKeyException $mongoEx) {
+            $errorDoc    = new ErrorDocument();
+            $errorDoc->setJsonApi(new JsonApiObject("1.0"));
+            $errors      = [];
 
-			$this->rolService->add( $role );
-		} catch ( \MongoDuplicateKeyException $mongoEx ) {
-			$errorDoc	 = new ErrorDocument();
-			$errorDoc->setJsonApi( new JsonApiObject( "1.0" ) );
-			$errors		 = [];
+            $error = new Error();
+            $error->setTitle($this->translator->translate('error-user-conflict', 'zfe-user'));
 
-			$error = new Error();
-			$error->setTitle( $this->translator->translate( 'error-user-conflict', 'zfe-user' ) );
+            return $jsonapi->respond()->conflict($errorDoc);
+        }
 
-			return $jsonapi->respond()->conflict( $errorDoc );
-		}
-
-		return $jsonapi->respond()->ok( $this->roleDocument, $role );
-	}
-
+        return $jsonapi->respond()->ok($this->roleDocument, $role);
+    }
 }

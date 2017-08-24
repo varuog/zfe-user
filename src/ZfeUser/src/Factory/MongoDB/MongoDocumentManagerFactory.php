@@ -15,12 +15,14 @@ use Doctrine\ODM\MongoDB\Mapping\Driver\YamlDriver;
 
 /**
  * Description of MongoDocumentManagerFactory
- * @todo Database name should be overridable 
+ * @todo Database name should be overridable
  * @author Win10Laptop-Kausik
  */
-class MongoDocumentManagerFactory {
+class MongoDocumentManagerFactory
+{
 
-    public function __invoke(ContainerInterface $container) {
+    public function __invoke(ContainerInterface $container)
+    {
         $connection = new \Doctrine\MongoDB\Connection();
         $config = new \Doctrine\ODM\MongoDB\Configuration();
 
@@ -43,5 +45,4 @@ class MongoDocumentManagerFactory {
 
         return $dm;
     }
-
 }

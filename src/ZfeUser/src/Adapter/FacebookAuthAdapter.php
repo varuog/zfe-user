@@ -10,18 +10,19 @@ namespace ZfeUser\Adapter;
 
 use Zend\Authentication\Adapter\AdapterInterface;
 use Zend\Authentication\Result;
+
 /**
  * Description of FacebookAuthAdapter
  *
  * @author Win10Laptop-Kausik
  */
-class FacebookAuthAdapter implements AdapterInterface{
-    
+class FacebookAuthAdapter implements AdapterInterface
+{
+
     /**
      * Authenticate on success if user does not exist register
      */
-    public function authenticate(): Result {
-        
+    public function authenticate(): Result
+    {
     }
-
 }

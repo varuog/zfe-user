@@ -13,7 +13,7 @@ class AbstractOptionsFactory implements AbstractFactoryInterface
 
         // Return the requested class and inject its dependencies
         $config= $container->get('config');
-        
+
         return new $requestedName($config['zfe-user']);
     }
 
