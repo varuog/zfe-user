@@ -39,8 +39,14 @@ return [
              * It should be called from other project
              */
             Application::class => [
-                \ZfeUser\RouteProvider::class
+                \ZfeUser\RouteProvider::class,
             ],
+            /**
+             * Set up translator resource
+             */
+            Zend\I18n\Translator\TranslatorInterface::class => [
+                \ZfeUser\Factory\Delegator\TranslatorDelegatorFactory::class
+            ]
         ],
     ],
 ];
