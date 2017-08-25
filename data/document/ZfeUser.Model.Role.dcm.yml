@@ -1,0 +1,9 @@
+## YAML Template.
+ZfeUser\Model\Role:
+  type: document
+  collection: role
+  fields:
+    name:
+        id: true
+        strategy: none
+        type: string   

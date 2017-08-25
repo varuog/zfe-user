@@ -1,9 +1,0 @@
-## YAML Template.
-Zend\Permissions\Rbac\Role:
-  type: document
-  collection: role
-  fields:
-    name:
-        id: true
-        strategy: none
-        type: string   

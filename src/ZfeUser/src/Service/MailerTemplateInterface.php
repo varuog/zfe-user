@@ -12,7 +12,7 @@ use Zend\Expressive\Template\TemplateRendererInterface;
 
 /**
  *
- * @author Win10Laptop-Kausik
+ * @author Gourav Sarkar
  */
 interface MailerTemplateInterface extends TemplateRendererInterface
 {

@@ -23,7 +23,7 @@ use Zend\Permissions\Rbac\Role;
 /**
  * Description of RoleService
  *
- * @author Win10Laptop-Kausik
+ * @author Gourav Sarkar
  */
 class RoleService
 {

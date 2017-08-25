@@ -47,6 +47,6 @@ ZfeUser\Model\User:
     roles:
         reference: true
         type: many
-        targetDocument: Zend\Permissions\Rbac\Role
+        targetDocument: ZfeUser\Model\Role
         cascade: all
   

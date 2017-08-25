@@ -15,7 +15,7 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 /**
  * Description of MongoDocumentManagerFactory
  *
- * @author Win10Laptop-Kausik
+ * @author Gourav Sarkar
  */
 class AuthValidatorMiddlewareFactory
 {

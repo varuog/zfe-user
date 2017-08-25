@@ -19,7 +19,7 @@ use Zend\Authentication\Result;
 use WoohooLabs\Yin\JsonApi\Schema\JsonApiObject;
 use WoohooLabs\Yin\JsonApi\Schema\Error;
 use ZfeUser\Middleware\JsonApiResponseMiddleware;
-use Zend\Permissions\Rbac\Role;
+use ZfeUser\Model\Role;
 
 class RoleAddAction implements ServerMiddlewareInterface
 {

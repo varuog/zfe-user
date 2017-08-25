@@ -17,7 +17,7 @@ use Facebook\Facebook;
 /**
  * Description of MongoDocumentManagerFactory
  * @todo Database name should be overridable
- * @author Win10Laptop-Kausik
+ * @author Gourav Sarkar
  */
 class SocialFacebookFactory
 {

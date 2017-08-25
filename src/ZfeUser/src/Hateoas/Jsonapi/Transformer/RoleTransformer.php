@@ -30,11 +30,8 @@ class RoleTransformer extends AbstractResourceTransformer
     {
         return [
             "name" => function (Role $domainObject) {
-                return $domainObject->getUsername();
+                return $domainObject->getName();
             },
-            "permission" => function (Role $domainObject) {
-                return iterator_to_array();
-            }
         ];
     }
 

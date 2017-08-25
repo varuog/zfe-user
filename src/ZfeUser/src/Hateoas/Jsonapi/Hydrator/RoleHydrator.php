@@ -11,7 +11,7 @@ namespace ZfeUser\Hateoas\Jsonapi\Hydrator;
 use WoohooLabs\Yin\JsonApi\Hydrator\AbstractHydrator;
 use WoohooLabs\Yin\JsonApi\Request\RequestInterface;
 use WoohooLabs\Yin\JsonApi\Exception\ExceptionFactoryInterface;
-use Zend\Permissions\Rbac\Role;
+use ZfeUser\Model\Role;
 
 /**
  * Description of UserHydrator
@@ -23,15 +23,14 @@ class RoleHydrator extends AbstractHydrator
 
     protected function generateId(): string
     {
-        $f = \Doctrine\ODM\MongoDB\Id\UuidGenerator::generateV4();
-        //return \Doctrine\ODM\MongoDB\Id\UuidGenerator::generateV4();
-        return null;
+        //$f = \Doctrine\ODM\MongoDB\Id\UuidGenerator::generateV4();
+        return \Doctrine\ODM\MongoDB\Id\UuidGenerator::generateV4();
     }
 
     protected function getAcceptedTypes(): array
     {
         $parts = explode('\\', Role::class);
-        return [ end($parts), Role::class ];
+        return [end($parts), Role::class];
     }
 
     /**
@@ -70,10 +69,10 @@ class RoleHydrator extends AbstractHydrator
      * @param \WoohooLabs\Yin\JsonApi\Exception\ExceptionFactoryInterface $exceptionFactory
      */
     protected function validateClientGeneratedId(
-        string $clientGeneratedId,
-        RequestInterface $request,
-        ExceptionFactoryInterface $exceptionFactory
-    ): void {
+    string $clientGeneratedId, RequestInterface $request, ExceptionFactoryInterface $exceptionFactory
+    ): void
+    {
+        
     }
 
     /**
@@ -82,5 +81,7 @@ class RoleHydrator extends AbstractHydrator
      */
     protected function validateRequest(RequestInterface $request): void
     {
+        
     }
+
 }

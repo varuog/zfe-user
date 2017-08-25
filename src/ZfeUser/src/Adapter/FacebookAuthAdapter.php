@@ -14,7 +14,7 @@ use Zend\Authentication\Result;
 /**
  * Description of FacebookAuthAdapter
  *
- * @author Win10Laptop-Kausik
+ * @author Gourav Sarkar
  */
 class FacebookAuthAdapter implements AdapterInterface
 {

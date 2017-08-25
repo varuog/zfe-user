@@ -23,7 +23,7 @@ class UserHydrator extends AbstractHydrator
 
     protected function generateId(): string
     {
-        $f = \Doctrine\ODM\MongoDB\Id\UuidGenerator::generateV4();
+        //$f = \Doctrine\ODM\MongoDB\Id\UuidGenerator::generateV4();
         return \Doctrine\ODM\MongoDB\Id\UuidGenerator::generateV4();
     }
 

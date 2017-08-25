@@ -21,7 +21,7 @@ use Zend\Stratigility\Middleware\ErrorHandler;
 /**
  * Description of RoutesDelegator
  * specify roots here
- * @author Win10Laptop-Kausik
+ * @author Gourav Sarkar
  */
 class RouteProvider
 {

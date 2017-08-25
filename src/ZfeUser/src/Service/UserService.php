@@ -24,7 +24,7 @@ use Zend\Expressive\Helper\UrlHelper;
 /**
  * Description of UserService
  *
- * @author Win10Laptop-Kausik
+ * @author Gourav Sarkar
  */
 class UserService implements AdapterInterface, EventManagerAwareInterface
 {
@@ -203,7 +203,7 @@ class UserService implements AdapterInterface, EventManagerAwareInterface
     {
          $loggedUser = $this->persistantManager
                 ->getRepository(get_class($this->authUser))
-                ->findOneBy(['social.*.id' =>$id, 'social.*.providerName' => $pr
+                ->findOneBy(['social.*.id' =>$id, 'social.*.providerName' => $providerName
                         ]);
          
         if ($loggedUser instanceof User) {
