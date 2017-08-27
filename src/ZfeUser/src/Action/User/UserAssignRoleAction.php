@@ -1,6 +1,6 @@
 <?php
 
-namespace ZfeUser\Action;
+namespace ZfeUser\Action\User;
 
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface as ServerMiddlewareInterface;
@@ -20,7 +20,7 @@ use Zend\Diactoros\Response;
 use WoohooLabs\Yin\JsonApi\Document\ErrorDocument;
 use WoohooLabs\Yin\JsonApi\Schema\JsonApiObject;
 
-class UserFetchAction implements ServerMiddlewareInterface
+class UserAssignRoleAction implements ServerMiddlewareInterface
 {
 
     private $userService;
@@ -39,7 +39,7 @@ class UserFetchAction implements ServerMiddlewareInterface
 
         $user = new User();
         $user->setSlug($request->getAttribute('slug'));
-        $user = $this->userService->fetch($user);
+        $user = $this->userService->manageRole($user, true);
 
         $defaultExpFactory = new DefaultExceptionFactory();
         $jsonapi = new JsonApi(new Request($request, $defaultExpFactory), new Response(), $defaultExpFactory);

@@ -22,4 +22,9 @@ class Role extends ZfRole
         $this->name=$name;
         return $this;
     }  
+    
+    public function getPermissions()
+    {
+        return $this->permissions;
+    }
 }

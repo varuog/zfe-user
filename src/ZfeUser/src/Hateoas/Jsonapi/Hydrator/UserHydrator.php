@@ -54,6 +54,9 @@ class UserHydrator extends AbstractHydrator
             },
             "slug" => function (User $domainObject, $attribute, $data, $attributeName) {
                 $domainObject->setSlug($attribute);
+            },
+            "approved" => function (User $domainObject, $attribute, $data, $attributeName) {
+                $domainObject->setApproved($attribute);
             }
         ];
     }

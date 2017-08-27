@@ -23,8 +23,7 @@ use Zend\Stratigility\Middleware\ErrorHandler;
  * specify roots here
  * @author Gourav Sarkar
  */
-class RouteProvider
-{
+class RouteProvider {
 
     /**
      * @param ContainerInterface $container
@@ -32,18 +31,28 @@ class RouteProvider
      * @param callable $callback Creates and returns the service.
      * @return Application
      */
-    public function __invoke(ContainerInterface $container, $serviceName, callable $callback)
-    {
+    public function __invoke(ContainerInterface $container, $serviceName, callable $callback) {
         /** @var $app Application */
         $app = $callback();
 
         // Setup routes:
-        $app->post('/user/register', [ \Zend\Expressive\Helper\BodyParams\BodyParamsMiddleware::class, Action\UserRegisterAction::class ], 'user.register');
-        $app->post('/user/login', [ \Zend\Expressive\Helper\BodyParams\BodyParamsMiddleware::class, Action\UserLoginAction::class ], 'user.login');
-        $app->get('/user/fetch/:slug', [ Middleware\AuthValidatorMiddleware::class, Action\UserFetchAction::class ], 'user.fetch');
+        $app->post('/user/register', [\Zend\Expressive\Helper\BodyParams\BodyParamsMiddleware::class, Action\User\UserRegisterAction::class], 'user.register');
+        $app->post('/user/login', [\Zend\Expressive\Helper\BodyParams\BodyParamsMiddleware::class, Action\User\UserLoginAction::class], 'user.login');
+        $app->get('/user/:slug', [Middleware\AuthValidatorMiddleware::class, Action\User\UserFetchAction::class], 'user.fetch');
+        $app->patch('/user/:slug/assign-role', [\Zend\Expressive\Helper\BodyParams\BodyParamsMiddleware::class, Action\User\UserAssignRoleAction::class], 'user.assign-role');
+        $app->patch('/user/:slug/revoke-role', [\Zend\Expressive\Helper\BodyParams\BodyParamsMiddleware::class, Action\User\UserRevokeRoleAction::class], 'user.revoke-role');
+        $app->patch('/user/:slug/activation', [\Zend\Expressive\Helper\BodyParams\BodyParamsMiddleware::class, Action\User\UserActivationAction::class], 'user.activation');
 
-        $app->post('/role/add', [ \Zend\Expressive\Helper\BodyParams\BodyParamsMiddleware::class, Action\Role\RoleAddAction::class ], 'role.add');
+        $app->patch('/user/:slug/trash', [Middleware\AuthValidatorMiddleware::class, Action\User\UserFetchAction::class], 'user.trash');
+
+
+        /**
+         * Role Routes
+         */
+        $app->post('/role/add', [\Zend\Expressive\Helper\BodyParams\BodyParamsMiddleware::class, Action\Role\RoleAddAction::class], 'role.add');
+        $app->post('/role/[:role]', [\Zend\Expressive\Helper\BodyParams\BodyParamsMiddleware::class, Action\Role\RoleFetchAction::class], 'role.fetch');
 
         return $app;
     }
+
 }

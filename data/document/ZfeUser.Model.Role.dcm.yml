@@ -6,4 +6,16 @@ ZfeUser\Model\Role:
     name:
         id: true
         strategy: none
-        type: string   
+        type: string 
+    parent:
+        reference: true
+        type: one
+        targetDocument: ZfeUser\Model\Role
+        cascade: all
+    children:
+        reference: true
+        type: many
+        targetDocument: ZfeUser\Model\Role
+    permissions:
+        type: hash
+        
