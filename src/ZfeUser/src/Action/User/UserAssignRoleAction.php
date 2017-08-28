@@ -37,20 +37,25 @@ class UserAssignRoleAction implements ServerMiddlewareInterface
     public function process(ServerRequestInterface $request, DelegateInterface $delegate)
     {
 
+        
         $user = new User();
-        $user->setSlug($request->getAttribute('slug'));
-        $user = $this->userService->manageRole($user, true);
-
         $defaultExpFactory = new DefaultExceptionFactory();
-        $jsonapi = new JsonApi(new Request($request, $defaultExpFactory), new Response(), $defaultExpFactory);
+        $jsonapiRequest = new JsonApiRequest($request, $defaultExpFactory);
+        $jsonApi = new JsonApi($jsonapiRequest, new \Zend\Diactoros\Response(), $defaultExpFactory, null);
+        $jsonApi->hydrate($this->userHydrator, $user);
+        
+        
+        $user->setSlug($request->getAttribute('slug'));
+        $user = $this->userService->manageRole($user, false);
+
 
         if ($user instanceof User) {
-            return $jsonapi->respond()->ok($this->userDocuemnt, $user);
+            return $jsonApi->respond()->ok($this->userDocuemnt, $user);
         }
 
 
         $errorDoc = new ErrorDocument();
         $errorDoc->setJsonApi(new JsonApiObject("1.0"));
-        return $jsonapi->respond()->notFound($errorDoc);
+        return $jsonApi->respond()->notFound($errorDoc);
     }
 }

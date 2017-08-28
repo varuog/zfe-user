@@ -57,6 +57,7 @@ class User
     private $authenticationTokens = [];
     private $socials;
     private $roles;
+    
 
     public function getId()
     {
@@ -230,4 +231,11 @@ class User
     {
         return end($this->authenticationTokens);
     }
+    
+    public function addRole(Role $role)
+    {
+        $this->roles[]=$role;
+        return $this;
+    }
+    
 }

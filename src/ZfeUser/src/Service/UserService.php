@@ -420,6 +420,7 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
      * @return type
      */
     public function manageRole(User $user, $revoke = false): User {
+        
         $updateApprove = $this->persistantManager->createQueryBuilder(get_class($user))
                 ->field('slug')
                 ->equals($user->getSlug())
@@ -428,7 +429,7 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
                 ->field('roles');
 
         if ($revoke) {
-            $updateApprove->pull($user->getRoles());
+            $updateApprove->pullAll($user->getRoles());
         } else {
             $updateApprove->set($user->getRoles());
         }

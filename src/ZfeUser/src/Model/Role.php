@@ -27,4 +27,5 @@ class Role extends ZfRole
     {
         return $this->permissions;
     }
+    
 }
