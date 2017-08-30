@@ -44,9 +44,11 @@ ZfeUser\Model\User:
         type: many
         targetDocument: ZfeUser\Model\Social
         cascade: all
+        storeAs: id
     roles:
         reference: true
         type: many
         targetDocument: ZfeUser\Model\Role
         cascade: all
+        storeAs: id
   

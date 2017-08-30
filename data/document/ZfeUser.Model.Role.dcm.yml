@@ -12,10 +12,12 @@ ZfeUser\Model\Role:
         type: one
         targetDocument: ZfeUser\Model\Role
         cascade: all
+        storeAs: id
     children:
         reference: true
         type: many
         targetDocument: ZfeUser\Model\Role
+        storeAs: id
     permissions:
         type: hash
         
