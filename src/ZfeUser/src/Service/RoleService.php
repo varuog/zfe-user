@@ -19,6 +19,7 @@ use Zend\Mail\Transport\TransportInterface;
 use Zend\Mail\Message;
 use Zend\Expressive\Template\TemplateRendererInterface;
 use Zend\Permissions\Rbac\Role;
+use ZfeUser\Model\Role as ModelRole;
 
 /**
  * Description of RoleService
@@ -40,21 +41,47 @@ class RoleService
 
 
     public function __construct(
-        DocumentManager $mongoManager,
-        TranslatorInterface $translator,
-        TransportInterface $mailer,
-        TemplateRendererInterface $mailTemplate,
-        UserServiceOptions $options
-    ) {
+    DocumentManager $mongoManager, TranslatorInterface $translator, TransportInterface $mailer, TemplateRendererInterface $mailTemplate, UserServiceOptions $options
+    )
+    {
         $this->persistantManager = $mongoManager;
-        $this->options           = $options;
-        $this->translator        = $translator;
-        $this->mailer            = $mailer;
-        $this->mailerTemplate    = $mailTemplate;
+        $this->options = $options;
+        $this->translator = $translator;
+        $this->mailer = $mailer;
+        $this->mailerTemplate = $mailTemplate;
     }
 
     public function fetchRoles(array $roles)
     {
+        $roleList=[];
+        foreach ($roles as $role) {
+            $roleIdList[] = $role->getName();
+        }
+        $roles = $this->persistantManager->createQueryBuilder(ModelRole::class)
+                ->field('name')
+                ->in($roleIdList)
+                ->getQuery()
+                ->execute();
+
+        foreach ($roles as $role)
+        {
+            $roleList[]=$role;
+        }
+        
+
+        return $roleList;
+    }
+    
+    public function fetchRoleNames(array $roles)
+    {
+        $roleNames=[];
+        $fetchedRoles=$this->fetchRoles($roles);
+
+        foreach($fetchedRoles as $role)
+        {
+            $roleNames[]=$role->getName();
+        }
+        return $roleNames;
     }
 
     /**
@@ -65,6 +92,7 @@ class RoleService
     {
         $this->persistantManager->getSchemaManager()->ensureIndexes();
         $this->persistantManager->persist($role);
-        $this->persistantManager->flush($role, [ 'safe' => true ]);
+        $this->persistantManager->flush($role, ['safe' => true]);
     }
+
 }

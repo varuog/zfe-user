@@ -15,6 +15,7 @@ use Zend\Expressive\Template\TemplateRendererInterface;
 use Firebase\JWT\JWT;
 use Zend\Expressive\Helper\UrlHelper;
 use \ZfeUser\Model\Role;
+use ZfeUser\Service\RoleService;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -40,6 +41,7 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
     private $identity;
     private $serverOptions;
     private $urlHelper;
+    private $roleService;
 
     /**
      *
@@ -49,7 +51,7 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
      * @param TemplateRendererInterface $mailTemplate
      * @param UserServiceOptions $options
      */
-    public function __construct(DocumentManager $mongoManager, TranslatorInterface $translator, TransportInterface $mailer, TemplateRendererInterface $mailTemplate, UserServiceOptions $options, UrlHelper $urlheper) {
+    public function __construct(DocumentManager $mongoManager, TranslatorInterface $translator, TransportInterface $mailer, TemplateRendererInterface $mailTemplate, UserServiceOptions $options, UrlHelper $urlheper, RoleService $roleService) {
         $this->persistantManager = $mongoManager;
         $this->options = $options;
         $this->translator = $translator;
@@ -60,6 +62,8 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
 
         $this->credential = $this->options->getCredentialField();
         $this->identity = $this->options->getIdentityField();
+        $this->urlHelper=$urlheper;
+        $this->roleService= $roleService;
     }
 
     public function fetch(User $user) {
@@ -421,6 +425,9 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
      */
     public function manageRole(User $user, $revoke = false): User {
         
+        $roles=$this->roleService->fetchRoleNames($user->getRoles());
+        //var_dump($roles);
+        
         $updateApprove = $this->persistantManager->createQueryBuilder(get_class($user))
                 ->field('slug')
                 ->equals($user->getSlug())
@@ -429,13 +436,13 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
                 ->field('roles');
 
         if ($revoke) {
-            $updateApprove->pullAll($user->getRoles());
+            $updateApprove->pullAll($roles);
         } else {
-            $updateApprove->set($user->getRoles());
+            $updateApprove->pushAll($roles);
         }
 
-        $updatedUser = $updateApprove->getQuery()
-                ->execute();
+        $query=$updateApprove->getQuery();
+        $updatedUser = $query->execute();
 
         return $updatedUser;
     }

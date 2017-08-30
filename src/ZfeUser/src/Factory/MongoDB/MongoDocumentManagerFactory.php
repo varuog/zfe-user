@@ -27,7 +27,7 @@ class MongoDocumentManagerFactory
         $config = new \Doctrine\ODM\MongoDB\Configuration();
 
         $config->setProxyDir('data/proxies');
-        $config->setProxyNamespace('data/Proxies');
+        $config->setProxyNamespace('Proxies');
         $config->setHydratorDir('data/hydrators');
         $config->setHydratorNamespace('Hydrators');
         $config->setDefaultDB('user');

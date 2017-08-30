@@ -17,7 +17,6 @@ ZfeUser\Model\Role:
         reference: true
         type: many
         targetDocument: ZfeUser\Model\Role
-        storeAs: id
     permissions:
         type: hash
         
