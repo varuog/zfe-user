@@ -36,8 +36,8 @@ class RouteProvider {
         $app = $callback();
 
         // Setup routes:
-        $app->post('/user/register', [\Zend\Expressive\Helper\BodyParams\BodyParamsMiddleware::class, Action\User\UserRegisterAction::class], 'user.register');
-        $app->post('/user/login', [\Zend\Expressive\Helper\BodyParams\BodyParamsMiddleware::class, Action\User\UserLoginAction::class], 'user.login');
+        $app->post('/auth/register', [\Zend\Expressive\Helper\BodyParams\BodyParamsMiddleware::class, Action\User\UserRegisterAction::class], 'user.register');
+        $app->post('/auth/login', [\Zend\Expressive\Helper\BodyParams\BodyParamsMiddleware::class, Action\User\UserLoginAction::class], 'user.login');
         $app->get('/user/:slug', [Middleware\AuthValidatorMiddleware::class, Action\User\UserFetchAction::class], 'user.fetch');
         $app->patch('/user/:slug/assign-role', [\Zend\Expressive\Helper\BodyParams\BodyParamsMiddleware::class, Action\User\UserAssignRoleAction::class], 'user.assign-role');
         $app->patch('/user/:slug/revoke-role', [\Zend\Expressive\Helper\BodyParams\BodyParamsMiddleware::class, Action\User\UserRevokeRoleAction::class], 'user.revoke-role');
