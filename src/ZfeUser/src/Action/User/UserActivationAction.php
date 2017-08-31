@@ -4,53 +4,51 @@ namespace ZfeUser\Action\User;
 
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface as ServerMiddlewareInterface;
-use Zend\Diactoros\Response\JsonResponse;
 use Psr\Http\Message\ServerRequestInterface;
 use ZfeUser\Service\UserService;
 use ZfeUser\Hateoas\Jsonapi\Hydrator\UserHydrator;
-use WoohooLabs\Yin\JsonApi\Request\Request as JsonApiRequest;
-use WoohooLabs\Yin\JsonApi\Exception\DefaultExceptionFactory;
-use ZfeUser\Hateoas\Jsonapi\Document;
-use ZfeUser\Hateoas\Jsonapi\Transformer;
 use ZfeUser\Model\User;
 use ZfeUser\Hateoas\Jsonapi\Document\UserDocument;
 use WoohooLabs\Yin\JsonApi\JsonApi;
-use WoohooLabs\Yin\JsonApi\Request\Request;
-use Zend\Diactoros\Response;
 use WoohooLabs\Yin\JsonApi\Document\ErrorDocument;
 use WoohooLabs\Yin\JsonApi\Schema\JsonApiObject;
+use Zend\I18n\Translator\TranslatorInterface;
 
-class UserActivationAction implements ServerMiddlewareInterface {
+class UserActivationAction implements ServerMiddlewareInterface
+{
 
     private $userService;
     private $userHydrator;
     private $userDocuemnt;
+    private $jsonApi;
+    private $translator;
 
-    public function __construct(UserService $userService, UserHydrator $userHydrator, UserDocument $userDoc) {
+    public function __construct(JsonApi $jsonApi, UserService $userService, UserHydrator $userHydrator, UserDocument $userDoc, TranslatorInterface $translator)
+    {
         $this->userService = $userService;
         $this->userHydrator = $userHydrator;
         $this->userDocuemnt = $userDoc;
+        $this->jsonApi = $jsonApi;
+        $this->translator = $translator;
     }
 
-    public function process(ServerRequestInterface $request, DelegateInterface $delegate) {
+    public function process(ServerRequestInterface $request, DelegateInterface $delegate)
+    {
 
+        $this->jsonApi->setRequest($request);
         $user = new User();
-        $defaultExpFactory = new DefaultExceptionFactory();
-        $jsonapiRequest = new JsonApiRequest($request, $defaultExpFactory);
-        $jsonApi = new JsonApi($jsonapiRequest, new \Zend\Diactoros\Response(), $defaultExpFactory, null);
-        $jsonApi->hydrate($this->userHydrator, $user);
-
         $user->setSlug($request->getAttribute('slug'));
         $user = $this->userService->userActivation($user);
 
-        if ($user instanceof User) {
-            return $jsonApi->respond()->ok($this->userDocuemnt, $user);
+        if ($user instanceof User)
+        {
+            return $this->jsonApi->respond()->ok($this->userDocuemnt, $user);
         }
 
 
         $errorDoc = new ErrorDocument();
         $errorDoc->setJsonApi(new JsonApiObject("1.0"));
-        return $jsonApi->respond()->notFound($errorDoc);
+        return $this->jsonApi->respond()->notFound($errorDoc);
     }
 
 }
