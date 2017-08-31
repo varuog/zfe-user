@@ -8,12 +8,12 @@ use Psr\Http\Message\ServerRequestInterface;
 use ZfeUser\Service\UserService;
 use ZfeUser\Hateoas\Jsonapi\Document;
 use WoohooLabs\Yin\JsonApi\Document\ErrorDocument;
-use WoohooLabs\Yin\JsonApi\JsonApi;
 use ZfeUser\Hateoas\Jsonapi\Hydrator\UserHydrator;
 use Zend\Authentication\Result;
 use WoohooLabs\Yin\JsonApi\Schema\JsonApiObject;
 use WoohooLabs\Yin\JsonApi\Schema\Error;
 use Zend\I18n\Translator\TranslatorInterface;
+use ZfeUser\Middleware\JsonApiDispatcherMiddleware;
 
 class UserLoginAction implements ServerMiddlewareInterface
 {
@@ -22,15 +22,13 @@ class UserLoginAction implements ServerMiddlewareInterface
     private $translator;
     private $userHydrator;
     private $userDocument;
-    private $jsonApi;
 
-    public function __construct(JsonApi $jsonApi, UserService $userService, UserHydrator $userHydrator, Document\UserDocument $userDoc, TranslatorInterface $translator)
+    public function __construct(UserService $userService, UserHydrator $userHydrator, Document\UserDocument $userDoc, TranslatorInterface $translator)
     {
         $this->userService = $userService;
         $this->translator = $translator;
         $this->userHydrator = $userHydrator;
         $this->userDocument = $userDoc;
-        $this->jsonApi = $jsonApi;
     }
 
     /**
@@ -42,10 +40,10 @@ class UserLoginAction implements ServerMiddlewareInterface
     public function process(ServerRequestInterface $request, DelegateInterface $delegate)
     {
 
-        $this->jsonApi->setRequest($request);
+         $jsonApi= $request->getAttribute(JsonApiDispatcherMiddleware::JSON_API_PROC);
         $user = new \ZfeUser\Model\User();
 
-        $this->jsonApi->hydrate($this->userHydrator, $user);
+        $jsonApi->hydrate($this->userHydrator, $user);
 
         $this->userService->setAuthUser($user);
         $this->userService->setServerOptions($request->getServerParams());
@@ -55,7 +53,7 @@ class UserLoginAction implements ServerMiddlewareInterface
         if ($authResult->getIdentity() != null)
         {
             $this->userDocument->setAccessToken($authResult->getIdentity()->getLastAccessToken());
-            return $this->jsonApi->respond()->ok($this->userDocument, $authResult->getIdentity());
+            return $jsonApi->respond()->ok($this->userDocument, $authResult->getIdentity());
         } else
         {
             $errorDoc = new ErrorDocument();
@@ -72,10 +70,10 @@ class UserLoginAction implements ServerMiddlewareInterface
 
             if ($authResult->getCode() == Result::FAILURE_IDENTITY_NOT_FOUND)
             {
-                return $this->jsonApi->respond()->notFound($errorDoc, $errors);
+                return $jsonApi->respond()->notFound($errorDoc, $errors);
             } else
             {
-                return $this->jsonApi->respond()->genericError($errorDoc, $errors, 500);
+                return $jsonApi->respond()->genericError($errorDoc, $errors, 500);
             }
         }
     }

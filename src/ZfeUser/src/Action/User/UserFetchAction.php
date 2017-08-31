@@ -9,7 +9,6 @@ use ZfeUser\Service\UserService;
 use ZfeUser\Hateoas\Jsonapi\Hydrator\UserHydrator;
 use ZfeUser\Model\User;
 use ZfeUser\Hateoas\Jsonapi\Document\UserDocument;
-use WoohooLabs\Yin\JsonApi\JsonApi;
 use WoohooLabs\Yin\JsonApi\Document\ErrorDocument;
 use WoohooLabs\Yin\JsonApi\Schema\JsonApiObject;
 use Zend\I18n\Translator\TranslatorInterface;

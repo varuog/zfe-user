@@ -8,31 +8,26 @@ use Psr\Http\Message\ServerRequestInterface;
 use ZfeUser\Service\RoleService;
 use ZfeUser\Hateoas\Jsonapi\Document;
 use WoohooLabs\Yin\JsonApi\Document\ErrorDocument;
-use WoohooLabs\Yin\JsonApi\JsonApi;
 use ZfeUser\Hateoas\Jsonapi\Hydrator\RoleHydrator;
 use WoohooLabs\Yin\JsonApi\Schema\JsonApiObject;
+use ZfeUser\Middleware\JsonApiDispatcherMiddleware;
 use WoohooLabs\Yin\JsonApi\Schema\Error;
 use ZfeUser\Model\Role;
 use Zend\I18n\Translator\TranslatorInterface;
 
-class RoleFetchAction implements ServerMiddlewareInterface
-{
+class RoleFetchAction implements ServerMiddlewareInterface {
 
     private $rolService;
     private $translator;
     private $roleHydrator;
     private $roleDocument;
-    private $jsonApi;
 
-    public function __construct(
-    JsonApi $jsonApi, RoleService $rolService, RoleHydrator $roleHydrator, Document\RoleDocument $roleDoc, TranslatorInterface $translator
-    )
-    {
+    public function __construct(RoleService $rolService, RoleHydrator $roleHydrator, Document\RoleDocument $roleDoc, TranslatorInterface $translator
+    ) {
         $this->rolService = $rolService;
         $this->translator = $translator;
         $this->roleHydrator = $roleHydrator;
         $this->roleDocument = $roleDoc;
-        $this->jsonApi = $jsonApi;
     }
 
     /**
@@ -41,12 +36,11 @@ class RoleFetchAction implements ServerMiddlewareInterface
      * @param DelegateInterface $delegate
      * @return \App\Action\renderResponse
      */
-    public function process(ServerRequestInterface $request, DelegateInterface $delegate)
-    {
+    public function process(ServerRequestInterface $request, DelegateInterface $delegate) {
 
-        $this->jsonApi->setRequest($request);
+        $jsonApi = $request->getAttribute(JsonApiDispatcherMiddleware::JSON_API_PROC);
         $role = new Role(null);
-        $this->jsonApi->hydrate($this->roleHydrator, $role);
+        $jsonApi->hydrate($this->roleHydrator, $role);
         //$this->rolService->addRole( $role );
 
 
@@ -60,10 +54,10 @@ class RoleFetchAction implements ServerMiddlewareInterface
             $error = new Error();
             $error->setTitle($this->translator->translate('error-user-conflict', 'zfe-user'));
 
-            return $this->jsonApi->respond()->conflict($errorDoc);
+            return $jsonApi->respond()->conflict($errorDoc);
         }
 
-        return $this->jsonApi->respond()->ok($this->roleDocument, $role);
+        return $jsonApi->respond()->ok($this->roleDocument, $role);
     }
 
 }

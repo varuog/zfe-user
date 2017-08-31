@@ -11,9 +11,9 @@ use ZfeUser\Model\User;
 use ZfeUser\Hateoas\Jsonapi\Document\UserDocument;
 use Zend\I18n\Translator\TranslatorInterface;
 use WoohooLabs\Yin\JsonApi\Document\ErrorDocument;
-use WoohooLabs\Yin\JsonApi\JsonApi;
 use WoohooLabs\Yin\JsonApi\Schema\JsonApiObject;
 use WoohooLabs\Yin\JsonApi\Schema\Error;
+use ZfeUser\Middleware\JsonApiDispatcherMiddleware;
 
 class UserRegisterAction implements ServerMiddlewareInterface
 {
@@ -21,7 +21,6 @@ class UserRegisterAction implements ServerMiddlewareInterface
     private $userService;
     private $userHydrator;
     private $userDocuemnt;
-    private $jsonApi;
 
     /**
      *
@@ -29,23 +28,21 @@ class UserRegisterAction implements ServerMiddlewareInterface
      */
     private $translator;
 
-    public function __construct(
-    JsonApi $jsonApi, UserService $userService, UserHydrator $userHydrator, UserDocument $userDoc, TranslatorInterface $translator
+    public function __construct( UserService $userService, UserHydrator $userHydrator, UserDocument $userDoc, TranslatorInterface $translator
     )
     {
         $this->userService = $userService;
         $this->userHydrator = $userHydrator;
         $this->userDocuemnt = $userDoc;
         $this->translator = $translator;
-        $this->jsonApi = $jsonApi;
     }
 
     public function process(ServerRequestInterface $request, DelegateInterface $delegate)
     {
 
-        $this->jsonApi->setRequest($request);
+       $jsonApi= $request->getAttribute(JsonApiDispatcherMiddleware::JSON_API_PROC);
         $user = new User();
-        $this->jsonApi->hydrate($this->userHydrator, $user);
+        $jsonApi->hydrate($this->userHydrator, $user);
 
         try {
             $this->userService->register($user);
@@ -59,10 +56,10 @@ class UserRegisterAction implements ServerMiddlewareInterface
             $error = new Error();
             $error->setTitle($this->translator->translate('error-user-conflict', 'zfe-user'));
 
-            return $this->jsonApi->respond()->conflict($errorDoc);
+            return $jsonApi->respond()->conflict($errorDoc);
         }
 
-        return $this->jsonApi->respond()->ok($this->userDocuemnt, $user);
+        return $jsonApi->respond()->ok($this->userDocuemnt, $user);
     }
 
 }

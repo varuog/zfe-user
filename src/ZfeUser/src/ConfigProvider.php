@@ -61,8 +61,6 @@ class ConfigProvider
                 //Social Provider
                 \Facebook\Facebook::class => Factory\MongoDB\SocialFacebookFactory::class,
                           
-                //Json API factory
-                \WoohooLabs\Yin\JsonApi\JsonApi::class => Factory\Hateoas\JsonApiFactory::class,
 
                 Action\HomePageAction::class => Action\HomePageFactory::class,
                 
