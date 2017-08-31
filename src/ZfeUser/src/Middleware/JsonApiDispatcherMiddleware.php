@@ -17,6 +17,7 @@ use WoohooLabs\Yin\JsonApi\Request\Request as JsonApiRequest;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Interop\Http\ServerMiddleware\DelegateInterface;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Description of MongoDocumentManagerFactory
@@ -34,11 +35,12 @@ class JsonApiDispatcherMiddleware implements MiddlewareInterface
         $jsonApiRequest      = new JsonApiRequest($request, $defaultExpFactory);
         $jsonApi             = new \WoohooLabs\Yin\JsonApi\JsonApi($jsonApiRequest, new \Zend\Diactoros\Response(), $defaultExpFactory, null);
         
-        $jsonApi->setRequest($jsonApiRequest);
-        $request=$request->withAttribute(JsonApiDispatcherMiddleware::JSON_API_PROC, $jsonApi);
+
+        $newJsonApiRequest=$jsonApiRequest->withAttribute(JsonApiDispatcherMiddleware::JSON_API_PROC, $jsonApi);
+
         
         
-        $actionHandler=$delegate->process($request);
+        $actionHandler=$delegate->process($newJsonApiRequest);
         
         return $actionHandler;
     }
