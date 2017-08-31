@@ -1,6 +1,6 @@
 <?php
 
-namespace ZfeUser\Action\User;
+namespace ZfeUser\Action\Api\User;
 
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface as ServerMiddlewareInterface;
@@ -14,36 +14,32 @@ use WoohooLabs\Yin\JsonApi\Schema\JsonApiObject;
 use Zend\I18n\Translator\TranslatorInterface;
 use ZfeUser\Middleware\JsonApiDispatcherMiddleware;
 
-class UserFetchAction implements ServerMiddlewareInterface
-{
+class UserRevokeRoleAction implements ServerMiddlewareInterface {
 
     private $userService;
     private $userHydrator;
     private $userDocuemnt;
     private $translator;
 
-    public function __construct(UserService $userService, UserHydrator $userHydrator, UserDocument $userDoc, TranslatorInterface $translator)
-    {
+    public function __construct(UserService $userService, UserHydrator $userHydrator, UserDocument $userDoc, TranslatorInterface $translator) {
         $this->userService = $userService;
         $this->userHydrator = $userHydrator;
         $this->userDocuemnt = $userDoc;
         $this->translator = $translator;
     }
-    
 
-    public function process(ServerRequestInterface $request, DelegateInterface $delegate)
-    {
-        
-        $jsonApi= $request->getAttribute(JsonApiDispatcherMiddleware::JSON_API_PROC);
-       
+    public function process(ServerRequestInterface $request, DelegateInterface $delegate) {
+        $jsonApi = $request->getAttribute(JsonApiDispatcherMiddleware::JSON_API_PROC);
         $user = new User();
-        $user->setSlug($request->getAttribute('slug'));
-        $user = $this->userService->fetch($user);
+        $jsonApi->hydrate($this->userHydrator, $user);
 
-        if ($user instanceof User)
-        {   
+        $user->setSlug($request->getAttribute('slug'));
+        $user = $this->userService->manageRole($user, true);
+
+        if ($user instanceof User) {
             return $jsonApi->respond()->ok($this->userDocuemnt, $user);
         }
+
 
         $errorDoc = new ErrorDocument();
         $errorDoc->setJsonApi(new JsonApiObject("1.0"));

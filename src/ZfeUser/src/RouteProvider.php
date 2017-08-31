@@ -42,23 +42,23 @@ class RouteProvider {
         $app->pipe(Middleware\JsonApiDispatcherMiddleware::class);
 
         // Setup routes:
-        $app->post('/auth/register', [Action\User\UserRegisterAction::class], 'user.register');
-        $app->post('/auth/login', [Action\User\UserLoginAction::class], 'user.login');
-        $app->get('/user/:slug'
-                , [Middleware\AuthValidatorMiddleware::class, Action\User\UserFetchAction::class]
+        $app->post('/api/auth/register', [Action\Api\User\UserRegisterAction::class], 'user.register');
+        $app->post('/api/auth/login', [Action\Api\User\UserLoginAction::class], 'user.login');
+        $app->get('/api/user/:slug'
+                , [Middleware\AuthValidatorMiddleware::class, Action\Api\User\UserFetchAction::class]
                 , 'user.fetch');
-        $app->patch('/user/:slug/assign-role', [Action\User\UserAssignRoleAction::class], 'user.assign-role');
-        $app->patch('/user/:slug/revoke-role', [Action\User\UserRevokeRoleAction::class], 'user.revoke-role');
-        $app->patch('/user/:slug/activation', [Action\User\UserActivationAction::class], 'user.activation');
+        $app->patch('/api/user/:slug/assign-role', [Action\Api\User\UserAssignRoleAction::class], 'user.assign-role');
+        $app->patch('/api/user/:slug/revoke-role', [Action\Api\User\UserRevokeRoleAction::class], 'user.revoke-role');
+        $app->patch('/api/user/:slug/activation', [Action\Api\User\UserActivationAction::class], 'user.activation');
 
-        $app->patch('/user/:slug/trash', [Action\User\UserFetchAction::class], 'user.trash');
+        $app->patch('/api/user/:slug/trash', [Action\Api\User\UserFetchAction::class], 'user.trash');
 
 
         /**
          * Role Routes
          */
-        $app->post('/role/add', [Action\Role\RoleAddAction::class], 'role.add');
-        $app->post('/role/[:role]', [Action\Role\RoleFetchAction::class], 'role.fetch');
+        $app->post('/api/role/add', [Action\Api\Role\RoleAddAction::class], 'role.add');
+        $app->post('/api/role/[:role]', [Action\Api\Role\RoleFetchAction::class], 'role.fetch');
 
         return $app;
     }

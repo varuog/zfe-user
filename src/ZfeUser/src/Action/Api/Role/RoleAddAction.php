@@ -1,6 +1,6 @@
 <?php
 
-namespace ZfeUser\Action\Role;
+namespace ZfeUser\Action\Api\Role;
 
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface as ServerMiddlewareInterface;
