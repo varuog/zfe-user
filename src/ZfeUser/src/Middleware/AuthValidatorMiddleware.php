@@ -13,10 +13,10 @@ use Psr\Http\Message\ServerRequestInterface;
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use \Psr\Http\Message\ResponseInterface;
 use WoohooLabs\Yin\JsonApi\Document\ErrorDocument;
-use WoohooLabs\Yin\JsonApi\JsonApi;
 use ZfeUser\Service\UserService;
 use WoohooLabs\Yin\JsonApi\Schema\JsonApiObject;
 use WoohooLabs\Yin\JsonApi\Schema\Error;
+use ZfeUser\Middleware\JsonApiDispatcherMiddleware;
 
 /**
  * Description of JsonApiResponseMiddleware
@@ -27,18 +27,16 @@ class AuthValidatorMiddleware implements MiddlewareInterface
 {
 
     private $userService;
-    private $jsonApi;
 
-    public function __construct(UserService $userService, JsonApi $jsonApi)
+    public function __construct(UserService $userService)
     {
         $this->userService = $userService;
-        $this->jsonApi= $jsonApi;
     }
 
     public function process(ServerRequestInterface $request, DelegateInterface $delegate): ResponseInterface
     {
         $authStringParts = [];
-        $this->jsonApi->setRequest($request);
+         $jsonApi= $request->getAttribute(JsonApiDispatcherMiddleware::JSON_API_PROC);
 
         $authString = $request->getHeader('Authorization');
         if (!empty($authString)) {
@@ -61,6 +59,6 @@ class AuthValidatorMiddleware implements MiddlewareInterface
         $error = new Error();
         $error->setTitle('Unathorised access');
 
-        return $this->jsonApi->respond()->forbidden($errorDoc);
+        return $jsonApi->respond()->forbidden($errorDoc);
     }
 }

@@ -35,7 +35,6 @@ class JsonApiDispatcherMiddleware implements MiddlewareInterface
         $jsonApiRequest      = new JsonApiRequest($request, $defaultExpFactory);
         $jsonApi             = new \WoohooLabs\Yin\JsonApi\JsonApi($jsonApiRequest, new \Zend\Diactoros\Response(), $defaultExpFactory, null);
         
-
         $newJsonApiRequest=$jsonApiRequest->withAttribute(JsonApiDispatcherMiddleware::JSON_API_PROC, $jsonApi);
 
         

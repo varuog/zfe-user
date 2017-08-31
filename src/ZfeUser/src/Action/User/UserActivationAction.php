@@ -37,6 +37,7 @@ class UserActivationAction implements ServerMiddlewareInterface
         $jsonApi= $request->getAttribute(JsonApiDispatcherMiddleware::JSON_API_PROC);
         
         $user = new User();
+        $jsonApi->hydrate($this->userHydrator, $user);
         $user->setSlug($request->getAttribute('slug'));
         $user = $this->userService->userActivation($user);
 

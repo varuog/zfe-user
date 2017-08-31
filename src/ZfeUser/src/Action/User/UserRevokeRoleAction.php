@@ -12,6 +12,7 @@ use ZfeUser\Hateoas\Jsonapi\Document\UserDocument;
 use WoohooLabs\Yin\JsonApi\Document\ErrorDocument;
 use WoohooLabs\Yin\JsonApi\Schema\JsonApiObject;
 use Zend\I18n\Translator\TranslatorInterface;
+use ZfeUser\Middleware\JsonApiDispatcherMiddleware;
 
 class UserRevokeRoleAction implements ServerMiddlewareInterface {
 
@@ -36,7 +37,7 @@ class UserRevokeRoleAction implements ServerMiddlewareInterface {
         $user = $this->userService->manageRole($user, true);
 
         if ($user instanceof User) {
-            return $this->jsonApi->respond()->ok($this->userDocuemnt, $user);
+            return $jsonApi->respond()->ok($this->userDocuemnt, $user);
         }
 
 

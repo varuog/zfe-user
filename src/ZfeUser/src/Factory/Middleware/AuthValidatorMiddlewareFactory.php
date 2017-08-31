@@ -14,7 +14,7 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 
 /**
  * Description of MongoDocumentManagerFactory
- *
+ * @todo Consider removing factory, instead use abstractFactories
  * @author Gourav Sarkar
  */
 class AuthValidatorMiddlewareFactory
@@ -23,8 +23,7 @@ class AuthValidatorMiddlewareFactory
     public function __invoke(ContainerInterface $container)
     {
         $userService = $container->get(\ZfeUser\Service\UserService::class);
-        $jsonapi = $container->get(\WoohooLabs\Yin\JsonApi\JsonApi::class);
-        return new \ZfeUser\Middleware\AuthValidatorMiddleware($userService, $jsonapi);
+        return new \ZfeUser\Middleware\AuthValidatorMiddleware($userService);
     }
 
 }
