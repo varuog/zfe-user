@@ -39,7 +39,10 @@ class ConfigProvider
                 //Mail transport
                 \Zend\Mail\Transport\TransportInterface::class => \Zend\Mail\Transport\Sendmail::class,
                 Hateoas\Jsonapi\Hydrator\UserHydrator::class=> Hateoas\Jsonapi\Hydrator\UserHydrator::class,
-                Hateoas\Jsonapi\Hydrator\RoleHydrator::class=> Hateoas\Jsonapi\Hydrator\RoleHydrator::class
+                Hateoas\Jsonapi\Hydrator\RoleHydrator::class=> Hateoas\Jsonapi\Hydrator\RoleHydrator::class,
+                
+                //Middleware
+                Middleware\JsonApiDispatcherMiddleware::class => Middleware\JsonApiDispatcherMiddleware::class
             ],
             'factories' => [
                  //Mongo factory
@@ -57,8 +60,12 @@ class ConfigProvider
                 
                 //Social Provider
                 \Facebook\Facebook::class => Factory\MongoDB\SocialFacebookFactory::class,
+                          
+                //Json API factory
+                \WoohooLabs\Yin\JsonApi\JsonApi::class => Factory\Hateoas\JsonApiFactory::class,
 
                 Action\HomePageAction::class => Action\HomePageFactory::class,
+                
             ],
             'abstract_factories' => [
                 Factory\AbstractServiceFactory::class,

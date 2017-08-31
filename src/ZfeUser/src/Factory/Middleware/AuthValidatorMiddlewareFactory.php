@@ -22,8 +22,9 @@ class AuthValidatorMiddlewareFactory
 
     public function __invoke(ContainerInterface $container)
     {
-        $userService=$container->get(\ZfeUser\Service\UserService::class);
-
-        return new \ZfeUser\Middleware\AuthValidatorMiddleware($userService);
+        $userService = $container->get(\ZfeUser\Service\UserService::class);
+        $jsonapi = $container->get(\WoohooLabs\Yin\JsonApi\JsonApi::class);
+        return new \ZfeUser\Middleware\AuthValidatorMiddleware($userService, $jsonapi);
     }
+
 }

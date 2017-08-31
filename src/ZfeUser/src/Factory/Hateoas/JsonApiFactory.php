@@ -24,9 +24,8 @@ class JsonApiFactory
 
     public function __invoke(ContainerInterface $container)
     {
-        $request = $container->get('Request');
         $defaultExpFactory = new DefaultExceptionFactory();
-        $jsonapi = new JsonApi(new Request($request, $defaultExpFactory), new Response(), $defaultExpFactory);
+        $jsonapi = new JsonApi(new Request(new Request, $defaultExpFactory), new Response(), $defaultExpFactory);
 
 
         return $jsonapi;

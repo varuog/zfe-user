@@ -15,9 +15,6 @@ use \Psr\Http\Message\ResponseInterface;
 use WoohooLabs\Yin\JsonApi\Document\ErrorDocument;
 use WoohooLabs\Yin\JsonApi\JsonApi;
 use ZfeUser\Service\UserService;
-use WoohooLabs\Yin\JsonApi\Exception\DefaultExceptionFactory;
-use WoohooLabs\Yin\JsonApi\Request\Request as JsonApiRequest;
-use Zend\Diactoros\Response;
 use WoohooLabs\Yin\JsonApi\Schema\JsonApiObject;
 use WoohooLabs\Yin\JsonApi\Schema\Error;
 
@@ -30,20 +27,18 @@ class AuthValidatorMiddleware implements MiddlewareInterface
 {
 
     private $userService;
+    private $jsonApi;
 
-    public function __construct(UserService $userService)
+    public function __construct(UserService $userService, JsonApi $jsonApi)
     {
         $this->userService = $userService;
+        $this->jsonApi= $jsonApi;
     }
 
     public function process(ServerRequestInterface $request, DelegateInterface $delegate): ResponseInterface
     {
         $authStringParts = [];
-        $defaultExpFactory = new DefaultExceptionFactory();
-
-        $jsonapiRequest = new JsonApiRequest($request, $defaultExpFactory);
-        $jsonApi = new JsonApi($jsonapiRequest, new Response(), $defaultExpFactory, null);
-
+        $this->jsonApi->setRequest($request);
 
         $authString = $request->getHeader('Authorization');
         if (!empty($authString)) {
@@ -66,6 +61,6 @@ class AuthValidatorMiddleware implements MiddlewareInterface
         $error = new Error();
         $error->setTitle('Unathorised access');
 
-        return $jsonApi->respond()->forbidden($errorDoc);
+        return $this->jsonApi->respond()->forbidden($errorDoc);
     }
 }
