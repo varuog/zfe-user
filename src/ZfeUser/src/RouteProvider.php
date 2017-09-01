@@ -40,6 +40,7 @@ class RouteProvider {
          */
         $app->pipe(\Zend\Expressive\Helper\BodyParams\BodyParamsMiddleware::class);
         $app->pipe(Middleware\JsonApiDispatcherMiddleware::class);
+        $app->pipe(Middleware\AuthValidatorMiddleware::class);
 
         // Setup routes:
         $app->post('/api/auth/register', [Action\Api\User\UserRegisterAction::class], 'user.register');

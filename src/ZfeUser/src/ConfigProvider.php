@@ -63,6 +63,8 @@ class ConfigProvider
                           
 
                 Action\HomePageAction::class => Action\HomePageFactory::class,
+                //Authorization middleware
+                Middleware\AuthorizationMiddleware::class => Factory\Middleware\AuthorizationMiddlewareFactory::class,
                 
             ],
             'abstract_factories' => [

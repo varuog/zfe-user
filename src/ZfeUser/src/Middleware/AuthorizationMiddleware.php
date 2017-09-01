@@ -13,43 +13,39 @@ use Psr\Http\Message\ServerRequestInterface;
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use \Psr\Http\Message\ResponseInterface;
 use WoohooLabs\Yin\JsonApi\Document\ErrorDocument;
-use ZfeUser\Service\UserService;
+use ZfeUser\Service\RoleService;
 use WoohooLabs\Yin\JsonApi\Schema\JsonApiObject;
 use WoohooLabs\Yin\JsonApi\Schema\Error;
 use ZfeUser\Middleware\JsonApiDispatcherMiddleware;
 
 /**
- * Description of JsonApiResponseMiddleware
- * @todo incomplete implementation
+ * check if user has permission or not to access this route
  * @author gourav sarkar
  */
-class AuthValidatorMiddleware implements MiddlewareInterface
+class AuthorizationMiddleware implements MiddlewareInterface
 {
 
-    const CURRENT_USER='CURRENT_USER';
-    private $userService;
+    private $roleService;
+    private $router;
 
-    public function __construct(UserService $userService)
+    public function __construct(RoleService $roleService, \Zend\Expressive\Router\RouterInterface $router)
     {
-        $this->userService = $userService;
+        $this->roleService = $roleService;
+        $this->router = $router;
     }
 
     public function process(ServerRequestInterface $request, DelegateInterface $delegate): ResponseInterface
     {
         $authStringParts = [];
-         $jsonApi= $request->getAttribute(JsonApiDispatcherMiddleware::JSON_API_PROC);
+        $jsonApi = $request->getAttribute(JsonApiDispatcherMiddleware::JSON_API_PROC);
+        $currentUser = $request->getAttribute(AuthValidatorMiddleware::CURRENT_USER);
 
-        $authString = $request->getHeader('Authorization');
-        if (!empty($authString)) {
-            $bearerPosition=strpos($authString[0], 'Bearer ') + strlen('Bearer');
-            $authToken = trim(substr($authString[0], $bearerPosition, strlen($authString[0])));
-        }
-
-
-        $currentUser = $this->userService->isValidAuthToken($authToken);
-
+        /**
+         * Check request validation
+         */
+        $routeName=$this->router->match($request)->getMatchedRoute();
+        var_dump('$routeName');
         if ($currentUser != null) {
-            $request->withAttribute(AuthValidatorMiddleware::CURRENT_USER, $currentUser);
             return $delegate->process($request);
         }
 
@@ -63,4 +59,5 @@ class AuthValidatorMiddleware implements MiddlewareInterface
 
         return $jsonApi->respond()->forbidden($errorDoc);
     }
+
 }
