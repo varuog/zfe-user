@@ -7,25 +7,34 @@
  */
 
 namespace ZfeUser\Model;
+
 use \Zend\Permissions\Rbac\Role as ZfRole;
+
 /**
  * Description of Social
  *
  * @author LaptopRK
  */
-class Role extends ZfRole
-{
+class Role extends ZfRole {
 
+    protected $ancestors;
 
-    public function setName($name)
-    {
-        $this->name=$name;
+    public function getAncestors() {
+        return $this->ancestors;
+    }
+
+    public function setAncestors($ancestors) {
+        $this->ancestors = $ancestors;
         return $this;
-    }  
-    
-    public function getPermissions()
-    {
+    }
+
+    public function setName($name) {
+        $this->name = $name;
+        return $this;
+    }
+
+    public function getPermissions() {
         return $this->permissions;
     }
-    
+
 }
