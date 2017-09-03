@@ -54,7 +54,7 @@ class RoleService {
         $this->rbac = new Rbac();
     }
 
-    public function fetchRoles(Collection $roles) : Collection{
+    public function fetchRoles(Collection $roles): Collection {
         $roleList = new ArrayCollection();
         foreach ($roles as $role) {
             $roleIdList[] = $role->getName();
@@ -93,12 +93,12 @@ class RoleService {
          * Check if role has parent
          */
         /*
-        $parentRole = $role->getParent();
-        $parentRole = $this->fetchRoles([$parentRole])[0];
-        $ancestors = $parentRole->getAncestors();
-        foreach ($ancestors as $ancetor) {
-            $ancestorNames[] = $ancetor->getName();
-        }
+          $parentRole = $role->getParent();
+          $parentRole = $this->fetchRoles([$parentRole])[0];
+          $ancestors = $parentRole->getAncestors();
+          foreach ($ancestors as $ancetor) {
+          $ancestorNames[] = $ancetor->getName();
+          }
          * 
          */
         //Populate ancestor names
@@ -116,18 +116,17 @@ class RoleService {
      * @param type $assert
      */
     public function isGranted(Collection $roles, $permission, $assert = null) {
-        $hasPermission=FALSE;
+        $hasPermission = FALSE;
         /*
          * Fetch all the ancestors role and current role and add it to rbac
          */
         foreach ($roles as $subrole) {
             $this->rbac->addRole($subrole);
-            $hasPermission=$this->rbac->isGranted($subrole, $permission, $assert);
-            
+            $hasPermission = $this->rbac->isGranted($subrole, $permission, $assert);
         }
-        
+
         return $hasPermission;
-        
     }
+
 
 }

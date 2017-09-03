@@ -43,7 +43,7 @@ class AuthorizationMiddleware implements MiddlewareInterface {
          */
         $routeName = $this->router->match($request)->getMatchedRoute()->getName();
         $roles=$currentUser->getRoles();
-        if ($this->roleService->isGranted($roles, $this->preparePath($routeName))) {
+        if ($this->roleService->isGranted($roles, $routeName)) {
             return $delegate->process($request);
         }
 
@@ -58,9 +58,6 @@ class AuthorizationMiddleware implements MiddlewareInterface {
         return $jsonApi->respond()->forbidden($errorDoc);
     }
     
-    public function preparePath(string $path) : string
-    {
-        return str_replace('.', '-', $path);
-    }
+   
 
 }
