@@ -18,16 +18,18 @@ use Zend\EventManager\EventManagerAwareInterface;
 use Zend\Mail\Transport\TransportInterface;
 use Zend\Mail\Message;
 use Zend\Expressive\Template\TemplateRendererInterface;
-use Zend\Permissions\Rbac\Role;
-use ZfeUser\Model\Role as ModelRole;
+use Zend\Permissions\Rbac\AssertionInterface;
+use ZfeUser\Model\Role;
+use Zend\Permissions\Rbac\Rbac;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * Description of RoleService
  *
  * @author Gourav Sarkar
  */
-class RoleService
-{
+class RoleService {
 
     private $persistantManager;
     private $options;
@@ -36,50 +38,47 @@ class RoleService
     private $mailer;
     private $mailerTemplate;
     private $events;
+    private $rbac;
 
     //private $serverOptions;
 
 
     public function __construct(
     DocumentManager $mongoManager, TranslatorInterface $translator, TransportInterface $mailer, TemplateRendererInterface $mailTemplate, UserServiceOptions $options
-    )
-    {
+    ) {
         $this->persistantManager = $mongoManager;
         $this->options = $options;
         $this->translator = $translator;
         $this->mailer = $mailer;
         $this->mailerTemplate = $mailTemplate;
+        $this->rbac = new Rbac();
     }
 
-    public function fetchRoles(array $roles)
-    {
-        $roleList=[];
+    public function fetchRoles(Collection $roles) : Collection{
+        $roleList = new ArrayCollection();
         foreach ($roles as $role) {
             $roleIdList[] = $role->getName();
         }
-        $roles = $this->persistantManager->createQueryBuilder(ModelRole::class)
+        $roles = $this->persistantManager->createQueryBuilder(Role::class)
                 ->field('name')
                 ->in($roleIdList)
                 ->getQuery()
                 ->execute();
 
-        foreach ($roles as $role)
-        {
-            $roleList[]=$role;
+        foreach ($roles as $role) {
+            $roleList->add($role);
         }
-        
+
 
         return $roleList;
     }
-    
-    public function fetchRoleNames(array $roles)
-    {
-        $roleNames=[];
-        $fetchedRoles=$this->fetchRoles($roles);
 
-        foreach($fetchedRoles as $role)
-        {
-            $roleNames[]=$role->getName();
+    public function fetchRoleNames(Collection $roles) {
+        $roleNames = [];
+        $fetchedRoles = $this->fetchRoles($roles);
+
+        foreach ($fetchedRoles as $role) {
+            $roleNames[] = $role->getName();
         }
         return $roleNames;
     }
@@ -88,11 +87,47 @@ class RoleService
      *
      * @param Role $role
      */
-    public function add(Role $role)
-    {
+    public function add(Role $role) {
+        $ancestorNames = [];
+        /**
+         * Check if role has parent
+         */
+        /*
+        $parentRole = $role->getParent();
+        $parentRole = $this->fetchRoles([$parentRole])[0];
+        $ancestors = $parentRole->getAncestors();
+        foreach ($ancestors as $ancetor) {
+            $ancestorNames[] = $ancetor->getName();
+        }
+         * 
+         */
+        //Populate ancestor names
+        //$role->setAncestors(array_merge($ancestorNames, $parentRole->getName()));
+
         $this->persistantManager->getSchemaManager()->ensureIndexes();
         $this->persistantManager->persist($role);
         $this->persistantManager->flush($role, ['safe' => true]);
+    }
+
+    /**
+     * 
+     * @param type $role
+     * @param type $permission
+     * @param type $assert
+     */
+    public function isGranted(Collection $roles, $permission, $assert = null) {
+        $hasPermission=FALSE;
+        /*
+         * Fetch all the ancestors role and current role and add it to rbac
+         */
+        foreach ($roles as $subrole) {
+            $this->rbac->addRole($subrole);
+            $hasPermission=$this->rbac->isGranted($subrole, $permission, $assert);
+            
+        }
+        
+        return $hasPermission;
+        
     }
 
 }

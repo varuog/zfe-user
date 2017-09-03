@@ -17,6 +17,7 @@ use ZfeUser\Service\UserService;
 use WoohooLabs\Yin\JsonApi\Schema\JsonApiObject;
 use WoohooLabs\Yin\JsonApi\Schema\Error;
 use ZfeUser\Middleware\JsonApiDispatcherMiddleware;
+use WoohooLabs\Yin\JsonApi\JsonApi;
 
 /**
  * Description of JsonApiResponseMiddleware
@@ -37,8 +38,9 @@ class AuthValidatorMiddleware implements MiddlewareInterface
     public function process(ServerRequestInterface $request, DelegateInterface $delegate): ResponseInterface
     {
         $authStringParts = [];
-         $jsonApi= $request->getAttribute(JsonApiDispatcherMiddleware::JSON_API_PROC);
-
+        /** @var $jsonapi JsonApi  */
+         $jsonApi = $request->getAttribute(JsonApiDispatcherMiddleware::JSON_API_PROC);
+                 
         $authString = $request->getHeader('Authorization');
         if (!empty($authString)) {
             $bearerPosition=strpos($authString[0], 'Bearer ') + strlen('Bearer');
@@ -46,10 +48,14 @@ class AuthValidatorMiddleware implements MiddlewareInterface
         }
 
 
-        $currentUser = $this->userService->isValidAuthToken($authToken);
+        $currentUserToken = $this->userService->isValidAuthToken($authToken);
 
-        if ($currentUser != null) {
-            $request->withAttribute(AuthValidatorMiddleware::CURRENT_USER, $currentUser);
+        if ($currentUserToken != null) {
+            $currentUser= new \ZfeUser\Model\User();
+            call_user_func([$currentUser, 'set' . $this->userService->getOptions()->getIdentityField()], $currentUserToken->identifier);
+            $currentUser=$this->userService->fetchByIdentifier($currentUser);
+            
+            $request=$request->withAttribute(AuthValidatorMiddleware::CURRENT_USER, $currentUser);
             return $delegate->process($request);
         }
 
@@ -59,8 +65,8 @@ class AuthValidatorMiddleware implements MiddlewareInterface
         $errorDoc->setJsonApi(new JsonApiObject("1.0"));
 
         $error = new Error();
-        $error->setTitle('Unathorised access');
-
+        $error->setTitle('Request access is not authenrticated');
+        
         return $jsonApi->respond()->forbidden($errorDoc);
     }
 }

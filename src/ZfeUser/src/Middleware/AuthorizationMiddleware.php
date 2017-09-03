@@ -17,35 +17,33 @@ use ZfeUser\Service\RoleService;
 use WoohooLabs\Yin\JsonApi\Schema\JsonApiObject;
 use WoohooLabs\Yin\JsonApi\Schema\Error;
 use ZfeUser\Middleware\JsonApiDispatcherMiddleware;
+use ZfeUser\Model\User;
 
 /**
  * check if user has permission or not to access this route
  * @author gourav sarkar
  */
-class AuthorizationMiddleware implements MiddlewareInterface
-{
+class AuthorizationMiddleware implements MiddlewareInterface {
 
     private $roleService;
     private $router;
 
-    public function __construct(RoleService $roleService, \Zend\Expressive\Router\RouterInterface $router)
-    {
+    public function __construct(RoleService $roleService, \Zend\Expressive\Router\RouterInterface $router) {
         $this->roleService = $roleService;
         $this->router = $router;
     }
 
-    public function process(ServerRequestInterface $request, DelegateInterface $delegate): ResponseInterface
-    {
+    public function process(ServerRequestInterface $request, DelegateInterface $delegate): ResponseInterface {
         $authStringParts = [];
         $jsonApi = $request->getAttribute(JsonApiDispatcherMiddleware::JSON_API_PROC);
-        $currentUser = $request->getAttribute(AuthValidatorMiddleware::CURRENT_USER);
+        $currentUser = $request->getAttribute(AuthValidatorMiddleware::CURRENT_USER, new User());
 
         /**
          * Check request validation
          */
-        $routeName=$this->router->match($request)->getMatchedRoute();
-        var_dump('$routeName');
-        if ($currentUser != null) {
+        $routeName = $this->router->match($request)->getMatchedRoute()->getName();
+        $roles=$currentUser->getRoles();
+        if ($this->roleService->isGranted($roles, $this->preparePath($routeName))) {
             return $delegate->process($request);
         }
 
@@ -58,6 +56,11 @@ class AuthorizationMiddleware implements MiddlewareInterface
         $error->setTitle('Unathorised access');
 
         return $jsonApi->respond()->forbidden($errorDoc);
+    }
+    
+    public function preparePath(string $path) : string
+    {
+        return str_replace('.', '-', $path);
     }
 
 }

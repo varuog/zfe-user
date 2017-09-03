@@ -13,10 +13,6 @@ ZfeUser\Model\Role:
         targetDocument: ZfeUser\Model\Role
         cascade: all
         storeAs: id
-    ancestors:
-        reference: true
-        type: many
-        targetDocument: ZfeUser\Model\Role
     children:
         reference: true
         type: many

@@ -23,7 +23,8 @@ class AuthorizationMiddlewareFactory
     public function __invoke(ContainerInterface $container)
     {
         $roleService = $container->get(\ZfeUser\Service\RoleService::class);
-        return new \ZfeUser\Middleware\AuthorizationMiddleware($roleService);
+        $router = $container->get(\Zend\Expressive\Router\RouterInterface::class);
+        return new \ZfeUser\Middleware\AuthorizationMiddleware($roleService, $router);
     }
 
 }

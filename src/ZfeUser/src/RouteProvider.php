@@ -40,13 +40,13 @@ class RouteProvider {
          */
         $app->pipe(\Zend\Expressive\Helper\BodyParams\BodyParamsMiddleware::class);
         $app->pipe(Middleware\JsonApiDispatcherMiddleware::class);
-        $app->pipe(Middleware\AuthValidatorMiddleware::class);
+        //$app->pipe(Middleware\AuthValidatorMiddleware::class);
 
         // Setup routes:
         $app->post('/api/auth/register', [Action\Api\User\UserRegisterAction::class], 'user.register');
         $app->post('/api/auth/login', [Action\Api\User\UserLoginAction::class], 'user.login');
         $app->get('/api/user/:slug'
-                , [Middleware\AuthValidatorMiddleware::class, Action\Api\User\UserFetchAction::class]
+                , [Middleware\AuthValidatorMiddleware::class, Middleware\AuthorizationMiddleware::class, Action\Api\User\UserFetchAction::class]
                 , 'user.fetch');
         $app->patch('/api/user/:slug/assign-role', [Action\Api\User\UserAssignRoleAction::class], 'user.assign-role');
         $app->patch('/api/user/:slug/revoke-role', [Action\Api\User\UserRevokeRoleAction::class], 'user.revoke-role');

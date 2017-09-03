@@ -49,3 +49,4 @@ ZfeUser\Model\User:
         type: many
         targetDocument: ZfeUser\Model\Role
         cascade: all
+        storeAs: id

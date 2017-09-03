@@ -17,24 +17,19 @@ use \Zend\Permissions\Rbac\Role as ZfRole;
  */
 class Role extends ZfRole {
 
-    protected $ancestors;
-
-    public function getAncestors() {
-        return $this->ancestors;
-    }
-
-    public function setAncestors($ancestors) {
-        $this->ancestors = $ancestors;
-        return $this;
-    }
-
-    public function setName($name) {
+    
+    public function setName($name): Role {
         $this->name = $name;
         return $this;
     }
 
-    public function getPermissions() {
+    public function getPermissions(): array {
         return $this->permissions;
     }
+
+    public function getParent(): Role {
+        return parent::getParent();
+    }
+
 
 }

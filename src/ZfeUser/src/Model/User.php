@@ -9,6 +9,7 @@
 namespace ZfeUser\Model;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
+use \Doctrine\Common\Collections\Collection;
 
 /**
  * Description of User
@@ -55,8 +56,8 @@ class User
 
     /** @ODM\Collection */
     private $authenticationTokens = [];
-    private $socials;
-    private $roles;
+    private $socials=[];
+    private $roles=[];
     
 
     public function getId()
@@ -190,7 +191,7 @@ class User
         return $this;
     }
 
-    public function getRoles()
+    public function getRoles() : Collection
     {
         return $this->roles;
     }
@@ -205,7 +206,7 @@ class User
     {
     }
 
-    public function getAuthenticationTokens()
+    public function getAuthenticationTokens() : array
     {
         return $this->authenticationTokens;
     }
