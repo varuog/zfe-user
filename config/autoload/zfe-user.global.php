@@ -21,11 +21,12 @@ return [
         'tokenRevokable' => false,
         'social' => [
             'facebook' => [
-                'appID'=> 485738178452691,
+                'appID'=> '485738178452691',
                 'authUri' => 'https://www.facebook.com/v2.10/dialog/oauth',
                 'redirectUrl' =>'',
                 'appSecret' => '653d9dcbfc0b0150592348c38eace83c',
-                'scopes' => ''
+                'scopes' => '',
+                'version' => 'v2.10'
             ]
         ]
     ],

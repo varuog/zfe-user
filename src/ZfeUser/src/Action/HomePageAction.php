@@ -12,22 +12,29 @@ use Zend\Expressive\Template;
 use Zend\Expressive\Plates\PlatesRenderer;
 use Zend\Expressive\Twig\TwigRenderer;
 use Zend\Expressive\ZendView\ZendViewRenderer;
+use ZfeUser\Adapter\Auth\Social\FacebookAuthAdapter;
+use Zend\Expressive\Helper\UrlHelper;
+use Zend\Expressive\Helper\ServerUrlHelper;
 
-class HomePageAction implements ServerMiddlewareInterface
-{
+class HomePageAction implements ServerMiddlewareInterface {
+
     private $router;
-
     private $template;
+    private $fbAuthAdapter;
+    private $urlHelper;
+    private $serverHelper;
 
-    public function __construct(Router\RouterInterface $router, Template\TemplateRendererInterface $template = null)
-    {
-        $this->router   = $router;
+    public function __construct(Router\RouterInterface $router, FacebookAuthAdapter $fbAuthAdapter,  UrlHelper $urlHelper, ServerUrlHelper $serverHelper, Template\TemplateRendererInterface $template = null) {
+        $this->router = $router;
         $this->template = $template;
+        $this->fbAuthAdapter = $fbAuthAdapter;
+        
+        $this->urlHelper = $urlHelper;
+        $this->serverHelper= $serverHelper;
     }
 
-    public function process(ServerRequestInterface $request, DelegateInterface $delegate)
-    {
-        if (! $this->template) {
+    public function process(ServerRequestInterface $request, DelegateInterface $delegate) {
+        if (!$this->template) {
             return new JsonResponse([
                 'welcome' => 'Congratulations! You have installed the zend-expressive skeleton application.',
                 'docsUrl' => 'https://docs.zendframework.com/zend-expressive/',
@@ -57,6 +64,10 @@ class HomePageAction implements ServerMiddlewareInterface
             $data['templateName'] = 'Zend View';
             $data['templateDocs'] = 'https://docs.zendframework.com/zend-view/';
         }
+
+        $fbHelper = $this->fbAuthAdapter->getHandler()->getRedirectLoginHelper();
+        $data['fblink'] = $fbHelper->getLoginUrl($this->serverHelper->generate($this->urlHelper->generate('user-social-login')));
         return new HtmlResponse($this->template->render('app::home-page', $data));
     }
+
 }

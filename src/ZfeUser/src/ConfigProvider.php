@@ -66,13 +66,18 @@ class ConfigProvider
                 //Authorization middleware
                 Middleware\AuthorizationMiddleware::class => Factory\Middleware\AuthorizationMiddlewareFactory::class,
                 
+                //Adapter for auth
+                Adapter\Auth\MongoDbAuthAdapter::class => Factory\Adapter\MongoDbAuthAdapterFactory::class,
+                Adapter\Auth\Social\FacebookAuthAdapter::class => Factory\Adapter\Social\FacebookAuthAdapterFactory::class,
+               
+                
             ],
             'abstract_factories' => [
                 Factory\AbstractServiceFactory::class,
                 Factory\AbstractOptionsFactory::class,
-                Factory\AbstractActionFactory::class,
                 Factory\AbstractDocumentfactory::class,
                 Factory\AbstractTransformerFactory::class,
+                Factory\AbstractActionFactory::class,
                // Factory\AbstractMiddlewareFactory::class,
             ],
             /*

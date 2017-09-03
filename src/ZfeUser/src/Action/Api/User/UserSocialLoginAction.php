@@ -14,24 +14,20 @@ use WoohooLabs\Yin\JsonApi\Schema\JsonApiObject;
 use WoohooLabs\Yin\JsonApi\Schema\Error;
 use Zend\I18n\Translator\TranslatorInterface;
 use ZfeUser\Middleware\JsonApiDispatcherMiddleware;
-use ZfeUser\Adapter\Auth\MongoDbAuthAdapter;
+use ZfeUser\Adapter\Auth\Social\FacebookAuthAdapter;
 
-class UserLoginAction implements ServerMiddlewareInterface
-{
+class UserSocialLoginAction implements ServerMiddlewareInterface {
 
     private $userService;
     private $translator;
-    private $userHydrator;
     private $userDocument;
-    private $mongoAuthAdapter;
+    private $fbAuthAdapter;
 
-    public function __construct(UserService $userService, UserHydrator $userHydrator, Document\UserDocument $userDoc, TranslatorInterface $translator, MongoDbAuthAdapter $mongoAuthAdapter)
-    {
+    public function __construct(UserService $userService, Document\UserDocument $userDoc, TranslatorInterface $translator, FacebookAuthAdapter $fbAuthAdapter) {
         $this->userService = $userService;
         $this->translator = $translator;
-        $this->userHydrator = $userHydrator;
         $this->userDocument = $userDoc;
-        $this->mongoAuthAdapter = $mongoAuthAdapter;
+        $this->fbAuthAdapter = $fbAuthAdapter;
     }
 
     /**
@@ -40,29 +36,21 @@ class UserLoginAction implements ServerMiddlewareInterface
      * @param DelegateInterface $delegate
      * @return \App\Action\renderResponse
      */
-    public function process(ServerRequestInterface $request, DelegateInterface $delegate)
-    {
+    public function process(ServerRequestInterface $request, DelegateInterface $delegate) {
 
-         $jsonApi= $request->getAttribute(JsonApiDispatcherMiddleware::JSON_API_PROC);
+        $jsonApi = $request->getAttribute(JsonApiDispatcherMiddleware::JSON_API_PROC);
+
         $user = new \ZfeUser\Model\User();
-
-        $jsonApi->hydrate($this->userHydrator, $user);
-        
-        /*
-         * Prepare adapter
-         */
-        $this->mongoAuthAdapter->setAuthUser($user);
-        $this->userService->setAuthAdapter($this->mongoAuthAdapter);
+        $this->fbAuthAdapter->setAuthUser($user);
+        $this->userService->setAuthAdapter($this->fbAuthAdapter);
         $this->userService->setServerOptions($request->getServerParams());
         $authResult = $this->userService->authenticate();
 
 
-        if ($authResult->getIdentity() != null)
-        {
+        if ($authResult->getIdentity() != null) {
             $this->userDocument->setAccessToken($authResult->getIdentity()->getLastAccessToken());
             return $jsonApi->respond()->ok($this->userDocument, $authResult->getIdentity());
-        } else
-        {
+        } else {
             $errorDoc = new ErrorDocument();
             $errorDoc->setJsonApi(new JsonApiObject("1.0"));
             $errors = [];
@@ -75,11 +63,9 @@ class UserLoginAction implements ServerMiddlewareInterface
                 $errors[] = $error;
             }
 
-            if ($authResult->getCode() == Result::FAILURE_IDENTITY_NOT_FOUND)
-            {
+            if ($authResult->getCode() == Result::FAILURE_IDENTITY_NOT_FOUND) {
                 return $jsonApi->respond()->notFound($errorDoc, $errors);
-            } else
-            {
+            } else {
                 return $jsonApi->respond()->genericError($errorDoc, $errors, 500);
             }
         }

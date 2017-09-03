@@ -37,11 +37,12 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
     private $mailer;
     private $mailerTemplate;
     private $events;
-    private $credential;
-    private $identity;
     private $serverOptions;
     private $urlHelper;
     private $roleService;
+    private $authAdapter;
+    private $credential;
+    private $identity;
 
     /**
      *
@@ -62,9 +63,15 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
 
         $this->credential = $this->options->getCredentialField();
         $this->identity = $this->options->getIdentityField();
-        $this->urlHelper=$urlheper;
-        $this->roleService= $roleService;
+        $this->urlHelper = $urlheper;
+        $this->roleService = $roleService;
     }
+
+    public function setAuthAdapter(AdapterInterface $authAdapter): UserService {
+        $this->authAdapter = $authAdapter;
+        return $this;
+    }
+    
 
     public function fetch(User $user) {
         //return $this->persistantManager->( get_class( $user ), $user->getId() );
@@ -73,12 +80,11 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
 
         return $user;
     }
-    
-    
-     public function fetchByIdentifier(User $user) {
+
+    public function fetchByIdentifier(User $user) {
         //return $this->persistantManager->( get_class( $user ), $user->getId() );
         $user = $this->persistantManager->getRepository(get_class($user))
-                ->findOneBy([ $this->options->getIdentityField() => call_user_func([$user, 'get'.$this->options->getIdentityField() ])]);
+                ->findOneBy([$this->options->getIdentityField() => call_user_func([$user, 'get' . $this->options->getIdentityField()])]);
 
         return $user;
     }
@@ -136,13 +142,6 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
         }
     }
 
-    /**
-     *
-     * @param User $user
-     */
-    public function setAuthUser(User $user) {
-        $this->authUser = $user;
-    }
 
     /**
      * @todo identity check can be removed [IMPORTANT]
@@ -220,29 +219,14 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
     }
 
     /**
-     *
+     * @todo specific exception
      * @return Result
      */
     public function authenticate(): Result {
-
-        $loggedUser = $this->persistantManager
-                ->getRepository(get_class($this->authUser))
-                ->findOneBy([$this->identity => call_user_func([$this->authUser, "get{$this->identity}"])]);
-        //$loggedUser = $this->persistantManager->createQueryBuilder(get_class($user))->field('email')->;
-
-        if ($loggedUser instanceof User) {
-            if (password_verify($this->authUser->getPassword(), $loggedUser->getPassword())) {
-                $this->generateAuthToken($this->authUser);
-
-                return new Result(Result::SUCCESS, $loggedUser, [$this->translator->translate('success-login', 'zfe-user')]);
-            } else {
-                return new Result(Result::FAILURE_CREDENTIAL_INVALID, null, [$this->translator->translate('error-credentail-invalid', 'zfe-user')]);
-            }
-        } else {
-            return new Result(Result::FAILURE_IDENTITY_NOT_FOUND, null, [$this->translator->translate('error-no-user-found', 'zfe-user')]);
+        if($this->authAdapter instanceof AdapterInterface) {
+            return $this->authAdapter->authenticate();
         }
-
-        return new Result(Result::FAILURE_UNCATEGORIZED, null, [$this->translator->translate('error-unknown-auth', 'zfe-user')]);
+        throw new \RuntimeException("An adapter must be set");
     }
 
     /**
@@ -310,61 +294,8 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
         return false;
     }
 
-    public function generateJwtToken(User $user) {
-        $identityField = $this->options->getIdentityField();
-        $token = [
-            "aud" => "http://example.com",
-            "iat" => time(),
-            "nbf" => 1357000000,
-            'iss' => 'appname',
-            'exp' => time() + 86400,
-            'id' => $user->getId(),
-            'identifier' => call_user_func([$user, "get{$identityField}"]),
-        ];
 
-
-        $user->addAuthenticationToken(JWT::encode($token, $this->options->getAuthSecret()));
-
-        return $token;
-    }
-
-    /**
-     * @todo refreashToken generate should be moved to User model
-     * @param User $user
-     */
-    public function generateAuthToken(User $user) {
-
-        $this->persistantManager->getSchemaManager()->ensureIndexes();
-
-        $user = $this->persistantManager
-                ->getRepository(get_class($user))
-                ->findOneBy([$this->identity => call_user_func([$user, "get{$this->identity}"])]);
-
-        $this->generateJwtToken($user);
-
-        $this->persistantManager->getSchemaManager()->ensureIndexes();
-
-        $this->persistantManager->persist($user);
-        $this->persistantManager->flush($user, ['safe' => true]);
-        /*
-         *
-         *
-          $user = $this->persistantManager->createQueryBuilder( get_class( $user ) )
-          ->update()
-          ->field( 'authenticationInfo' )
-          ->pushAll()
-          ->field( $this->identity )
-          ->equals( call_user_func( [ $user, "get{$this->identity}" ] ) )
-
-          //->field('authenticationInfo.refreshToken')
-          //->set($user->getRefreashToken())
-          ->getQuery()
-          ->execute();
-         *
-         */
-
-        return $user;
-    }
+    
 
     /**
      *
@@ -433,10 +364,10 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
      * @return type
      */
     public function manageRole(User $user, $revoke = false): User {
-        
-        $roles=$this->roleService->fetchRoleNames($user->getRoles());
+
+        $roles = $this->roleService->fetchRoleNames($user->getRoles());
         //var_dump($roles);
-        
+
         $updateApprove = $this->persistantManager->createQueryBuilder(get_class($user))
                 ->field('slug')
                 ->equals($user->getSlug())
@@ -450,7 +381,7 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
             $updateApprove->pushAll($roles);
         }
 
-        $query=$updateApprove->getQuery();
+        $query = $updateApprove->getQuery();
         $updatedUser = $query->execute();
 
         return $updatedUser;
@@ -498,7 +429,7 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
 
             $this->mailer->send($mail);
         }
-        
+
         return $updatedUser;
     }
 
