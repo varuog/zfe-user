@@ -77,7 +77,7 @@ class FacebookAuthAdapter extends AbstractAuthAdapter
                 $longLiveAccessToken = $oAuth2Client->getLongLivedAccessToken($accessToken);
 
                 $response = $this->fbHandler->get('/me', $longLiveAccessToken);
-                $responseData = $response->getGraphUser(); var_dump($responseData);
+                $responseData = $response->getGraphUser();
 
                 $loggedUser = $this->persistantManager
                         ->getRepository(get_class($this->authUser))
