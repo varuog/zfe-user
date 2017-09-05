@@ -7,10 +7,14 @@ ZfeUser\Model\Social:
         strategy: none
         type: int   
     accessToken:
-        unique:
-            order: desc
         type: string
     providerName:
-        unique:
-            order: desc
         type: string
+  indexes:
+      socialAccessToken:
+        keys:
+            accessToken: desc
+            providerName: desc
+        options:
+            sparse: true
+            unique: true

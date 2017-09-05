@@ -26,8 +26,6 @@ ZfeUser\Model\User:
             order: desc
         type: string   
     resetToken:
-        unique:
-            order: desc
         type: string   
     resetTokenTime:
         type: int
@@ -50,3 +48,10 @@ ZfeUser\Model\User:
         targetDocument: ZfeUser\Model\Role
         cascade: all
         storeAs: id
+  indexes:
+    resetTokenIndex:
+        keys:
+            resetToken: desc
+        options:
+            sparse: true
+            unique: true

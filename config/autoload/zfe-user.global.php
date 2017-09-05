@@ -7,12 +7,12 @@ return [
         'resetTokenValidity' => 300,
         'responseType' => \WoohooLabs\Yin\JsonApi\JsonApi::class,
         //'responseType' => Zend\Diactoros\Response\JsonResponse::class,
-        'notifyNewRegistration' => true,
+        'notifyNewRegistration' => false,
         'responderEmail' => 'sample@email.com',
         'responderName' => 'somename',
         'enableUserApproval' => true,
-        'enableEmailVerification' => true,
-        'enableEmailNotification' => true,
+        'enableEmailVerification' => false,
+        'enableEmailNotification' => false,
         'enableNotifyDeactivation' => false,
         'enableNotifyActivation' => false,
         'accessTokenTtl' => 86400 * 365,
@@ -25,7 +25,7 @@ return [
                 'authUri' => 'https://www.facebook.com/v2.10/dialog/oauth',
                 'redirectUrl' =>'',
                 'appSecret' => '653d9dcbfc0b0150592348c38eace83c',
-                'scopes' => '',
+                'scope' => 'email',
                 'version' => 'v2.10'
             ]
         ]

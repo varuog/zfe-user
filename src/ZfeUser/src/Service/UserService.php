@@ -72,6 +72,10 @@ class UserService implements AdapterInterface, EventManagerAwareInterface {
         return $this;
     }
     
+    public function generateAuthToken(User $user)
+    {
+        return $this->authAdapter->generateAuthToken($user);
+    }
 
     public function fetch(User $user) {
         //return $this->persistantManager->( get_class( $user ), $user->getId() );
