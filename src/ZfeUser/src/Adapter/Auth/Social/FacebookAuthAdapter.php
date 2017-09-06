@@ -20,6 +20,7 @@ use Zend\Expressive\Helper\ServerUrlHelper;
 use ZfeUser\Model\Role;
 use ZfeUser\Adapter\Auth\AbstractAuthAdapter;
 use Doctrine\ODM\MongoDB\Id\UuidGenerator;
+use ZfeUser\Model\Social;
 
 /**
  * Description of FacebookAuthAdapter
@@ -76,7 +77,8 @@ class FacebookAuthAdapter extends AbstractAuthAdapter
                 $tokenMetaData->validateExpiration();
                 $longLiveAccessToken = $oAuth2Client->getLongLivedAccessToken($accessToken);
 
-                $response = $this->fbHandler->get('/me', $longLiveAccessToken);
+                $fields= implode(',', $this->options->getSocial()['facebook']['scope']);
+                $response = $this->fbHandler->get("/me?fields={$fields}", $longLiveAccessToken);
                 $responseData = $response->getGraphUser();
 
                 $loggedUser = $this->persistantManager
@@ -84,14 +86,23 @@ class FacebookAuthAdapter extends AbstractAuthAdapter
                         ->findOneBy(['email' => $responseData->getEmail()]);
 
 
+                $social = new Social($responseData->getId()
+                        , Social::SOCIAL_PROVIDER_FACEBOOK
+                        , $longLiveAccessToken->getValue());
+
                 if ($loggedUser instanceof User)
                 {
-                    $this->generateAuthToken($this->authUser);
+                    $this->generateAuthToken($loggedUser);
+
+                    $loggedUser->addSocial($social);
+                    $this->persistantManager->getSchemaManager()->ensureIndexes();
+                    $this->persistantManager->persist($loggedUser);
+                    $this->persistantManager->flush();
 
                     return new Result(Result::SUCCESS, $loggedUser, [$this->translator->translate('success-login', 'zfe-user')]);
                 } else
                 {
-                   
+
                     $newUser = new User();
                     $newUser->setId(UuidGenerator::generateV4());
                     $newUser->setEmail($responseData->getEmail());
@@ -105,6 +116,8 @@ class FacebookAuthAdapter extends AbstractAuthAdapter
                     $newUser->setSlug(explode('@', $responseData->getEmail())[0]);
                     $newUser->setPassword(bin2hex(random_bytes(10)));
                     $newUser->addRole(new Role('user'));
+                    $newUser->addSocial($social);
+
                     return new Result(Result::FAILURE_IDENTITY_NOT_FOUND, $newUser, [$this->translator->translate('error-no-user-found', 'zfe-user')]);
                 }
 

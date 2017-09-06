@@ -11,10 +11,15 @@ ZfeUser\Model\Social:
     providerName:
         type: string
   indexes:
-      socialAccessToken:
+      providerIndex:
+        keys:
+            providerName: desc
+        options:
+            sparse: true
+            unique: true
+      accessTokenIndex:
         keys:
             accessToken: desc
-            providerName: desc
         options:
             sparse: true
             unique: true

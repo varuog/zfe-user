@@ -56,9 +56,8 @@ class User
 
     /** @ODM\Collection */
     private $authenticationTokens = [];
-    private $socials=[];
-    private $roles=[];
-    
+    private $socials = [];
+    private $roles = [];
 
     public function getId()
     {
@@ -191,7 +190,7 @@ class User
         return $this;
     }
 
-    public function getRoles() : Collection
+    public function getRoles(): Collection
     {
         return $this->roles;
     }
@@ -204,9 +203,10 @@ class User
 
     public function genereateJwtToken(User $user)
     {
+        
     }
 
-    public function getAuthenticationTokens() : array
+    public function getAuthenticationTokens(): array
     {
         return $this->authenticationTokens;
     }
@@ -221,7 +221,6 @@ class User
         return $this->socials;
     }
 
-
     public function setSocials($socials)
     {
         $this->socials = $socials;
@@ -232,11 +231,22 @@ class User
     {
         return end($this->authenticationTokens);
     }
-    
+
     public function addRole(Role $role)
     {
-        $this->roles[]=$role;
+        $this->roles[] = $role;
         return $this;
     }
-    
+
+    public function addSocial(Social $social)
+    {
+        foreach ($this->socials as $socialIndex => $socialProfile) {
+            if ($social->getProviderName() == $social->getProviderName())
+            {
+                unset($this->socials[$socialIndex]);
+            }
+        }
+        $this->socials[] = $social;
+    }
+
 }

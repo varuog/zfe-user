@@ -76,7 +76,7 @@ class HomePageAction implements ServerMiddlewareInterface
         }
 
         $fbHelper = $this->fbAuthAdapter->getHandler()->getRedirectLoginHelper();
-        $data['fblink'] = $fbHelper->getLoginUrl($this->serverHelper->generate($this->urlHelper->generate('user-social-login')), ['email  ']);
+        $data['fblink'] = $fbHelper->getLoginUrl($this->serverHelper->generate($this->urlHelper->generate('user-social-login')), ['email,fullName']);
         return new HtmlResponse($this->template->render('app::home-page', $data));
     }
 

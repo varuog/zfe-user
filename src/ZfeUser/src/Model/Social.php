@@ -16,10 +16,21 @@ namespace ZfeUser\Model;
 class Social
 {
 
+    const SOCIAL_PROVIDER_FACEBOOK='facebook';
+    const SOCIAL_PROVIDER_TWITTER='twitter';
+    const SOCIAL_PROVIDER_GOOGLE='google';
+    
+    
     private $providerName;
     private $id;
     private $accessToken;
 
+    public function __construct($id, $providerName, $accesstoken)
+    {
+        $this->id=$id;
+        $this->providerName= $providerName;
+        $this->accessToken=$accesstoken;
+    }
     public function getProviderName()
     {
         return $this->providerName;
