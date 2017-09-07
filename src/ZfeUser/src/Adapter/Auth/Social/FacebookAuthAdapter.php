@@ -27,7 +27,7 @@ use ZfeUser\Model\Social;
  * @todo introduce zend-session. instead of calling session_start directly
  * @author gourav sarkar
  */
-class FacebookAuthAdapter extends AbstractAuthAdapter
+class FacebookAuthAdapter extends AbstractAuthAdapter implements SocialAuthAdapterInterface
 {
 
     private $urlHelper;
@@ -141,10 +141,17 @@ class FacebookAuthAdapter extends AbstractAuthAdapter
      * 
      * @return type
      */
-    public function getSocialLink()
+    public function getSocialLoginLink()
     {
         $fbHelper = $this->getHandler()->getRedirectLoginHelper();
-        return $fbHelper->getLoginUrl($this->serverHelper->generate($this->urlHelper->generate('user-social-login')), $this->options->getSocial()['facebook']['scope']);
+        return $fbHelper->getLoginUrl($this->serverHelper->generate($this->urlHelper->generate('user-social-login', ['provider' => 'facebook'])), $this->options->getSocial()['facebook']['scope']);
         
     }
+
+    public function getSocialLogOutLink()
+    {
+        
+    }
+
+
 }

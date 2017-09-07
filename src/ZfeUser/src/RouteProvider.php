@@ -45,7 +45,7 @@ class RouteProvider {
         // Setup routes:
         $app->post('/api/auth/register', [Action\Api\User\UserRegisterAction::class], 'user-register');
         $app->post('/api/auth/login', [Action\Api\User\UserLoginAction::class], 'user-login');
-        $app->get('/api/auth/social/login', [Action\Api\User\UserSocialLoginAction::class], 'user-social-login');
+        $app->get('/api/auth/social/login/:provider', [Action\Api\User\UserSocialLoginAction::class], 'user-social-login');
         
         $app->get('/api/user/:slug'
                 , [Middleware\AuthValidatorMiddleware::class, Middleware\AuthorizationMiddleware::class, Action\Api\User\UserFetchAction::class]

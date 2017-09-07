@@ -57,16 +57,14 @@ class ConfigProvider
 
                 //Middleware intercepter
                 Middleware\AuthValidatorMiddleware::class => Factory\Middleware\AuthValidatorMiddlewareFactory::class,
-                
-                //Social Provider
-                \Facebook\Facebook::class => Factory\MongoDB\SocialFacebookFactory::class,
-                          
+
 
                 Action\HomePageAction::class => Action\HomePageFactory::class,
                 //Authorization middleware
                 Middleware\AuthorizationMiddleware::class => Factory\Middleware\AuthorizationMiddlewareFactory::class,
                 
                 //Adapter for auth
+                Factory\Social\SocialAuthAdapterFactory::class => Factory\Social\SocialAuthAdapterFactoryFactory::class,
                 Adapter\Auth\MongoDbAuthAdapter::class => Factory\Adapter\MongoDbAuthAdapterFactory::class,
                 Adapter\Auth\Social\FacebookAuthAdapter::class => Factory\Adapter\Social\FacebookAuthAdapterFactory::class,
                

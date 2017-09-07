@@ -75,7 +75,7 @@ class HomePageAction implements ServerMiddlewareInterface
             $data['templateDocs'] = 'https://docs.zendframework.com/zend-view/';
         }
 
-        $fbHelper = $this->fbAuthAdapter->getSocialLink();
+        $fbHelper = $this->fbAuthAdapter->getSocialLoginLink();
         $data['fblink'] = $fbHelper;
         return new HtmlResponse($this->template->render('app::home-page', $data));
     }

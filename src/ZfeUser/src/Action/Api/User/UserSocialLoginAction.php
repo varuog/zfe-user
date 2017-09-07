@@ -14,8 +14,7 @@ use WoohooLabs\Yin\JsonApi\Schema\JsonApiObject;
 use WoohooLabs\Yin\JsonApi\Schema\Error;
 use Zend\I18n\Translator\TranslatorInterface;
 use ZfeUser\Middleware\JsonApiDispatcherMiddleware;
-use ZfeUser\Adapter\Auth\Social\FacebookAuthAdapter;
-use ZfeUser\Adapter\Auth\MongoDbAuthAdapter;
+use ZfeUser\Factory\Social\SocialAuthAdapterFactory;
 
 class UserSocialLoginAction implements ServerMiddlewareInterface
 {
@@ -23,14 +22,15 @@ class UserSocialLoginAction implements ServerMiddlewareInterface
     private $userService;
     private $translator;
     private $userDocument;
-    private $fbAuthAdapter;
+    private $authAdapter;
+    private $authAdapterFactory;
 
-    public function __construct(UserService $userService, Document\UserDocument $userDoc, TranslatorInterface $translator, FacebookAuthAdapter $fbAuthAdapter)
+    public function __construct(UserService $userService, Document\UserDocument $userDoc, TranslatorInterface $translator, SocialAuthAdapterFactory $authAdapterFactory)
     {
         $this->userService = $userService;
         $this->translator = $translator;
         $this->userDocument = $userDoc;
-        $this->fbAuthAdapter = $fbAuthAdapter;
+        $this->authAdapterFactory = $authAdapterFactory;
     }
 
     /**
@@ -41,12 +41,14 @@ class UserSocialLoginAction implements ServerMiddlewareInterface
      */
     public function process(ServerRequestInterface $request, DelegateInterface $delegate)
     {
-
+        $providerName= $request->getAttribute('provider');
+        $this->authAdapter= $this->authAdapterFactory->build($providerName);
+        
         $jsonApi = $request->getAttribute(JsonApiDispatcherMiddleware::JSON_API_PROC);
 
         $user = new \ZfeUser\Model\User();
-        $this->fbAuthAdapter->setAuthUser($user);
-        $this->userService->setAuthAdapter($this->fbAuthAdapter);
+        $this->authAdapter->setAuthUser($user);
+        $this->userService->setAuthAdapter($this->authAdapter);
         $this->userService->setServerOptions($request->getServerParams());
         $authResult = $this->userService->authenticate();
 
