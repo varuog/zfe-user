@@ -25,7 +25,8 @@ return [
                 'authUri' => 'https://www.facebook.com/v2.10/dialog/oauth',
                 'redirectUrl' =>'',
                 'appSecret' => '653d9dcbfc0b0150592348c38eace83c',
-                'scope' => ['email','name'],
+                'scope' => ['email','public_profile'],
+                'fields' => ['email','name'],
                 'version' => 'v2.10'
             ]
         ]

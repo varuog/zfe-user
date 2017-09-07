@@ -57,6 +57,7 @@ class FacebookAuthAdapter extends AbstractAuthAdapter
     }
 
     /**
+     * @todo make email field mandatory, resend request
      * @todo fix result type in return
      * @return Result
      */
@@ -77,7 +78,7 @@ class FacebookAuthAdapter extends AbstractAuthAdapter
                 $tokenMetaData->validateExpiration();
                 $longLiveAccessToken = $oAuth2Client->getLongLivedAccessToken($accessToken);
 
-                $fields= implode(',', $this->options->getSocial()['facebook']['scope']);
+                $fields= implode(',', $this->options->getSocial()['facebook']['fields']);
                 $response = $this->fbHandler->get("/me?fields={$fields}", $longLiveAccessToken);
                 $responseData = $response->getGraphUser();
 
@@ -106,11 +107,7 @@ class FacebookAuthAdapter extends AbstractAuthAdapter
                     $newUser = new User();
                     $newUser->setId(UuidGenerator::generateV4());
                     $newUser->setEmail($responseData->getEmail());
-                    $newUser->setFullName(sprintf('%s %s %s'
-                                    , $responseData->getFirstName()
-                                    , $responseData->getMiddleName()
-                                    , $responseData->getLastName()
-                    ));
+                    $newUser->setFullName($responseData->getName());
 
                     $newUser->setUsername(explode('@', $responseData->getEmail())[0]);
                     $newUser->setSlug(explode('@', $responseData->getEmail())[0]);
@@ -139,4 +136,15 @@ class FacebookAuthAdapter extends AbstractAuthAdapter
         return new Result(Result::FAILURE_UNCATEGORIZED, null, [$e->getMessage()]);
     }
 
+    
+    /**
+     * 
+     * @return type
+     */
+    public function getSocialLink()
+    {
+        $fbHelper = $this->getHandler()->getRedirectLoginHelper();
+        return $fbHelper->getLoginUrl($this->serverHelper->generate($this->urlHelper->generate('user-social-login')), $this->options->getSocial()['facebook']['scope']);
+        
+    }
 }
