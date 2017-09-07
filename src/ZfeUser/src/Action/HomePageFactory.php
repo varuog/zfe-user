@@ -13,8 +13,8 @@ class HomePageFactory {
         $serverHelper = $container->get(\Zend\Expressive\Helper\ServerUrlHelper::class);
         $router = $container->get(RouterInterface::class);
         $template = $container->has(TemplateRendererInterface::class) ? $container->get(TemplateRendererInterface::class) : null;
-        $fbAuthAdapter = $container->get(\ZfeUser\Adapter\Auth\Social\FacebookAuthAdapter::class);
-        return new HomePageAction($router, $fbAuthAdapter, $urlHelper, $serverHelper, $template);
+        $authAdapterFactory = $container->get(\ZfeUser\Factory\Social\SocialAuthAdapterFactory::class);
+        return new HomePageAction($router, $authAdapterFactory, $urlHelper, $serverHelper, $template);
     }
 
 }

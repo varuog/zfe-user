@@ -7,7 +7,9 @@
  */
 
 namespace ZfeUser\Adapter\Auth\Social;
+
 use Zend\Authentication\Adapter\AdapterInterface;
+use ZfeUser\Model\User;
 
 /**
  *
@@ -15,7 +17,12 @@ use Zend\Authentication\Adapter\AdapterInterface;
  */
 interface SocialAuthAdapterInterface extends AdapterInterface
 {
+
     public function getHandler();
+
     public function getSocialLoginLink();
+
     public function getSocialLogOutLink();
+
+    public function createUser($data): User;
 }

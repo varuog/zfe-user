@@ -184,6 +184,12 @@ class User
         return $this->slug;
     }
 
+    /**
+     * @todo Slug should remove all the unwanted characters. 
+     * only url safe character should be tehre
+     * @param type $slug
+     * @return $this
+     */
     public function setSlug($slug)
     {
         $this->slug = $slug;

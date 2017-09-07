@@ -18,6 +18,7 @@ class SocialAuthAdapterFactoryFactory
     public function __invoke(ContainerInterface $container)
     {
         $fbAuthAdapter= $container->get(\ZfeUser\Adapter\Auth\Social\FacebookAuthAdapter::class);
-        return new SocialAuthAdapterFactory($fbAuthAdapter);
+        $twitterAuthAdapter= $container->get(\ZfeUser\Adapter\Auth\Social\TwitterAuthAdapter::class);
+        return new SocialAuthAdapterFactory($fbAuthAdapter, $twitterAuthAdapter);
     }
 }

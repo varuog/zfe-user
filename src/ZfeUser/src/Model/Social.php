@@ -16,9 +16,6 @@ namespace ZfeUser\Model;
 class Social
 {
 
-    const SOCIAL_PROVIDER_FACEBOOK='facebook';
-    const SOCIAL_PROVIDER_TWITTER='twitter';
-    const SOCIAL_PROVIDER_GOOGLE='google';
     
     
     private $providerName;

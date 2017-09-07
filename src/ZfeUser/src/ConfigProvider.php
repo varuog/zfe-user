@@ -67,6 +67,7 @@ class ConfigProvider
                 Factory\Social\SocialAuthAdapterFactory::class => Factory\Social\SocialAuthAdapterFactoryFactory::class,
                 Adapter\Auth\MongoDbAuthAdapter::class => Factory\Adapter\MongoDbAuthAdapterFactory::class,
                 Adapter\Auth\Social\FacebookAuthAdapter::class => Factory\Adapter\Social\FacebookAuthAdapterFactory::class,
+                Adapter\Auth\Social\TwitterAuthAdapter::class => Factory\Adapter\Social\TwitterAuthAdapterFactory::class,
                
                 
             ],

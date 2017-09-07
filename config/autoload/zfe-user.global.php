@@ -21,17 +21,21 @@ return [
         'tokenRevokable' => false,
         'social' => [
             'facebook' => [
-                'appID'=> '485738178452691',
-                'authUri' => 'https://www.facebook.com/v2.10/dialog/oauth',
-                'redirectUrl' =>'',
+                'appID' => '485738178452691',
                 'appSecret' => '653d9dcbfc0b0150592348c38eace83c',
-                'scope' => ['email','public_profile'],
-                'fields' => ['email','name'],
+                'scope' => ['email', 'public_profile'],
+                'fields' => ['email', 'name'],
+                'version' => 'v2.10'
+            ],
+            'twitter' => [
+                'appID' => 'wwJk03f6MkyH1qsaVZIG7xAAa',
+                'appSecret' => 'izmcp1U7HO0w4mXkXsDqfBqZTuiwBf9ad07LRvS0esoVX1mIE1',
+                'scope' => ['email', 'public_profile'],
+                'fields' => ['email', 'name'],
                 'version' => 'v2.10'
             ]
         ]
     ],
-    
     /**
      * Not documented
      */

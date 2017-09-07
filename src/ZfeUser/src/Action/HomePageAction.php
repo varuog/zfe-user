@@ -15,21 +15,22 @@ use Zend\Expressive\ZendView\ZendViewRenderer;
 use ZfeUser\Adapter\Auth\Social\FacebookAuthAdapter;
 use Zend\Expressive\Helper\UrlHelper;
 use Zend\Expressive\Helper\ServerUrlHelper;
+use ZfeUser\Factory\Social\SocialAuthAdapterFactory;
 
 class HomePageAction implements ServerMiddlewareInterface
 {
 
     private $router;
     private $template;
-    private $fbAuthAdapter;
+    private $authAdapterFactory;
     private $urlHelper;
     private $serverHelper;
 
-    public function __construct(Router\RouterInterface $router, FacebookAuthAdapter $fbAuthAdapter, UrlHelper $urlHelper, ServerUrlHelper $serverHelper, Template\TemplateRendererInterface $template = null)
+    public function __construct(Router\RouterInterface $router, SocialAuthAdapterFactory $adapterFactory, UrlHelper $urlHelper, ServerUrlHelper $serverHelper, Template\TemplateRendererInterface $template = null)
     {
         $this->router = $router;
         $this->template = $template;
-        $this->fbAuthAdapter = $fbAuthAdapter;
+        $this->authAdapterFactory = $adapterFactory;
 
         $this->urlHelper = $urlHelper;
         $this->serverHelper = $serverHelper;
@@ -75,7 +76,9 @@ class HomePageAction implements ServerMiddlewareInterface
             $data['templateDocs'] = 'https://docs.zendframework.com/zend-view/';
         }
 
-        $fbHelper = $this->fbAuthAdapter->getSocialLoginLink();
+        $fbHelper = $this->authAdapterFactory->build('facebook')->getSocialLoginLink();
+        $twitterHelper = $this->authAdapterFactory->build('twitter')->getSocialLoginLink();
+        $data['twitterlink'] = $twitterHelper;
         $data['fblink'] = $fbHelper;
         return new HtmlResponse($this->template->render('app::home-page', $data));
     }

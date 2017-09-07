@@ -21,6 +21,7 @@ use ZfeUser\Model\Role;
 use ZfeUser\Adapter\Auth\AbstractAuthAdapter;
 use Doctrine\ODM\MongoDB\Id\UuidGenerator;
 use ZfeUser\Model\Social;
+use ZfeUser\Factory\Social\SocialAuthAdapterFactory;
 
 /**
  * Description of FacebookAuthAdapter
@@ -65,7 +66,6 @@ class FacebookAuthAdapter extends AbstractAuthAdapter implements SocialAuthAdapt
     {
 
         $helper = $this->fbHandler->getRedirectLoginHelper();
-        $redirectUrl = $this->serverHelper->generate($this->urlHelper->generate('user-social-login'));
         $fbSocialOption = $this->options->getSocial()['facebook'];
 
         try {
@@ -78,7 +78,7 @@ class FacebookAuthAdapter extends AbstractAuthAdapter implements SocialAuthAdapt
                 $tokenMetaData->validateExpiration();
                 $longLiveAccessToken = $oAuth2Client->getLongLivedAccessToken($accessToken);
 
-                $fields= implode(',', $this->options->getSocial()['facebook']['fields']);
+                $fields = implode(',', $this->options->getSocial()['facebook']['fields']);
                 $response = $this->fbHandler->get("/me?fields={$fields}", $longLiveAccessToken);
                 $responseData = $response->getGraphUser();
 
@@ -88,7 +88,7 @@ class FacebookAuthAdapter extends AbstractAuthAdapter implements SocialAuthAdapt
 
 
                 $social = new Social($responseData->getId()
-                        , Social::SOCIAL_PROVIDER_FACEBOOK
+                        , SocialAuthAdapterFactory::SOCIAL_PROVIDER_FACEBOOK
                         , $longLiveAccessToken->getValue());
 
                 if ($loggedUser instanceof User)
@@ -103,18 +103,7 @@ class FacebookAuthAdapter extends AbstractAuthAdapter implements SocialAuthAdapt
                     return new Result(Result::SUCCESS, $loggedUser, [$this->translator->translate('success-login', 'zfe-user')]);
                 } else
                 {
-
-                    $newUser = new User();
-                    $newUser->setId(UuidGenerator::generateV4());
-                    $newUser->setEmail($responseData->getEmail());
-                    $newUser->setFullName($responseData->getName());
-
-                    $newUser->setUsername(explode('@', $responseData->getEmail())[0]);
-                    $newUser->setSlug(explode('@', $responseData->getEmail())[0]);
-                    $newUser->setPassword(bin2hex(random_bytes(10)));
-                    $newUser->addRole(new Role('user'));
-                    $newUser->addSocial($social);
-
+                    $newUser= $this->createUser($responseData);
                     return new Result(Result::FAILURE_IDENTITY_NOT_FOUND, $newUser, [$this->translator->translate('error-no-user-found', 'zfe-user')]);
                 }
 
@@ -136,7 +125,6 @@ class FacebookAuthAdapter extends AbstractAuthAdapter implements SocialAuthAdapt
         return new Result(Result::FAILURE_UNCATEGORIZED, null, [$e->getMessage()]);
     }
 
-    
     /**
      * 
      * @return type
@@ -145,7 +133,6 @@ class FacebookAuthAdapter extends AbstractAuthAdapter implements SocialAuthAdapt
     {
         $fbHelper = $this->getHandler()->getRedirectLoginHelper();
         return $fbHelper->getLoginUrl($this->serverHelper->generate($this->urlHelper->generate('user-social-login', ['provider' => 'facebook'])), $this->options->getSocial()['facebook']['scope']);
-        
     }
 
     public function getSocialLogOutLink()
@@ -153,5 +140,20 @@ class FacebookAuthAdapter extends AbstractAuthAdapter implements SocialAuthAdapt
         
     }
 
+    public function createUser($responseData): User
+    {
+        $newUser = new User();
+        $newUser->setId(UuidGenerator::generateV4());
+        $newUser->setEmail($responseData->getEmail());
+        $newUser->setFullName($responseData->getName());
+
+        $newUser->setUsername(explode('@', $responseData->getEmail())[0]);
+        $newUser->setSlug(explode('@', $responseData->getEmail())[0]);
+        $newUser->setPassword(bin2hex(random_bytes(10)));
+        $newUser->addRole(new Role('user'));
+        $newUser->addSocial($social);
+
+        return $newUser;
+    }
 
 }
