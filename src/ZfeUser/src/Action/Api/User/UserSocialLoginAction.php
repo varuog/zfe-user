@@ -16,12 +16,17 @@ use Zend\I18n\Translator\TranslatorInterface;
 use ZfeUser\Middleware\JsonApiDispatcherMiddleware;
 use ZfeUser\Factory\Social\SocialAuthAdapterFactory;
 
+
 class UserSocialLoginAction implements ServerMiddlewareInterface
 {
 
     private $userService;
     private $translator;
     private $userDocument;
+    /**
+     *
+     * @var ZfeUser\Adapter\Auth\Social\SocialAuthAdapterInterface 
+     */
     private $authAdapter;
     private $authAdapterFactory;
 
@@ -42,7 +47,10 @@ class UserSocialLoginAction implements ServerMiddlewareInterface
     public function process(ServerRequestInterface $request, DelegateInterface $delegate)
     {
         $providerName= $request->getAttribute('provider');
+        $socialAccessToken= isset($request->getQueryParams()['accesstoken']) ? $request->getQueryParams()['accesstoken'] : '';
+        
         $this->authAdapter= $this->authAdapterFactory->build($providerName);
+        $this->authAdapter->setAccessToken($socialAccessToken);
         
         $jsonApi = $request->getAttribute(JsonApiDispatcherMiddleware::JSON_API_PROC);
 

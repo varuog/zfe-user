@@ -24,5 +24,9 @@ interface SocialAuthAdapterInterface extends AdapterInterface
 
     public function getSocialLogOutLink();
 
-    public function createUser($data): User;
+    public function createUser(User $newUser, $data): User;
+    
+    public function setAccessToken(string $accessToken);
+    
+    public function fetchAccessToken(): string;
 }

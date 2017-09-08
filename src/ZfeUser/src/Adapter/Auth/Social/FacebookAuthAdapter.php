@@ -34,6 +34,7 @@ class FacebookAuthAdapter extends AbstractAuthAdapter implements SocialAuthAdapt
     private $urlHelper;
     private $serverHelper;
     private $fbHandler;
+    private $accessToken;
 
     public function __construct(UserServiceOptions $options, DocumentManager $persistantManager, TranslatorInterface $translator, UrlHelper $urlHelper, ServerUrlHelper $serverHelper)
     {
@@ -69,46 +70,41 @@ class FacebookAuthAdapter extends AbstractAuthAdapter implements SocialAuthAdapt
         $fbSocialOption = $this->options->getSocial()['facebook'];
 
         try {
-            $accessToken = $helper->getAccessToken();
-            if (!$helper->getError())
+            //fetch access token
+            $this->fetchAccessToken();
+
+            $fields = implode(',', $this->options->getSocial()['facebook']['fields']);
+            $response = $this->fbHandler->get("/me?fields={$fields}", $this->accessToken);
+            $responseData = $response->getGraphUser();
+
+            $loggedUser = $this->persistantManager
+                    ->getRepository(get_class($this->authUser))
+                    ->findOneBy(['email' => $responseData->getEmail()]);
+
+
+            $social = new Social($responseData->getId()
+                    , SocialAuthAdapterFactory::SOCIAL_PROVIDER_FACEBOOK
+                    , $this->accessToken->getValue());
+
+            if ($loggedUser instanceof User)
             {
-                $oAuth2Client = $this->fbHandler->getOAuth2Client();
-                $tokenMetaData = $oAuth2Client->debugToken($accessToken);
-                $tokenMetaData->validateAppId($fbSocialOption['appID']);
-                $tokenMetaData->validateExpiration();
-                $longLiveAccessToken = $oAuth2Client->getLongLivedAccessToken($accessToken);
+                $this->generateAuthToken($loggedUser);
 
-                $fields = implode(',', $this->options->getSocial()['facebook']['fields']);
-                $response = $this->fbHandler->get("/me?fields={$fields}", $longLiveAccessToken);
-                $responseData = $response->getGraphUser();
+                $loggedUser->addSocial($social);
+                $this->persistantManager->getSchemaManager()->ensureIndexes();
+                $this->persistantManager->persist($loggedUser);
+                $this->persistantManager->flush();
 
-                $loggedUser = $this->persistantManager
-                        ->getRepository(get_class($this->authUser))
-                        ->findOneBy(['email' => $responseData->getEmail()]);
-
-
-                $social = new Social($responseData->getId()
-                        , SocialAuthAdapterFactory::SOCIAL_PROVIDER_FACEBOOK
-                        , $longLiveAccessToken->getValue());
-
-                if ($loggedUser instanceof User)
-                {
-                    $this->generateAuthToken($loggedUser);
-
-                    $loggedUser->addSocial($social);
-                    $this->persistantManager->getSchemaManager()->ensureIndexes();
-                    $this->persistantManager->persist($loggedUser);
-                    $this->persistantManager->flush();
-
-                    return new Result(Result::SUCCESS, $loggedUser, [$this->translator->translate('success-login', 'zfe-user')]);
-                } else
-                {
-                    $newUser= $this->createUser($responseData);
-                    return new Result(Result::FAILURE_IDENTITY_NOT_FOUND, $newUser, [$this->translator->translate('error-no-user-found', 'zfe-user')]);
-                }
-
-                return new Result(Result::FAILURE_UNCATEGORIZED, null, [$this->translator->translate('error-unknown-auth', 'zfe-user')]);
+                return new Result(Result::SUCCESS, $loggedUser, [$this->translator->translate('success-login', 'zfe-user')]);
+            } else
+            {
+                $newUser = new User();
+                $newUser->addSocial($social);
+                $this->createUser($newUser, $responseData);
+                return new Result(Result::FAILURE_IDENTITY_NOT_FOUND, $newUser, [$this->translator->translate('error-no-user-found', 'zfe-user')]);
             }
+
+            return new Result(Result::FAILURE_UNCATEGORIZED, null, [$this->translator->translate('error-unknown-auth', 'zfe-user')]);
         } catch (Facebook\Exceptions\FacebookResponseException $e) {
             // When Graph returns an error
             //echo 'Graph returned an error: ' . $e->getMessage();
@@ -140,9 +136,8 @@ class FacebookAuthAdapter extends AbstractAuthAdapter implements SocialAuthAdapt
         
     }
 
-    public function createUser($responseData): User
+    public function createUser(User $newUser, $responseData): User
     {
-        $newUser = new User();
         $newUser->setId(UuidGenerator::generateV4());
         $newUser->setEmail($responseData->getEmail());
         $newUser->setFullName($responseData->getName());
@@ -151,9 +146,33 @@ class FacebookAuthAdapter extends AbstractAuthAdapter implements SocialAuthAdapt
         $newUser->setSlug(explode('@', $responseData->getEmail())[0]);
         $newUser->setPassword(bin2hex(random_bytes(10)));
         $newUser->addRole(new Role('user'));
-        $newUser->addSocial($social);
 
         return $newUser;
+    }
+
+    public function fetchAccessToken(): string
+    {
+        if (empty($this->accessToken))
+        {
+            $helper = $this->fbHandler->getRedirectLoginHelper();
+            $fbSocialOption = $this->options->getSocial()['facebook'];
+            $accessToken = $helper->getAccessToken();
+            if (!$helper->getError())
+            {
+                $oAuth2Client = $this->fbHandler->getOAuth2Client();
+                $tokenMetaData = $oAuth2Client->debugToken($accessToken);
+                $tokenMetaData->validateAppId($fbSocialOption['appID']);
+                $tokenMetaData->validateExpiration();
+                $this->accessToken = $oAuth2Client->getLongLivedAccessToken($accessToken);
+            }
+        }
+
+        return $this->accessToken;
+    }
+
+    public function setAccessToken(string $accessToken)
+    {
+        $this->accessToken = $accessToken;
     }
 
 }
