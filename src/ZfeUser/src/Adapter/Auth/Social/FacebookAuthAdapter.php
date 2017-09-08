@@ -88,12 +88,15 @@ class FacebookAuthAdapter extends AbstractAuthAdapter implements SocialAuthAdapt
 
             if ($loggedUser instanceof User)
             {
+                
                 $this->generateAuthToken($loggedUser);
-
+                
                 $loggedUser->addSocial($social);
                 $this->persistantManager->getSchemaManager()->ensureIndexes();
                 $this->persistantManager->persist($loggedUser);
                 $this->persistantManager->flush();
+                
+
 
                 return new Result(Result::SUCCESS, $loggedUser, [$this->translator->translate('success-login', 'zfe-user')]);
             } else

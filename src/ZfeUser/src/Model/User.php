@@ -246,8 +246,9 @@ class User
 
     public function addSocial(Social $social)
     {
+        
         foreach ($this->socials as $socialIndex => $socialProfile) {
-            if ($social->getProviderName() == $social->getProviderName())
+            if ($social->getProviderName() == $socialProfile->getProviderName())
             {
                 unset($this->socials[$socialIndex]);
             }

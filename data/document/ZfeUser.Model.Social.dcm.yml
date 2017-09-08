@@ -8,6 +8,8 @@ ZfeUser\Model\Social:
         type: int   
     accessToken:
         type: string
+    accessTokenSecret:
+        type: string
     providerName:
         type: string
   indexes:

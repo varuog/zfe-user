@@ -1,4 +1,5 @@
 ## YAML Template.
+#not null value should be added
 ZfeUser\Model\User:
   type: document    
   collection: user
