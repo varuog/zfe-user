@@ -15,15 +15,15 @@ namespace ZfeUser\Model;
  */
 class Social
 {
-   
 
-        
+
+
     private $providerName;
     private $id;
     private $accessToken;
     private $accessTokenSecret;
 
-    public function __construct($id, $providerName, $accesstoken, $accessTokenSecret='')
+    public function __construct($id, $providerName, $accesstoken, $accessTokenSecret = '')
     {
         $this->id=$id;
         $this->providerName= $providerName;
@@ -62,8 +62,8 @@ class Social
         $this->accessToken = $accessToken;
         return $this;
     }
-    
-     public function getAccessTokenSecret()
+
+    public function getAccessTokenSecret()
     {
         return $this->accessTokenSecret;
     }

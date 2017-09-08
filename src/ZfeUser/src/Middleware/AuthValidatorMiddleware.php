@@ -40,7 +40,7 @@ class AuthValidatorMiddleware implements MiddlewareInterface
         $authStringParts = [];
         /** @var $jsonapi JsonApi  */
          $jsonApi = $request->getAttribute(JsonApiDispatcherMiddleware::JSON_API_PROC);
-                 
+
         $authString = $request->getHeader('Authorization');
         if (!empty($authString)) {
             $bearerPosition=strpos($authString[0], 'Bearer ') + strlen('Bearer');
@@ -54,7 +54,7 @@ class AuthValidatorMiddleware implements MiddlewareInterface
             $currentUser= new \ZfeUser\Model\User();
             call_user_func([$currentUser, 'set' . $this->userService->getOptions()->getIdentityField()], $currentUserToken->identifier);
             $currentUser=$this->userService->fetchByIdentifier($currentUser);
-            
+
             $request=$request->withAttribute(AuthValidatorMiddleware::CURRENT_USER, $currentUser);
             return $delegate->process($request);
         }
@@ -66,7 +66,7 @@ class AuthValidatorMiddleware implements MiddlewareInterface
 
         $error = new Error();
         $error->setTitle('Request access is not authenrticated');
-        
+
         return $jsonApi->respond()->forbidden($errorDoc);
     }
 }

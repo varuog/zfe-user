@@ -26,5 +26,4 @@ class AuthorizationMiddlewareFactory
         $router = $container->get(\Zend\Expressive\Router\RouterInterface::class);
         return new \ZfeUser\Middleware\AuthorizationMiddleware($roleService, $router);
     }
-
 }

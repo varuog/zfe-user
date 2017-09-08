@@ -19,14 +19,17 @@ use WoohooLabs\Yin\JsonApi\Hydrator\Relationship\ToOneRelationship;
  *
  * @author Gourav Sarkar
  */
-class RoleHydrator extends AbstractHydrator {
+class RoleHydrator extends AbstractHydrator
+{
 
-    protected function generateId(): string {
+    protected function generateId(): string
+    {
         //$f = \Doctrine\ODM\MongoDB\Id\UuidGenerator::generateV4();
         return '';
     }
 
-    protected function getAcceptedTypes(): array {
+    protected function getAcceptedTypes(): array
+    {
         $parts = explode('\\', Role::class);
         return [end($parts), Role::class];
     }
@@ -35,15 +38,15 @@ class RoleHydrator extends AbstractHydrator {
      *
      * @param Role $domainObject
      */
-    protected function getAttributeHydrator($domainObject): array {
+    protected function getAttributeHydrator($domainObject): array
+    {
 
         return [
             "name" => function (Role $domainObject, $attribute, $data, $attributeName) {
                 $domainObject->setName($attribute);
             },
             "permissions" => function (Role $domainObject, $attribute, $data, $attributeName) {
-                foreach($attribute as $permission)
-                {
+                foreach ($attribute as $permission) {
                     $domainObject->addPermission($permission);
                 }
             },
@@ -54,14 +57,14 @@ class RoleHydrator extends AbstractHydrator {
      *
      * @param Role $domainObject
      */
-    protected function getRelationshipHydrator($domainObject): array {
+    protected function getRelationshipHydrator($domainObject): array
+    {
         $f='s';
-        return [ 
-            "parent" => function ( $domainObject, ToOneRelationship $parent, $data, string $relationshipName) {
-            $id=$parent->getResourceIdentifier()->getId();
+        return [
+            "parent" => function ($domainObject, ToOneRelationship $parent, $data, string $relationshipName) {
+                $id=$parent->getResourceIdentifier()->getId();
                 $domainObject->setParent(new Role($id));
             }];
-       
     }
 
     /**
@@ -69,7 +72,8 @@ class RoleHydrator extends AbstractHydrator {
      * @param Role $domainObject
      * @param string $id
      */
-    protected function setId($domainObject, String $id) {
+    protected function setId($domainObject, String $id)
+    {
         $domainObject->setName($id);
     }
 
@@ -80,17 +84,17 @@ class RoleHydrator extends AbstractHydrator {
      * @param \WoohooLabs\Yin\JsonApi\Exception\ExceptionFactoryInterface $exceptionFactory
      */
     protected function validateClientGeneratedId(
-    string $clientGeneratedId, RequestInterface $request, ExceptionFactoryInterface $exceptionFactory
+        string $clientGeneratedId,
+        RequestInterface $request,
+        ExceptionFactoryInterface $exceptionFactory
     ): void {
-        
     }
 
     /**
      * @todo validate request to filter out sensitive but conditional data
      * @param \WoohooLabs\Yin\JsonApi\Request\RequestInterface $request
      */
-    protected function validateRequest(RequestInterface $request): void {
-        
+    protected function validateRequest(RequestInterface $request): void
+    {
     }
-
 }

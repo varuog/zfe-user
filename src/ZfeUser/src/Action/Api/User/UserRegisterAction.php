@@ -40,7 +40,7 @@ class UserRegisterAction implements ServerMiddlewareInterface
     public function process(ServerRequestInterface $request, DelegateInterface $delegate)
     {
 
-       $jsonApi= $request->getAttribute(JsonApiDispatcherMiddleware::JSON_API_PROC);
+        $jsonApi= $request->getAttribute(JsonApiDispatcherMiddleware::JSON_API_PROC);
         $user = new User();
         $jsonApi->hydrate($this->userHydrator, $user);
 
@@ -61,5 +61,4 @@ class UserRegisterAction implements ServerMiddlewareInterface
 
         return $jsonApi->respond()->ok($this->userDocuemnt, $user);
     }
-
 }

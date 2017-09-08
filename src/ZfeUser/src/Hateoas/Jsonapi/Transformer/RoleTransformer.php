@@ -20,11 +20,12 @@ use Zend\Expressive\Helper\UrlHelper;
  *
  * @author Gourav Sarkar
  */
-class RoleTransformer extends AbstractResourceTransformer {
+class RoleTransformer extends AbstractResourceTransformer
+{
 
     private $uriHelper;
-    
-     public function __construct(UrlHelper $urihelper)
+
+    public function __construct(UrlHelper $urihelper)
     {
         $this->uriHelper= $urihelper;
     }
@@ -61,7 +62,8 @@ class RoleTransformer extends AbstractResourceTransformer {
      *
      * @param Model\Role $domainObject
      */
-    public function getId($domainObject): string {
+    public function getId($domainObject): string
+    {
         return $domainObject->getName();
     }
 
@@ -69,15 +71,16 @@ class RoleTransformer extends AbstractResourceTransformer {
      *
      * @param Model\Role $domainObject
      */
-    public function getLinks($domainObject) {
-        
+    public function getLinks($domainObject)
+    {
     }
 
     /**
      *
      * @param Model\Role $domainObject
      */
-    public function getMeta($domainObject): array {
+    public function getMeta($domainObject): array
+    {
         return [];
     }
 
@@ -85,12 +88,13 @@ class RoleTransformer extends AbstractResourceTransformer {
      *
      * @param Model\Role $domainObject
      */
-    public function getRelationships($domainObject): array {
+    public function getRelationships($domainObject): array
+    {
         return [
             "parent" => function ($domainObject) {
                 return ToOneRelationship::create()
                                 ->setLinks(
-                                        Links::createWithoutBaseUri()->setSelf(new Link($this->uriHelper->generate('role.fetch', ['role' => $domainObject->getParent()->getName()])))
+                                    Links::createWithoutBaseUri()->setSelf(new Link($this->uriHelper->generate('role.fetch', ['role' => $domainObject->getParent()->getName()])))
                                 )
                                 ->setData($domainObject->getParent(), $this);
             }
@@ -101,9 +105,9 @@ class RoleTransformer extends AbstractResourceTransformer {
      *
      * @param Model\Role $domainObject
      */
-    public function getType($domainObject): string {
+    public function getType($domainObject): string
+    {
         $parts = explode('\\', get_class($domainObject));
         return end($parts);
     }
-
 }

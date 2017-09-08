@@ -40,7 +40,7 @@ class ConfigProvider
                 \Zend\Mail\Transport\TransportInterface::class => \Zend\Mail\Transport\Sendmail::class,
                 Hateoas\Jsonapi\Hydrator\UserHydrator::class=> Hateoas\Jsonapi\Hydrator\UserHydrator::class,
                 Hateoas\Jsonapi\Hydrator\RoleHydrator::class=> Hateoas\Jsonapi\Hydrator\RoleHydrator::class,
-                
+
                 //Middleware
                 Middleware\JsonApiDispatcherMiddleware::class => Middleware\JsonApiDispatcherMiddleware::class
             ],
@@ -62,14 +62,14 @@ class ConfigProvider
                 Action\HomePageAction::class => Action\HomePageFactory::class,
                 //Authorization middleware
                 Middleware\AuthorizationMiddleware::class => Factory\Middleware\AuthorizationMiddlewareFactory::class,
-                
+
                 //Adapter for auth
                 Factory\Social\SocialAuthAdapterFactory::class => Factory\Social\SocialAuthAdapterFactoryFactory::class,
                 Adapter\Auth\MongoDbAuthAdapter::class => Factory\Adapter\MongoDbAuthAdapterFactory::class,
                 Adapter\Auth\Social\FacebookAuthAdapter::class => Factory\Adapter\Social\FacebookAuthAdapterFactory::class,
                 Adapter\Auth\Social\TwitterAuthAdapter::class => Factory\Adapter\Social\TwitterAuthAdapterFactory::class,
-               
-                
+
+
             ],
             'abstract_factories' => [
                 Factory\AbstractServiceFactory::class,

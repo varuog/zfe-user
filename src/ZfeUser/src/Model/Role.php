@@ -15,21 +15,23 @@ use \Zend\Permissions\Rbac\Role as ZfRole;
  *
  * @author LaptopRK
  */
-class Role extends ZfRole {
+class Role extends ZfRole
+{
 
-    
-    public function setName($name): Role {
+
+    public function setName($name): Role
+    {
         $this->name = $name;
         return $this;
     }
 
-    public function getPermissions(): array {
+    public function getPermissions(): array
+    {
         return $this->permissions;
     }
 
-    public function getParent(): Role {
+    public function getParent(): Role
+    {
         return parent::getParent();
     }
-
-
 }

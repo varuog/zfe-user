@@ -115,9 +115,9 @@ class UserService implements AdapterInterface, EventManagerAwareInterface
                         ->execute();
     }
 
-    
-   
-    
+
+
+
 
     /**
      *
@@ -140,8 +140,7 @@ class UserService implements AdapterInterface, EventManagerAwareInterface
          * @todo move to event based trigger
          * Send Mail
          */
-        if ($this->options->getEnableEmailNotification())
-        {
+        if ($this->options->getEnableEmailNotification()) {
             $mail = new Message();
             $data = ['layout' => 'layout::mail-template'];
             $mail->addTo($user->getEmail(), $user->getFullName());
@@ -182,16 +181,14 @@ class UserService implements AdapterInterface, EventManagerAwareInterface
          * If setting is set to be revokable auth token, check database for
          * validation association
          */
-        if ($this->options->isTokenRevokable())
-        {
+        if ($this->options->isTokenRevokable()) {
             $foundUsers = $this->persistantManager->createQueryBuilder(User::class)
                     ->field('authenticationTokens')
                     ->equals($token)
                     ->getQuery()
                     ->execute();
 
-            if ($foundUsers->count() != 1)
-            {
+            if ($foundUsers->count() != 1) {
                 return false;
             }
         }
@@ -220,7 +217,7 @@ class UserService implements AdapterInterface, EventManagerAwareInterface
     }
 
     /**
-     * 
+     *
      * @param type $id
      * @param type $providerName
      */
@@ -229,10 +226,9 @@ class UserService implements AdapterInterface, EventManagerAwareInterface
         $loggedUser = $this->persistantManager
                 ->getRepository(get_class($this->authUser))
                 ->findOneBy(['social.*.id' => $id, 'social.*.providerName' => $providerName
-        ]);
+                ]);
 
-        if ($loggedUser instanceof User)
-        {
+        if ($loggedUser instanceof User) {
             $this->generateAuthToken($this->authUser);
             return $loggedUser;
         }
@@ -246,8 +242,7 @@ class UserService implements AdapterInterface, EventManagerAwareInterface
      */
     public function authenticate(): Result
     {
-        if ($this->authAdapter instanceof AdapterInterface)
-        {
+        if ($this->authAdapter instanceof AdapterInterface) {
             return $this->authAdapter->authenticate();
         }
         throw new \RuntimeException("An adapter must be set");
@@ -265,8 +260,7 @@ class UserService implements AdapterInterface, EventManagerAwareInterface
                 ->findOneBy([$this->identity => call_user_func([$user, "get{$this->identity}"])]);
         //$loggedUser = $this->persistantManager->createQueryBuilder(get_class($user))->field('email')->;
         $isExpiredToken = time() < $loggedUser->getResetTokenTime() + $this->options->getResetTokenValidity();
-        if ($loggedUser instanceof User && !$isExpiredToken)
-        {
+        if ($loggedUser instanceof User && !$isExpiredToken) {
             $loggedUser->getResetToken();
             return $this->persistantManager->createQueryBuilder(get_class($user))
                             ->field("resetToken")
@@ -298,8 +292,7 @@ class UserService implements AdapterInterface, EventManagerAwareInterface
                 ->findOneBy([$this->identity => call_user_func([$user, "get{$this->identity}"])]);
         //$loggedUser = $this->persistantManager->createQueryBuilder(get_class($user))->field('email')->;
         $isExpiredToken = time() < $loggedUser->getResetTokenTime() + $this->options->getResetTokenValidity();
-        if ($loggedUser instanceof User && !$isExpiredToken)
-        {
+        if ($loggedUser instanceof User && !$isExpiredToken) {
             $loggedUser->getResetToken();
 
             return $this->persistantManager->createQueryBuilder(get_class($user))
@@ -371,8 +364,7 @@ class UserService implements AdapterInterface, EventManagerAwareInterface
      */
     public function getEventManager(): \Zend\EventManager\EventManagerInterface
     {
-        if (!$this->events)
-        {
+        if (!$this->events) {
             $this->setEventManager(new EventManager());
         }
         return $this->events;
@@ -388,7 +380,7 @@ class UserService implements AdapterInterface, EventManagerAwareInterface
     }
 
     /**
-     * 
+     *
      * @param User $user
      * @param type $revoke
      * @return type
@@ -406,11 +398,9 @@ class UserService implements AdapterInterface, EventManagerAwareInterface
                 ->returnNew()
                 ->field('roles');
 
-        if ($revoke)
-        {
+        if ($revoke) {
             $updateApprove->pullAll($roles);
-        } else
-        {
+        } else {
             $updateApprove->pushAll($roles);
         }
 
@@ -437,8 +427,7 @@ class UserService implements AdapterInterface, EventManagerAwareInterface
         /*
          * Only update time if activation is true
          */
-        if ($user->getApproved())
-        {
+        if ($user->getApproved()) {
             $updateApprove = $updateApprove->field('approvedTime')
                     ->set(time());
         }
@@ -450,8 +439,7 @@ class UserService implements AdapterInterface, EventManagerAwareInterface
         /**
          * @todo Mail notification should be moved to event
          */
-        if (($this->options->getEnableNotifyDeactivation() && !$updatedUser->getApproved()) || $updatedUser->getApproved() && $this->options->getEnableNotifyActivation())
-        {
+        if (($this->options->getEnableNotifyDeactivation() && !$updatedUser->getApproved()) || $updatedUser->getApproved() && $this->options->getEnableNotifyActivation()) {
             $mail = new Message();
             $data = ['layout' => 'layout::mail-template'];
             $mail->addTo($user->getEmail(), $user->getFullName());
@@ -488,5 +476,4 @@ class UserService implements AdapterInterface, EventManagerAwareInterface
     {
         return $this->authAdapter->getSocialLoginUrl();
     }
-
 }

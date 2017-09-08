@@ -63,12 +63,11 @@ class TwitterAuthAdapter extends AbstractAuthAdapter implements SocialAuthAdapte
     {
 
         try {
-
             $this->fetchAccessToken();
             $this->twitterHandler->setOauthToken($this->accessToken, $this->accessTokenSecret);
             $requestData = $this->twitterHandler->get('account/verify_credentials', ['include_email' => 'true']);
             //var_dump($requestData);
-            
+
             /*
              * Should be moved to separate method
              */
@@ -77,33 +76,25 @@ class TwitterAuthAdapter extends AbstractAuthAdapter implements SocialAuthAdapte
                     ->findOneBy(['email' => $requestData->email]);
 
 
-            $social = new Social($requestData->id_str
-                    , SocialAuthAdapterFactory::SOCIAL_PROVIDER_TWITTER
-                    , $this->accessToken
-                    , $this->accessTokenSecret);
-            
-             if ($loggedUser instanceof User)
-            {
+            $social = new Social($requestData->id_str, SocialAuthAdapterFactory::SOCIAL_PROVIDER_TWITTER, $this->accessToken, $this->accessTokenSecret);
 
+            if ($loggedUser instanceof User) {
                 $this->generateAuthToken($loggedUser);
-                
+
                 $loggedUser->addSocial($social);
                 $this->persistantManager->getSchemaManager()->ensureIndexes();
                 $this->persistantManager->persist($loggedUser);
                 $this->persistantManager->flush();
-                
-                
+
+
 
                 return new Result(Result::SUCCESS, $loggedUser, [$this->translator->translate('success-login', 'zfe-user')]);
-            } else
-            {
+            } else {
                 $newUser = new User();
                 $newUser->addSocial($social);
                 $this->createUser($newUser, $requestData);
                 return new Result(Result::FAILURE_IDENTITY_NOT_FOUND, $newUser, [$this->translator->translate('error-no-user-found', 'zfe-user')]);
             }
-            
-            
         } catch (TwitterOAuthException $exp) {
             var_dump($exp);
         }
@@ -112,24 +103,22 @@ class TwitterAuthAdapter extends AbstractAuthAdapter implements SocialAuthAdapte
     }
 
     /**
-     * 
+     *
      * @return type
      */
     public function getSocialLoginLink()
     {
-        $callbackurl = $this->serverHelper->generate($this->urlHelper->generate('user-social-login'
-                        , ['provider' => SocialAuthAdapterFactory::SOCIAL_PROVIDER_TWITTER]));
-        $request_token = $this->twitterHandler->oauth('oauth/request_token', array('oauth_callback' => $callbackurl));
+        $callbackurl = $this->serverHelper->generate($this->urlHelper->generate('user-social-login', ['provider' => SocialAuthAdapterFactory::SOCIAL_PROVIDER_TWITTER]));
+        $request_token = $this->twitterHandler->oauth('oauth/request_token', ['oauth_callback' => $callbackurl]);
 
         $_SESSION['oauth_token'] = $request_token['oauth_token'];
         $_SESSION['oauth_token_secret'] = $request_token['oauth_token_secret'];
 
-        return $this->twitterHandler->url('oauth/authorize', array('oauth_token' => $request_token['oauth_token']));
+        return $this->twitterHandler->url('oauth/authorize', ['oauth_token' => $request_token['oauth_token']]);
     }
 
     public function getSocialLogOutLink()
     {
-        
     }
 
     public function createUser(User $newUser, $responseData): User
@@ -162,5 +151,4 @@ class TwitterAuthAdapter extends AbstractAuthAdapter implements SocialAuthAdapte
     {
         $this->accessToken = $accessToken;
     }
-
 }

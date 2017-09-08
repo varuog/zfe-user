@@ -42,8 +42,7 @@ class UserAssignRoleAction implements ServerMiddlewareInterface
         $user = $this->userService->manageRole($user, false);
 
 
-        if ($user instanceof User)
-        {
+        if ($user instanceof User) {
             return $jsonApi->respond()->ok($this->userDocuemnt, $user);
         }
 
@@ -52,5 +51,4 @@ class UserAssignRoleAction implements ServerMiddlewareInterface
         $errorDoc->setJsonApi(new JsonApiObject("1.0"));
         return $jsonApi->respond()->notFound($errorDoc);
     }
-
 }

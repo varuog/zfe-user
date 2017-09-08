@@ -29,7 +29,8 @@ use Doctrine\Common\Collections\ArrayCollection;
  *
  * @author Gourav Sarkar
  */
-class RoleService {
+class RoleService
+{
 
     private $persistantManager;
     private $options;
@@ -44,7 +45,11 @@ class RoleService {
 
 
     public function __construct(
-    DocumentManager $mongoManager, TranslatorInterface $translator, TransportInterface $mailer, TemplateRendererInterface $mailTemplate, UserServiceOptions $options
+        DocumentManager $mongoManager,
+        TranslatorInterface $translator,
+        TransportInterface $mailer,
+        TemplateRendererInterface $mailTemplate,
+        UserServiceOptions $options
     ) {
         $this->persistantManager = $mongoManager;
         $this->options = $options;
@@ -54,7 +59,8 @@ class RoleService {
         $this->rbac = new Rbac();
     }
 
-    public function fetchRoles(Collection $roles): Collection {
+    public function fetchRoles(Collection $roles): Collection
+    {
         $roleList = new ArrayCollection();
         foreach ($roles as $role) {
             $roleIdList[] = $role->getName();
@@ -73,7 +79,8 @@ class RoleService {
         return $roleList;
     }
 
-    public function fetchRoleNames(Collection $roles) {
+    public function fetchRoleNames(Collection $roles)
+    {
         $roleNames = [];
         $fetchedRoles = $this->fetchRoles($roles);
 
@@ -87,7 +94,8 @@ class RoleService {
      *
      * @param Role $role
      */
-    public function add(Role $role) {
+    public function add(Role $role)
+    {
         $ancestorNames = [];
         /**
          * Check if role has parent
@@ -99,7 +107,7 @@ class RoleService {
           foreach ($ancestors as $ancetor) {
           $ancestorNames[] = $ancetor->getName();
           }
-         * 
+         *
          */
         //Populate ancestor names
         //$role->setAncestors(array_merge($ancestorNames, $parentRole->getName()));
@@ -110,13 +118,14 @@ class RoleService {
     }
 
     /**
-     * 
+     *
      * @param type $role
      * @param type $permission
      * @param type $assert
      */
-    public function isGranted(Collection $roles, $permission, $assert = null) {
-        $hasPermission = FALSE;
+    public function isGranted(Collection $roles, $permission, $assert = null)
+    {
+        $hasPermission = false;
         /*
          * Fetch all the ancestors role and current role and add it to rbac
          */
@@ -127,6 +136,4 @@ class RoleService {
 
         return $hasPermission;
     }
-
-
 }

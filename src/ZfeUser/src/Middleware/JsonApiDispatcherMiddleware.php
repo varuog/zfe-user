@@ -27,21 +27,20 @@ use Psr\Http\Message\ResponseInterface;
 class JsonApiDispatcherMiddleware implements MiddlewareInterface
 {
     const JSON_API_PROC='JSON_API_PROC';
-    
+
     public function process(ServerRequestInterface $request, DelegateInterface $delegate): ResponseInterface
     {
-        
-       $defaultExpFactory   = new DefaultExceptionFactory();
+
+        $defaultExpFactory   = new DefaultExceptionFactory();
         $jsonApiRequest      = new JsonApiRequest($request, $defaultExpFactory);
         $jsonApi             = new \WoohooLabs\Yin\JsonApi\JsonApi($jsonApiRequest, new \Zend\Diactoros\Response(), $defaultExpFactory, null);
-        
+
         $newJsonApiRequest=$jsonApiRequest->withAttribute(JsonApiDispatcherMiddleware::JSON_API_PROC, $jsonApi);
 
-        
-        
+
+
         $actionHandler=$delegate->process($newJsonApiRequest);
-        
+
         return $actionHandler;
     }
-
 }

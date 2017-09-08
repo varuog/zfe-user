@@ -23,17 +23,20 @@ use ZfeUser\Model\User;
  * check if user has permission or not to access this route
  * @author gourav sarkar
  */
-class AuthorizationMiddleware implements MiddlewareInterface {
+class AuthorizationMiddleware implements MiddlewareInterface
+{
 
     private $roleService;
     private $router;
 
-    public function __construct(RoleService $roleService, \Zend\Expressive\Router\RouterInterface $router) {
+    public function __construct(RoleService $roleService, \Zend\Expressive\Router\RouterInterface $router)
+    {
         $this->roleService = $roleService;
         $this->router = $router;
     }
 
-    public function process(ServerRequestInterface $request, DelegateInterface $delegate): ResponseInterface {
+    public function process(ServerRequestInterface $request, DelegateInterface $delegate): ResponseInterface
+    {
         $authStringParts = [];
         $jsonApi = $request->getAttribute(JsonApiDispatcherMiddleware::JSON_API_PROC);
         $currentUser = $request->getAttribute(AuthValidatorMiddleware::CURRENT_USER, new User());
@@ -57,7 +60,4 @@ class AuthorizationMiddleware implements MiddlewareInterface {
 
         return $jsonApi->respond()->forbidden($errorDoc);
     }
-    
-   
-
 }

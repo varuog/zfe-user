@@ -29,19 +29,18 @@ class UserFetchAction implements ServerMiddlewareInterface
         $this->userDocuemnt = $userDoc;
         $this->translator = $translator;
     }
-    
+
 
     public function process(ServerRequestInterface $request, DelegateInterface $delegate)
     {
-        
+
         $jsonApi= $request->getAttribute(JsonApiDispatcherMiddleware::JSON_API_PROC);
-       
+
         $user = new User();
         $user->setSlug($request->getAttribute('slug'));
         $user = $this->userService->fetch($user);
 
-        if ($user instanceof User)
-        {   
+        if ($user instanceof User) {
             return $jsonApi->respond()->ok($this->userDocuemnt, $user);
         }
 
@@ -49,5 +48,4 @@ class UserFetchAction implements ServerMiddlewareInterface
         $errorDoc->setJsonApi(new JsonApiObject("1.0"));
         return $jsonApi->respond()->notFound($errorDoc);
     }
-
 }

@@ -185,7 +185,7 @@ class User
     }
 
     /**
-     * @todo Slug should remove all the unwanted characters. 
+     * @todo Slug should remove all the unwanted characters.
      * only url safe character should be tehre
      * @param type $slug
      * @return $this
@@ -209,7 +209,6 @@ class User
 
     public function genereateJwtToken(User $user)
     {
-        
     }
 
     public function getAuthenticationTokens(): array
@@ -246,14 +245,12 @@ class User
 
     public function addSocial(Social $social)
     {
-        
+
         foreach ($this->socials as $socialIndex => $socialProfile) {
-            if ($social->getProviderName() == $socialProfile->getProviderName())
-            {
+            if ($social->getProviderName() == $socialProfile->getProviderName()) {
                 unset($this->socials[$socialIndex]);
             }
         }
         $this->socials[] = $social;
     }
-
 }

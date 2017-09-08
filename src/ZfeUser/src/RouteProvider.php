@@ -23,7 +23,8 @@ use Zend\Stratigility\Middleware\ErrorHandler;
  * specify roots here
  * @author Gourav Sarkar
  */
-class RouteProvider {
+class RouteProvider
+{
 
     /**
      * @param ContainerInterface $container
@@ -31,7 +32,8 @@ class RouteProvider {
      * @param callable $callback Creates and returns the service.
      * @return Application
      */
-    public function __invoke(ContainerInterface $container, $serviceName, callable $callback) {
+    public function __invoke(ContainerInterface $container, $serviceName, callable $callback)
+    {
         /** @var $app Application */
         $app = $callback();
 
@@ -46,10 +48,8 @@ class RouteProvider {
         $app->post('/api/auth/register', [Action\Api\User\UserRegisterAction::class], 'user-register');
         $app->post('/api/auth/login', [Action\Api\User\UserLoginAction::class], 'user-login');
         $app->get('/api/auth/social/login/:provider', [Action\Api\User\UserSocialLoginAction::class], 'user-social-login');
-        
-        $app->get('/api/user/:slug'
-                , [Middleware\AuthValidatorMiddleware::class, Middleware\AuthorizationMiddleware::class, Action\Api\User\UserFetchAction::class]
-                , 'user.fetch');
+
+        $app->get('/api/user/:slug', [Middleware\AuthValidatorMiddleware::class, Middleware\AuthorizationMiddleware::class, Action\Api\User\UserFetchAction::class], 'user.fetch');
         $app->patch('/api/user/:slug/assign-role', [Action\Api\User\UserAssignRoleAction::class], 'user-assign-role');
         $app->patch('/api/user/:slug/revoke-role', [Action\Api\User\UserRevokeRoleAction::class], 'user-revoke-role');
         $app->patch('/api/user/:slug/activation', [Action\Api\User\UserActivationAction::class], 'user-activation');
@@ -65,5 +65,4 @@ class RouteProvider {
 
         return $app;
     }
-
 }

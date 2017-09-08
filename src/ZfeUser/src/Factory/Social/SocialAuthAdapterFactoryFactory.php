@@ -7,7 +7,9 @@
  */
 
 namespace ZfeUser\Factory\Social;
+
 use Interop\Container\ContainerInterface;
+
 /**
  * Description of AbstractSocialAuthAdapterFactory
  *

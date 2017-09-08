@@ -25,5 +25,4 @@ class AuthValidatorMiddlewareFactory
         $userService = $container->get(\ZfeUser\Service\UserService::class);
         return new \ZfeUser\Middleware\AuthValidatorMiddleware($userService);
     }
-
 }

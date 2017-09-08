@@ -38,8 +38,7 @@ class HomePageAction implements ServerMiddlewareInterface
 
     public function process(ServerRequestInterface $request, DelegateInterface $delegate)
     {
-        if (!$this->template)
-        {
+        if (!$this->template) {
             return new JsonResponse([
                 'welcome' => 'Congratulations! You have installed the zend-expressive skeleton application.',
                 'docsUrl' => 'https://docs.zendframework.com/zend-expressive/',
@@ -48,30 +47,24 @@ class HomePageAction implements ServerMiddlewareInterface
 
         $data = [];
 
-        if ($this->router instanceof Router\AuraRouter)
-        {
+        if ($this->router instanceof Router\AuraRouter) {
             $data['routerName'] = 'Aura.Router';
             $data['routerDocs'] = 'http://auraphp.com/packages/2.x/Router.html';
-        } elseif ($this->router instanceof Router\FastRouteRouter)
-        {
+        } elseif ($this->router instanceof Router\FastRouteRouter) {
             $data['routerName'] = 'FastRoute';
             $data['routerDocs'] = 'https://github.com/nikic/FastRoute';
-        } elseif ($this->router instanceof Router\ZendRouter)
-        {
+        } elseif ($this->router instanceof Router\ZendRouter) {
             $data['routerName'] = 'Zend Router';
             $data['routerDocs'] = 'https://docs.zendframework.com/zend-router/';
         }
 
-        if ($this->template instanceof PlatesRenderer)
-        {
+        if ($this->template instanceof PlatesRenderer) {
             $data['templateName'] = 'Plates';
             $data['templateDocs'] = 'http://platesphp.com/';
-        } elseif ($this->template instanceof TwigRenderer)
-        {
+        } elseif ($this->template instanceof TwigRenderer) {
             $data['templateName'] = 'Twig';
             $data['templateDocs'] = 'http://twig.sensiolabs.org/documentation';
-        } elseif ($this->template instanceof ZendViewRenderer)
-        {
+        } elseif ($this->template instanceof ZendViewRenderer) {
             $data['templateName'] = 'Zend View';
             $data['templateDocs'] = 'https://docs.zendframework.com/zend-view/';
         }
@@ -82,5 +75,4 @@ class HomePageAction implements ServerMiddlewareInterface
         $data['fblink'] = $fbHelper;
         return new HtmlResponse($this->template->render('app::home-page', $data));
     }
-
 }

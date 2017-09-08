@@ -14,7 +14,6 @@ use WoohooLabs\Yin\JsonApi\Schema\JsonApiObject;
 use Zend\I18n\Translator\TranslatorInterface;
 use ZfeUser\Middleware\JsonApiDispatcherMiddleware;
 
-
 class UserActivationAction implements ServerMiddlewareInterface
 {
 
@@ -35,14 +34,13 @@ class UserActivationAction implements ServerMiddlewareInterface
     {
 
         $jsonApi= $request->getAttribute(JsonApiDispatcherMiddleware::JSON_API_PROC);
-        
+
         $user = new User();
         $jsonApi->hydrate($this->userHydrator, $user);
         $user->setSlug($request->getAttribute('slug'));
         $user = $this->userService->userActivation($user);
 
-        if ($user instanceof User)
-        {
+        if ($user instanceof User) {
             return $jsonApi->respond()->ok($this->userDocuemnt, $user);
         }
 
@@ -51,5 +49,4 @@ class UserActivationAction implements ServerMiddlewareInterface
         $errorDoc->setJsonApi(new JsonApiObject("1.0"));
         return $jsonApi->respond()->notFound($errorDoc);
     }
-
 }

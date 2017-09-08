@@ -47,7 +47,7 @@ class UserLoginAction implements ServerMiddlewareInterface
         $user = new \ZfeUser\Model\User();
 
         $jsonApi->hydrate($this->userHydrator, $user);
-        
+
         /*
          * Prepare adapter
          */
@@ -57,12 +57,10 @@ class UserLoginAction implements ServerMiddlewareInterface
         $authResult = $this->userService->authenticate();
 
 
-        if ($authResult->getIdentity() != null)
-        {
+        if ($authResult->getIdentity() != null) {
             $this->userDocument->setAccessToken($authResult->getIdentity()->getLastAccessToken());
             return $jsonApi->respond()->ok($this->userDocument, $authResult->getIdentity());
-        } else
-        {
+        } else {
             $errorDoc = new ErrorDocument();
             $errorDoc->setJsonApi(new JsonApiObject("1.0"));
             $errors = [];
@@ -75,14 +73,11 @@ class UserLoginAction implements ServerMiddlewareInterface
                 $errors[] = $error;
             }
 
-            if ($authResult->getCode() == Result::FAILURE_IDENTITY_NOT_FOUND)
-            {
+            if ($authResult->getCode() == Result::FAILURE_IDENTITY_NOT_FOUND) {
                 return $jsonApi->respond()->notFound($errorDoc, $errors);
-            } else
-            {
+            } else {
                 return $jsonApi->respond()->genericError($errorDoc, $errors, 500);
             }
         }
     }
-
 }

@@ -15,7 +15,8 @@ use WoohooLabs\Yin\JsonApi\Schema\Error;
 use ZfeUser\Model\Role;
 use Zend\I18n\Translator\TranslatorInterface;
 
-class RoleFetchAction implements ServerMiddlewareInterface {
+class RoleFetchAction implements ServerMiddlewareInterface
+{
 
     private $rolService;
     private $translator;
@@ -23,7 +24,8 @@ class RoleFetchAction implements ServerMiddlewareInterface {
     private $roleDocument;
 
     public function __construct(RoleService $rolService, RoleHydrator $roleHydrator, Document\RoleDocument $roleDoc, TranslatorInterface $translator
-    ) {
+    )
+    {
         $this->rolService = $rolService;
         $this->translator = $translator;
         $this->roleHydrator = $roleHydrator;
@@ -36,7 +38,8 @@ class RoleFetchAction implements ServerMiddlewareInterface {
      * @param DelegateInterface $delegate
      * @return \App\Action\renderResponse
      */
-    public function process(ServerRequestInterface $request, DelegateInterface $delegate) {
+    public function process(ServerRequestInterface $request, DelegateInterface $delegate)
+    {
 
         $jsonApi = $request->getAttribute(JsonApiDispatcherMiddleware::JSON_API_PROC);
         $role = new Role(null);
@@ -59,5 +62,4 @@ class RoleFetchAction implements ServerMiddlewareInterface {
 
         return $jsonApi->respond()->ok($this->roleDocument, $role);
     }
-
 }

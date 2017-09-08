@@ -43,5 +43,4 @@ class SocialAuthAdapterFactory
                 return $this->twitterAdapter;
         }
     }
-
 }

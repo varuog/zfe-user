@@ -16,7 +16,6 @@ use Zend\I18n\Translator\TranslatorInterface;
 use ZfeUser\Middleware\JsonApiDispatcherMiddleware;
 use ZfeUser\Factory\Social\SocialAuthAdapterFactory;
 
-
 class UserSocialLoginAction implements ServerMiddlewareInterface
 {
 
@@ -25,7 +24,7 @@ class UserSocialLoginAction implements ServerMiddlewareInterface
     private $userDocument;
     /**
      *
-     * @var ZfeUser\Adapter\Auth\Social\SocialAuthAdapterInterface 
+     * @var ZfeUser\Adapter\Auth\Social\SocialAuthAdapterInterface
      */
     private $authAdapter;
     private $authAdapterFactory;
@@ -48,10 +47,10 @@ class UserSocialLoginAction implements ServerMiddlewareInterface
     {
         $providerName= $request->getAttribute('provider');
         $socialAccessToken= isset($request->getQueryParams()['accesstoken']) ? $request->getQueryParams()['accesstoken'] : '';
-        
+
         $this->authAdapter= $this->authAdapterFactory->build($providerName);
         $this->authAdapter->setAccessToken($socialAccessToken);
-        
+
         $jsonApi = $request->getAttribute(JsonApiDispatcherMiddleware::JSON_API_PROC);
 
         $user = new \ZfeUser\Model\User();
@@ -61,21 +60,16 @@ class UserSocialLoginAction implements ServerMiddlewareInterface
         $authResult = $this->userService->authenticate();
 
 
-        if ($authResult->getCode() == Result::SUCCESS)
-        {
+        if ($authResult->getCode() == Result::SUCCESS) {
             $this->userDocument->setAccessToken($authResult->getIdentity()->getLastAccessToken());
             return $jsonApi->respond()->ok($this->userDocument, $authResult->getIdentity());
-        } else
-        if ($authResult->getCode() == Result::FAILURE_IDENTITY_NOT_FOUND)
-        {
+        } elseif ($authResult->getCode() == Result::FAILURE_IDENTITY_NOT_FOUND) {
             $newUser = $authResult->getIdentity();
             $this->userService->register($newUser);
             $this->userService->generateAuthToken($newUser);
             $this->userDocument->setAccessToken($authResult->getIdentity()->getLastAccessToken());
             return $jsonApi->respond()->ok($this->userDocument, $authResult->getIdentity());
-            
-        } else
-        {
+        } else {
             $errorDoc = new ErrorDocument();
             $errorDoc->setJsonApi(new JsonApiObject("1.0"));
             $errors = [];
@@ -88,14 +82,11 @@ class UserSocialLoginAction implements ServerMiddlewareInterface
                 $errors[] = $error;
             }
 
-            if ($authResult->getCode() == Result::FAILURE_IDENTITY_NOT_FOUND)
-            {
+            if ($authResult->getCode() == Result::FAILURE_IDENTITY_NOT_FOUND) {
                 return $jsonApi->respond()->notFound($errorDoc, $errors);
-            } else
-            {
+            } else {
                 return $jsonApi->respond()->genericError($errorDoc, $errors, 500);
             }
         }
     }
-
 }

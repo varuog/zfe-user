@@ -82,25 +82,20 @@ class FacebookAuthAdapter extends AbstractAuthAdapter implements SocialAuthAdapt
                     ->findOneBy(['email' => $responseData->getEmail()]);
 
 
-            $social = new Social($responseData->getId()
-                    , SocialAuthAdapterFactory::SOCIAL_PROVIDER_FACEBOOK
-                    , $this->accessToken->getValue());
+            $social = new Social($responseData->getId(), SocialAuthAdapterFactory::SOCIAL_PROVIDER_FACEBOOK, $this->accessToken->getValue());
 
-            if ($loggedUser instanceof User)
-            {
-                
+            if ($loggedUser instanceof User) {
                 $this->generateAuthToken($loggedUser);
-                
+
                 $loggedUser->addSocial($social);
                 $this->persistantManager->getSchemaManager()->ensureIndexes();
                 $this->persistantManager->persist($loggedUser);
                 $this->persistantManager->flush();
-                
+
 
 
                 return new Result(Result::SUCCESS, $loggedUser, [$this->translator->translate('success-login', 'zfe-user')]);
-            } else
-            {
+            } else {
                 $newUser = new User();
                 $newUser->addSocial($social);
                 $this->createUser($newUser, $responseData);
@@ -125,7 +120,7 @@ class FacebookAuthAdapter extends AbstractAuthAdapter implements SocialAuthAdapt
     }
 
     /**
-     * 
+     *
      * @return type
      */
     public function getSocialLoginLink()
@@ -136,7 +131,6 @@ class FacebookAuthAdapter extends AbstractAuthAdapter implements SocialAuthAdapt
 
     public function getSocialLogOutLink()
     {
-        
     }
 
     public function createUser(User $newUser, $responseData): User
@@ -155,13 +149,11 @@ class FacebookAuthAdapter extends AbstractAuthAdapter implements SocialAuthAdapt
 
     public function fetchAccessToken(): string
     {
-        if (empty($this->accessToken))
-        {
+        if (empty($this->accessToken)) {
             $helper = $this->fbHandler->getRedirectLoginHelper();
             $fbSocialOption = $this->options->getSocial()['facebook'];
             $accessToken = $helper->getAccessToken();
-            if (!$helper->getError())
-            {
+            if (!$helper->getError()) {
                 $oAuth2Client = $this->fbHandler->getOAuth2Client();
                 $tokenMetaData = $oAuth2Client->debugToken($accessToken);
                 $tokenMetaData->validateAppId($fbSocialOption['appID']);
@@ -177,5 +169,4 @@ class FacebookAuthAdapter extends AbstractAuthAdapter implements SocialAuthAdapt
     {
         $this->accessToken = $accessToken;
     }
-
 }

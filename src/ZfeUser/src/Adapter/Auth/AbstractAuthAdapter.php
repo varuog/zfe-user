@@ -27,7 +27,7 @@ abstract class AbstractAuthAdapter implements AdapterInterface
     protected $authUser;
     protected $persistantManager;
     protected $translator;
-    
+
     protected $credential;
     protected $identity;
 
@@ -36,13 +36,13 @@ abstract class AbstractAuthAdapter implements AdapterInterface
         $this->authUser = $user;
     }
 
-    public function __construct( UserServiceOptions $options, DocumentManager $persistantManager, TranslatorInterface $translator)
+    public function __construct(UserServiceOptions $options, DocumentManager $persistantManager, TranslatorInterface $translator)
     {
         $this->options = $options;
         $this->persistantManager = $persistantManager;
         $this->translator = $translator;
-        
-        
+
+
         $this->credential = $this->options->getCredentialField();
         $this->identity = $this->options->getIdentityField();
     }
@@ -109,5 +109,4 @@ abstract class AbstractAuthAdapter implements AdapterInterface
 
         return $user;
     }
-
 }

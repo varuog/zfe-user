@@ -41,10 +41,10 @@ class RoleAddAction implements ServerMiddlewareInterface
     public function process(ServerRequestInterface $request, DelegateInterface $delegate)
     {
 
-        
-       $jsonApi= $request->getAttribute(JsonApiDispatcherMiddleware::JSON_API_PROC);
+
+        $jsonApi= $request->getAttribute(JsonApiDispatcherMiddleware::JSON_API_PROC);
         $role = new Role(null);
-       $jsonApi->hydrate($this->roleHydrator, $role);
+        $jsonApi->hydrate($this->roleHydrator, $role);
         //$this->rolService->addRole( $role );
 
 
@@ -63,5 +63,4 @@ class RoleAddAction implements ServerMiddlewareInterface
 
         return $jsonApi->respond()->ok($this->roleDocument, $role);
     }
-
 }

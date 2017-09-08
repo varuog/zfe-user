@@ -44,23 +44,18 @@ class MongoDbAuthAdapter extends AbstractAuthAdapter
                 ->findOneBy([$this->identity => call_user_func([$this->authUser, "get{$this->identity}"])]);
         //$loggedUser = $this->persistantManager->createQueryBuilder(get_class($user))->field('email')->;
 
-        if ($loggedUser instanceof User)
-        {
-            if (password_verify($this->authUser->getPassword(), $loggedUser->getPassword()))
-            {
+        if ($loggedUser instanceof User) {
+            if (password_verify($this->authUser->getPassword(), $loggedUser->getPassword())) {
                 $this->generateAuthToken($this->authUser);
 
                 return new Result(Result::SUCCESS, $loggedUser, [$this->translator->translate('success-login', 'zfe-user')]);
-            } else
-            {
+            } else {
                 return new Result(Result::FAILURE_CREDENTIAL_INVALID, null, [$this->translator->translate('error-credentail-invalid', 'zfe-user')]);
             }
-        } else
-        {
+        } else {
             return new Result(Result::FAILURE_IDENTITY_NOT_FOUND, null, [$this->translator->translate('error-no-user-found', 'zfe-user')]);
         }
 
         return new Result(Result::FAILURE_UNCATEGORIZED, null, [$this->translator->translate('error-unknown-auth', 'zfe-user')]);
     }
-
 }
