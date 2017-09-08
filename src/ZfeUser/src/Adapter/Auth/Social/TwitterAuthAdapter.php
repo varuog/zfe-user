@@ -36,8 +36,8 @@ class TwitterAuthAdapter extends AbstractAuthAdapter implements SocialAuthAdapte
     private $urlHelper;
     private $serverHelper;
     private $twitterHandler;
-    private $oauthToken;
-    private $oauthSecret;
+    private $accessToken;
+    private $accessTokenSecret;
 
     public function __construct(UserServiceOptions $options, DocumentManager $persistantManager, TranslatorInterface $translator, UrlHelper $urlHelper, ServerUrlHelper $serverHelper)
     {
@@ -61,24 +61,51 @@ class TwitterAuthAdapter extends AbstractAuthAdapter implements SocialAuthAdapte
      */
     public function authenticate(): Result
     {
-        $twitterSocialOption = $this->options->getSocial()['twitter'];
-        $callbackurl = $this->serverHelper->generate($this->urlHelper->generate('user-social-login'
-                        , ['provider' => SocialAuthAdapterFactory::SOCIAL_PROVIDER_TWITTER]));
-        try {
-            $callbackurl = $this->serverHelper->generate($this->urlHelper->generate('user-social-login'
-                            , ['provider' => SocialAuthAdapterFactory::SOCIAL_PROVIDER_TWITTER]));
-            $request_token = $this->twitterHandler->oauth('oauth/request_token', array('oauth_callback' => $callbackurl));
-            var_dump($request_token);
-            $access_token = $this->twitterHandler->oauth("oauth/access_token", ["oauth_verifier" => $_REQUEST['oauth_verifier']]);
-            $this->twitterHandler->setOauthToken($request_token['oauth_token'], $request_token['oauth_token_secret']);
-            $access_token = $this->twitterHandler->oauth("oauth/access_token", ["oauth_verifier" => $_REQUEST['oauth_verifier']]);
-            var_dump($access_token);
-            $this->twitterHandler->setOauthToken($access_token['oauth_token'], $access_token['oauth_token_secret']);
 
-            $d = $this->twitterHandler->oauth('account/verify_credentials');
-            var_dump($d);
+        try {
+
+            $this->fetchAccessToken();
+            $this->twitterHandler->setOauthToken($this->accessToken, $this->accessTokenSecret);
+            $requestData = $this->twitterHandler->get('account/verify_credentials', ['include_email' => 'true']);
+            //var_dump($requestData);
+            
+            /*
+             * Should be moved to separate method
+             */
+            $loggedUser = $this->persistantManager
+                    ->getRepository(get_class($this->authUser))
+                    ->findOneBy(['email' => $requestData->email]);
+
+
+            $social = new Social($requestData->id_str
+                    , SocialAuthAdapterFactory::SOCIAL_PROVIDER_TWITTER
+                    , $this->accessToken
+                    , $this->accessTokenSecret);
+            
+             if ($loggedUser instanceof User)
+            {
+
+                $this->generateAuthToken($loggedUser);
+                
+                $loggedUser->addSocial($social);
+                $this->persistantManager->getSchemaManager()->ensureIndexes();
+                $this->persistantManager->persist($loggedUser);
+                $this->persistantManager->flush();
+                
+                
+
+                return new Result(Result::SUCCESS, $loggedUser, [$this->translator->translate('success-login', 'zfe-user')]);
+            } else
+            {
+                $newUser = new User();
+                $newUser->addSocial($social);
+                $this->createUser($newUser, $requestData);
+                return new Result(Result::FAILURE_IDENTITY_NOT_FOUND, $newUser, [$this->translator->translate('error-no-user-found', 'zfe-user')]);
+            }
+            
+            
         } catch (TwitterOAuthException $exp) {
-            var_dump($exp->getMessage());
+            var_dump($exp);
         }
 
         return new Result(Result::FAILURE_UNCATEGORIZED, null, ['Unknow Error']);
@@ -93,6 +120,10 @@ class TwitterAuthAdapter extends AbstractAuthAdapter implements SocialAuthAdapte
         $callbackurl = $this->serverHelper->generate($this->urlHelper->generate('user-social-login'
                         , ['provider' => SocialAuthAdapterFactory::SOCIAL_PROVIDER_TWITTER]));
         $request_token = $this->twitterHandler->oauth('oauth/request_token', array('oauth_callback' => $callbackurl));
+
+        $_SESSION['oauth_token'] = $request_token['oauth_token'];
+        $_SESSION['oauth_token_secret'] = $request_token['oauth_token_secret'];
+
         return $this->twitterHandler->url('oauth/authorize', array('oauth_token' => $request_token['oauth_token']));
     }
 
@@ -101,20 +132,35 @@ class TwitterAuthAdapter extends AbstractAuthAdapter implements SocialAuthAdapte
         
     }
 
-    public function createUser($responseData): User
+    public function createUser(User $newUser, $responseData): User
     {
-        $newUser = new User();
         $newUser->setId(UuidGenerator::generateV4());
-        $newUser->setEmail($responseData->getEmail());
-        $newUser->setFullName($responseData->getName());
+        $newUser->setEmail($responseData->email);
+        $newUser->setFullName($responseData->name);
 
-        $newUser->setUsername(explode('@', $responseData->getEmail())[0]);
-        $newUser->setSlug(explode('@', $responseData->getEmail())[0]);
+        $newUser->setUsername($responseData->screeen_name);
+        $newUser->setSlug($responseData->screeen_name);
         $newUser->setPassword(bin2hex(random_bytes(10)));
         $newUser->addRole(new Role('user'));
-        $newUser->addSocial($social);
 
         return $newUser;
+    }
+
+    public function fetchAccessToken(): string
+    {
+
+
+        $this->twitterHandler->setOauthToken($_SESSION['oauth_token'], $_SESSION['oauth_token_secret']);
+        $access_token = $this->twitterHandler->oauth("oauth/access_token", ["oauth_verifier" => $_REQUEST['oauth_verifier']]);
+        $this->accessToken = $access_token['oauth_token'];
+        $this->accessTokenSecret = $access_token['oauth_token_secret'];
+
+        return $this->accessToken;
+    }
+
+    public function setAccessToken(string $accessToken)
+    {
+        $this->accessToken = $accessToken;
     }
 
 }
