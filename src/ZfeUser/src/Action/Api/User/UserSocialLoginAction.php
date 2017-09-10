@@ -46,7 +46,7 @@ class UserSocialLoginAction implements ServerMiddlewareInterface
     public function process(ServerRequestInterface $request, DelegateInterface $delegate)
     {
         $providerName= $request->getAttribute('provider');
-        $socialAccessToken= isset($request->getQueryParams()['accesstoken']) ? $request->getQueryParams()['accesstoken'] : '';
+        $socialAccessToken= isset($request->getQueryParams()['access_token']) ? $request->getQueryParams()['access_token'] : '';
 
         $this->authAdapter= $this->authAdapterFactory->build($providerName);
         $this->authAdapter->setAccessToken($socialAccessToken);

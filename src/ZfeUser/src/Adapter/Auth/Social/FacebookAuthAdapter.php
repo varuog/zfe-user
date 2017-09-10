@@ -82,7 +82,8 @@ class FacebookAuthAdapter extends AbstractAuthAdapter implements SocialAuthAdapt
                     ->findOneBy(['email' => $responseData->getEmail()]);
 
 
-            $social = new Social($responseData->getId(), SocialAuthAdapterFactory::SOCIAL_PROVIDER_FACEBOOK, $this->accessToken->getValue());
+            $accessTokenValue= (is_string($this->accessToken))? $this->accessToken : $this->accessToken->getValue();
+            $social = new Social($responseData->getId(), SocialAuthAdapterFactory::SOCIAL_PROVIDER_FACEBOOK, $accessTokenValue);
 
             if ($loggedUser instanceof User) {
                 $this->generateAuthToken($loggedUser);
@@ -168,5 +169,6 @@ class FacebookAuthAdapter extends AbstractAuthAdapter implements SocialAuthAdapt
     public function setAccessToken(string $accessToken)
     {
         $this->accessToken = $accessToken;
+        return $this;
     }
 }
