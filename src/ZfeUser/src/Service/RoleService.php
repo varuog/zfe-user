@@ -23,6 +23,7 @@ use ZfeUser\Model\Role;
 use Zend\Permissions\Rbac\Rbac;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Zend\Stdlib\SplPriorityQueue;
 
 /**
  * Description of RoleService
@@ -59,9 +60,10 @@ class RoleService
         $this->rbac = new Rbac();
     }
 
-    public function fetchRoles(Collection $roles): Collection
+    public function fetchRoles(SplPriorityQueue $roles): Collection
     {
         $roleList = new ArrayCollection();
+        //$roleList = new SplPriorityQueue();
         foreach ($roles as $role) {
             $roleIdList[] = $role->getName();
         }
@@ -79,7 +81,7 @@ class RoleService
         return $roleList;
     }
 
-    public function fetchRoleNames(Collection $roles)
+    public function fetchRoleNames(SplPriorityQueue $roles)
     {
         $roleNames = [];
         $fetchedRoles = $this->fetchRoles($roles);
@@ -123,7 +125,7 @@ class RoleService
      * @param type $permission
      * @param type $assert
      */
-    public function isGranted(Collection $roles, $permission, $assert = null)
+    public function isGranted(SplPriorityQueue $roles, $permission, $assert = null)
     {
         $hasPermission = false;
         /*

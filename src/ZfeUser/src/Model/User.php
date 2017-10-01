@@ -10,6 +10,7 @@ namespace ZfeUser\Model;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use \Doctrine\Common\Collections\Collection;
+use Zend\Stdlib\SplPriorityQueue;
 
 /**
  * Description of User
@@ -57,7 +58,11 @@ class User
     /** @ODM\Collection */
     private $authenticationTokens = [];
     private $socials = [];
-    private $roles = [];
+    private $roles=[];
+    
+    public function __construct() {
+        $this->roles=new SplPriorityQueue();
+    }
 
     public function getId()
     {
@@ -196,12 +201,12 @@ class User
         return $this;
     }
 
-    public function getRoles(): Collection
+    public function getRoles(): SplPriorityQueue
     {
         return $this->roles;
     }
 
-    public function setRoles($roles)
+    public function setRoles(SplPriorityQueue $roles)
     {
         $this->roles = $roles;
         return $this;
@@ -239,7 +244,7 @@ class User
 
     public function addRole(Role $role)
     {
-        $this->roles[] = $role;
+        $this->roles->insert($role, $role->getPriority());
         return $this;
     }
 

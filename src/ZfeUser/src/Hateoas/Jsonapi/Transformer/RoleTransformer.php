@@ -9,7 +9,7 @@
 namespace ZfeUser\Hateoas\Jsonapi\Transformer;
 
 use WoohooLabs\Yin\JsonApi\Transformer\AbstractResourceTransformer;
-use Zend\Permissions\Rbac\Role;
+use ZfeUser\Model\Role ;
 use WoohooLabs\Yin\JsonApi\Schema\Relationship\ToOneRelationship;
 use WoohooLabs\Yin\JsonApi\Schema\Link;
 use WoohooLabs\Yin\JsonApi\Schema\Links;
@@ -44,6 +44,9 @@ class RoleTransformer extends AbstractResourceTransformer
             },
             "permissions" => function (Role $domainObject) {
                 return $domainObject->getPermissions();
+            },      
+            "priority" => function (Role $domainObject) {
+                return $domainObject->getPriority();
             },
         ];
     }
@@ -94,7 +97,7 @@ class RoleTransformer extends AbstractResourceTransformer
             "parent" => function ($domainObject) {
                 return ToOneRelationship::create()
                                 ->setLinks(
-                                    Links::createWithoutBaseUri()->setSelf(new Link($this->uriHelper->generate('role.fetch', ['role' => $domainObject->getParent()->getName()])))
+                                    Links::createWithoutBaseUri()->setSelf(new Link($this->uriHelper->generate('role-fetch', ['role' => $domainObject->getParent()->getName()])))
                                 )
                                 ->setData($domainObject->getParent(), $this);
             }
