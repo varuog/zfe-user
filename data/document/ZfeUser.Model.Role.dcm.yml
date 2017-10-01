@@ -8,7 +8,7 @@ ZfeUser\Model\Role:
         strategy: none
         type: string 
     priority:
-        type: integer
+        type: int
     parent:
         reference: true
         type: one
