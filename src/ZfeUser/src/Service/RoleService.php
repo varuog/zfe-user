@@ -30,8 +30,7 @@ use Zend\Stdlib\SplPriorityQueue;
  *
  * @author Gourav Sarkar
  */
-class RoleService
-{
+class RoleService {
 
     private $persistantManager;
     private $options;
@@ -46,11 +45,7 @@ class RoleService
 
 
     public function __construct(
-        DocumentManager $mongoManager,
-        TranslatorInterface $translator,
-        TransportInterface $mailer,
-        TemplateRendererInterface $mailTemplate,
-        UserServiceOptions $options
+    DocumentManager $mongoManager, TranslatorInterface $translator, TransportInterface $mailer, TemplateRendererInterface $mailTemplate, UserServiceOptions $options
     ) {
         $this->persistantManager = $mongoManager;
         $this->options = $options;
@@ -60,8 +55,7 @@ class RoleService
         $this->rbac = new Rbac();
     }
 
-    public function fetchRoles(SplPriorityQueue $roles): Collection
-    {
+    public function fetchRoles(Collection $roles): Collection {
         $roleList = new ArrayCollection();
         //$roleList = new SplPriorityQueue();
         foreach ($roles as $role) {
@@ -81,8 +75,7 @@ class RoleService
         return $roleList;
     }
 
-    public function fetchRoleNames(SplPriorityQueue $roles)
-    {
+    public function fetchRoleNames(Collection $roles) {
         $roleNames = [];
         $fetchedRoles = $this->fetchRoles($roles);
 
@@ -96,8 +89,7 @@ class RoleService
      *
      * @param Role $role
      */
-    public function add(Role $role)
-    {
+    public function add(Role $role) {
         $ancestorNames = [];
         /**
          * Check if role has parent
@@ -117,6 +109,22 @@ class RoleService
         $this->persistantManager->getSchemaManager()->ensureIndexes();
         $this->persistantManager->persist($role);
         $this->persistantManager->flush($role, ['safe' => true]);
+
+        /**
+         * Populate childrent elements
+         */
+        $parentRole = $role->getParent();
+        $updateParent = $this->persistantManager->createQueryBuilder(get_class($role))
+                ->field('name')
+                ->equals($parentRole->getName())
+                ->findAndUpdate()
+                ->returnNew()
+                ->field('children')
+                ->pushAll([$role->getName()]);
+        $query = $updateParent->getQuery();
+        $updatedUser = $query->execute();
+        
+        return $role;
     }
 
     /**
@@ -125,17 +133,22 @@ class RoleService
      * @param type $permission
      * @param type $assert
      */
-    public function isGranted(SplPriorityQueue $roles, $permission, $assert = null)
-    {
+    public function isGranted(Collection $roles, $permission, $assert = null) {
         $hasPermission = false;
+        $roleList = new SplPriorityQueue();
+        foreach ($roles as $role) {
+            $roleList->insert($role, $role->getPriority());
+        }
+
         /*
          * Fetch all the ancestors role and current role and add it to rbac
          */
-        foreach ($roles as $subrole) {
-            $this->rbac->addRole($subrole);
-            $hasPermission = $this->rbac->isGranted($subrole, $permission, $assert);
+        foreach ($roleList as $role) {
+            $this->rbac->addRole($role);
+            $hasPermission = $this->rbac->isGranted($role, $permission, $assert);
         }
 
         return $hasPermission;
     }
+
 }

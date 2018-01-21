@@ -39,6 +39,7 @@ class AuthorizationMiddleware implements MiddlewareInterface
     {
         $authStringParts = [];
         $jsonApi = $request->getAttribute(JsonApiDispatcherMiddleware::JSON_API_PROC);
+        /** @var User $currentUser */
         $currentUser = $request->getAttribute(AuthValidatorMiddleware::CURRENT_USER, new User());
 
         /**
@@ -46,6 +47,7 @@ class AuthorizationMiddleware implements MiddlewareInterface
          */
         $routeName = $this->router->match($request)->getMatchedRoute()->getName();
         $roles=$currentUser->getRoles();
+        
         if ($this->roleService->isGranted($roles, $routeName)) {
             return $delegate->process($request);
         }

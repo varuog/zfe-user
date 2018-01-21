@@ -11,6 +11,7 @@ namespace ZfeUser\Model;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use \Doctrine\Common\Collections\Collection;
 use Zend\Stdlib\SplPriorityQueue;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * Description of User
@@ -19,8 +20,7 @@ use Zend\Stdlib\SplPriorityQueue;
  * @ODM\Document
  *
  */
-class User
-{
+class User {
 
     /** @ODM\Id(strategy="NONE") */
     private $id;
@@ -58,134 +58,111 @@ class User
     /** @ODM\Collection */
     private $authenticationTokens = [];
     private $socials = [];
-    private $roles=[];
-    
+    private $roles = [];
+
     public function __construct() {
-        $this->roles=new SplPriorityQueue();
+        $this->roles = new ArrayCollection();
     }
 
-    public function getId()
-    {
+    public function getId() {
         return $this->id;
     }
 
-    public function getEmail()
-    {
+    public function getEmail() {
         return $this->email;
     }
 
-    public function getUsername()
-    {
+    public function getUsername() {
         return $this->username;
     }
 
-    public function getFullName()
-    {
+    public function getFullName() {
         return $this->fullName;
     }
 
-    public function getPassword()
-    {
+    public function getPassword() {
         return $this->password;
     }
 
-    public function getResetToken()
-    {
+    public function getResetToken() {
         return $this->resetToken;
     }
 
-    public function getResetTokenTime()
-    {
+    public function getResetTokenTime() {
         return $this->resetTokenTime;
     }
 
-    public function setResetToken($resetToken)
-    {
+    public function setResetToken($resetToken) {
         $this->resetToken = $resetToken;
         return $this;
     }
 
-    public function setResetTokenTime($resetTokenTime)
-    {
+    public function setResetTokenTime($resetTokenTime) {
         $this->resetTokenTime = $resetTokenTime;
         return $this;
     }
 
-    public function setId($id)
-    {
+    public function setId($id) {
         $this->id = $id;
         return $this;
     }
 
-    public function setEmail($email)
-    {
+    public function setEmail($email) {
         $this->email = $email;
         return $this;
     }
 
-    public function setUsername($username)
-    {
+    public function setUsername($username) {
         $this->username = $username;
         return $this;
     }
 
-    public function setFullName($fullName)
-    {
+    public function setFullName($fullName) {
         $this->fullName = $fullName;
         return $this;
     }
 
-    public function setPassword($password)
-    {
+    public function setPassword($password) {
         $this->password = $password;
         return $this;
     }
 
-    public function generateResetToken()
-    {
+    public function generateResetToken() {
         $this->resetToken = hash('sha256', random_int(PHP_INT_MIN, PHP_INT_MAX));
     }
 
-    public function hashPassword()
-    {
+    public function hashPassword() {
         $this->password = password_hash($this->password, PASSWORD_DEFAULT);
     }
 
-    public function getApproveTime()
-    {
+    public function getApproveTime() {
         return $this->approveTime;
     }
 
-    public function getApproved()
-    {
+    public function getApproved() {
         return $this->approved;
     }
 
-    public function getEmailVerified()
-    {
+    public function getEmailVerified() {
         return $this->emailVerified;
     }
 
-    public function setApproveTime(\DateTime $approveTime)
-    {
+    public function setApproveTime(\DateTime $approveTime) {
         $this->approveTime = $approveTime;
         return $this;
     }
 
-    public function setApproved($approved)
-    {
+    public function setApproved($approved) {
         $this->approved = $approved;
         return $this;
     }
 
-    public function setEmailVerified($emailVerified)
-    {
+    public function setEmailVerified($emailVerified) {
         $this->emailVerified = $emailVerified;
         return $this;
     }
 
-    public function getSlug()
-    {
+    public function getSlug() {
         return $this->slug;
     }
 
@@ -195,61 +172,51 @@ class User
      * @param type $slug
      * @return $this
      */
-    public function setSlug($slug)
-    {
+    public function setSlug($slug) {
         $this->slug = $slug;
         return $this;
     }
 
-    public function getRoles(): SplPriorityQueue
-    {
+    public function getRoles(): Collection {
         return $this->roles;
     }
 
-    public function setRoles(SplPriorityQueue $roles)
-    {
+    public function setRoles(Collection $roles) {
         $this->roles = $roles;
         return $this;
     }
 
-    public function genereateJwtToken(User $user)
-    {
+    public function genereateJwtToken(User $user) {
+        
     }
 
-    public function getAuthenticationTokens(): array
-    {
+    public function getAuthenticationTokens(): array {
         return $this->authenticationTokens;
     }
 
-    public function addAuthenticationToken($token)
-    {
+    public function addAuthenticationToken($token) {
         $this->authenticationTokens[] = $token;
     }
 
-    public function getSocials()
-    {
+    public function getSocials() {
         return $this->socials;
     }
 
-    public function setSocials($socials)
-    {
+    public function setSocials($socials) {
         $this->socials = $socials;
         return $this;
     }
 
-    public function getLastAccessToken()
-    {
+    public function getLastAccessToken() {
         return end($this->authenticationTokens);
     }
 
-    public function addRole(Role $role)
-    {
-        $this->roles->insert($role, $role->getPriority());
+    public function addRole(Role $role) {
+        $this->roles->add($role);
         return $this;
     }
 
-    public function addSocial(Social $social)
-    {
+    public function addSocial(Social $social) {
 
         foreach ($this->socials as $socialIndex => $socialProfile) {
             if ($social->getProviderName() == $socialProfile->getProviderName()) {
@@ -258,4 +225,5 @@ class User
         }
         $this->socials[] = $social;
     }
+
 }
